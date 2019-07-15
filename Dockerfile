@@ -3,7 +3,8 @@ MAINTAINER FeroXz "https://feroxz.myds.me"
 
 RUN apt-get update
 RUN apt-get upgrade -y
-
+RUN apt-get install -y openssh-server
+RUN mkdir /var/run/sshd
 RUN apt-get install -y zip unzip apt-utils 
 
 RUN apt-get install apache2 -y
