@@ -37,4 +37,4 @@ VOLUME /etc/apache2
 EXPOSE 22
 EXPOSE 80
 
-CMD    ["/usr/sbin/sshd", "-D"]
+CMD ["/usr/sbin/run-lamp.sh"]
