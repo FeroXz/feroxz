@@ -6,6 +6,9 @@ RUN apt-get update
 RUN apt-get install -y openssh-server
 RUN mkdir /var/run/sshd
 
+RUN apt-get install -y apache2
+
+
 RUN echo 'root:root' |chpasswd
 
 RUN sed -ri 's/^#?PermitRootLogin\s+.*/PermitRootLogin yes/' /etc/ssh/sshd_config
@@ -18,7 +21,5 @@ RUN apt-get clean && \
 
 EXPOSE 22
 EXPOSE 80
-
-RUN apt-get install -y apache2
 
 CMD    ["/usr/sbin/sshd", "-D"]
