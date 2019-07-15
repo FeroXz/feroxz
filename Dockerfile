@@ -2,7 +2,7 @@ FROM       ubuntu:18.04
 MAINTAINER FeroXz "https://feroxz.myds.me"
 
 RUN apt-get install -y zip unzip
-RUN apt-get install apache2 l -y
+RUN apt-get install apache2 -y
 RUN apt-get install git nodejs npm composer nano tree vim curl ftp -y
 RUN npm install -g bower grunt-cli gulp
 
