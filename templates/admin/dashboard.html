@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Adminbereich - Feroxz CMS{% endblock %}
+{% block content %}
+<section class="dashboard">
+  <div class="dashboard-header">
+    <h1>Beiträge verwalten</h1>
+    <a class="btn" href="{{ url_for('admin_create_post') }}">Neuer Beitrag</a>
+  </div>
+
+  {% if posts %}
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Titel</th>
+        <th>Erstellt</th>
+        <th>Aktualisiert</th>
+        <th class="actions">Aktionen</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for post in posts %}
+      <tr>
+        <td>{{ post.title }}</td>
+        <td>{{ post.created_at|replace("T", " ") }}</td>
+        <td>{{ post.updated_at|replace("T", " ") }}</td>
+        <td class="actions">
+          <a class="link" href="{{ url_for('admin_edit_post', post_id=post.id) }}">Bearbeiten</a>
+          <form
+            method="post"
+            action="{{ url_for('admin_delete_post', post_id=post.id) }}"
+            onsubmit="return confirm('Beitrag wirklich löschen?');"
+          >
+            <button type="submit" class="link danger">Löschen</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">
+    <h2>Noch keine Beiträge</h2>
+    <p>Erstelle den ersten Beitrag, um die Seite zu füllen.</p>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}
