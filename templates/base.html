@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Feroxz CMS{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-content">
+        <a class="brand" href="{{ url_for('index') }}">Feroxz CMS</a>
+        <nav>
+          <ul>
+            <li><a href="{{ url_for('index') }}">Start</a></li>
+            {% if session.get('admin_id') %}
+            <li><a href="{{ url_for('admin_dashboard') }}">Admin</a></li>
+            <li><a href="{{ url_for('admin_logout') }}" class="logout">Logout</a></li>
+            {% else %}
+            <li><a href="{{ url_for('admin_login') }}">Login</a></li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      {% with messages = get_flashed_messages(with_categories=True) %}
+      {% if messages %}
+      <div class="flash-wrapper">
+        {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endwith %}
+
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>&copy; {{ current_year or 2024 }} Feroxz CMS. Alle Rechte vorbehalten.</p>
+      </div>
+    </footer>
+  </body>
+</html>
