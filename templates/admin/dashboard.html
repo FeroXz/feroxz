@@ -5,6 +5,10 @@
   <div class="dashboard-header">
     <h1>Beiträge verwalten</h1>
     <div class="dashboard-header-actions">
+      {% if homepage %}
+      <a class="btn ghost" href="{{ url_for('admin_pages_edit', page_id=homepage.id) }}">Startseite bearbeiten</a>
+      {% endif %}
+      <a class="btn ghost" href="{{ url_for('admin_pages') }}">Seiten verwalten</a>
       <a class="btn" href="{{ url_for('admin_create_post') }}">Neuer Beitrag</a>
       <a class="btn ghost" href="{{ url_for('admin_gallery') }}">Galerie verwalten</a>
     </div>

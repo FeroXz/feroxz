@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Seiten verwalten - Feroxz CMS{% endblock %}
+{% block content %}
+<section class="dashboard">
+  <div class="dashboard-header">
+    <h1>Seiten verwalten</h1>
+    <div class="dashboard-header-actions">
+      <a class="btn" href="{{ url_for('admin_pages_new') }}">Neue Seite</a>
+      <a class="btn ghost" href="{{ url_for('admin_dashboard') }}">Zurück</a>
+    </div>
+  </div>
+
+  {% if pages %}
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Titel</th>
+        <th>Slug</th>
+        <th>Status</th>
+        <th class="actions">Aktionen</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for page in pages %}
+      <tr>
+        <td>{{ page.title }}</td>
+        <td>{{ page.slug }}</td>
+        <td>
+          {% if page.is_homepage %}
+          <span class="badge">Startseite</span>
+          {% else %}
+          <span class="badge ghost">Veröffentlicht</span>
+          {% endif %}
+        </td>
+        <td class="actions">
+          <a class="link" href="{{ url_for('admin_pages_edit', page_id=page.id) }}">Bearbeiten</a>
+          {% if not page.is_homepage %}
+          <form
+            method="post"
+            action="{{ url_for('admin_pages_delete', page_id=page.id) }}"
+            onsubmit="return confirm('Seite wirklich löschen?');"
+          >
+            <button type="submit" class="link danger">Löschen</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">
+    <h2>Noch keine Seiten vorhanden</h2>
+    <p>Lege deine erste Inhaltsseite an, um die Navigation zu befüllen.</p>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

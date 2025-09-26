@@ -162,6 +162,19 @@ main.container {
   z-index: 1;
 }
 
+.hero-content {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  line-height: 1.65;
+  max-width: 520px;
+  display: grid;
+  gap: 1rem;
+}
+
+.hero-content p {
+  margin: 0;
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -295,6 +308,11 @@ main.container {
   text-transform: uppercase;
 }
 
+.badge.ghost {
+  background: rgba(217, 115, 31, 0.12);
+  color: var(--text-muted);
+}
+
 .auth-card,
 .editor,
 .dashboard {
@@ -309,6 +327,26 @@ main.container {
   display: grid;
   gap: 1rem;
   margin-top: 1.5rem;
+}
+
+.checkbox-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.checkbox-field input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}
+
+.form-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
 }
 
 input,
@@ -417,6 +455,43 @@ textarea:focus {
   display: grid;
   gap: 1.5rem;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.page-view {
+  background: var(--card-bg);
+  padding: 2.5rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(61, 139, 116, 0.18);
+  display: grid;
+  gap: 1.5rem;
+}
+
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.page-header h1 {
+  font-family: "Kanit", system-ui, sans-serif;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  margin: 0;
+}
+
+.page-content-body {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.page-content-body img {
+  max-width: 100%;
+  border-radius: calc(var(--radius) / 1.5);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
 }
 
 .gallery-item {

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% if page %}
+  {% set page_title = "Seite bearbeiten" %}
+{% else %}
+  {% set page_title = "Neue Seite erstellen" %}
+{% endif %}
+{% block title %}{{ page_title }} - Feroxz CMS{% endblock %}
+{% block content %}
+<section class="editor">
+  <div class="editor-header">
+    <h1>{{ page_title }}</h1>
+    <a class="link" href="{{ url_for('admin_pages') }}">Zurück</a>
+  </div>
+  <form method="post" class="form">
+    <label for="title">Titel</label>
+    <input
+      type="text"
+      id="title"
+      name="title"
+      value="{{ page.title if page else '' }}"
+      required
+    />
+
+    <label for="slug">Adresse (Slug)</label>
+    <input
+      type="text"
+      id="slug"
+      name="slug"
+      value="{{ page.slug if page else '' }}"
+      placeholder="z. B. terrarium-tipps"
+    />
+    <p class="form-hint">Lass das Feld frei, um automatisch eine Adresse aus dem Titel zu erzeugen.</p>
+
+    <label for="content">Inhalt</label>
+    <textarea id="content" name="content" rows="12" required>{{ (page.content if page else '') | safe }}</textarea>
+
+    <label class="checkbox-field">
+      <input type="checkbox" name="is_homepage" {% if page and page.is_homepage %}checked{% endif %} />
+      <span>Als Startseite verwenden</span>
+    </label>
+    {% if page and page.is_homepage %}
+    <p class="form-hint">Lege zuerst eine andere Seite als Startseite fest, bevor du diese Option deaktivierst.</p>
+    {% endif %}
+
+    <button class="btn" type="submit">Speichern</button>
+  </form>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+  <script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.3/tinymce.min.js" referrerpolicy="origin"></script>
+  <script>
+    tinymce.init({
+      selector: "#content",
+      height: 460,
+      menubar: false,
+      plugins: "link lists image table media code autoresize",
+      toolbar:
+        "undo redo | styles | bold italic underline | alignleft aligncenter alignright | bullist numlist outdent indent | link image media table | removeformat code",
+      skin: "oxide-dark",
+      content_css: "dark",
+      image_advtab: true,
+      automatic_uploads: true,
+      images_upload_url: "{{ url_for('admin_upload_post_image') }}",
+      images_upload_credentials: true,
+      convert_urls: false,
+      branding: false,
+      content_style:
+        "body { font-family: 'Inter', sans-serif; color: #1d1b16; line-height: 1.65; } a { color: #d9731f; }",
+    });
+  </script>
+{% endblock %}

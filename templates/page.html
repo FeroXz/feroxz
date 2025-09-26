@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}{{ page.title }} - Feroxz CMS{% endblock %}
+{% block content %}
+<section class="page-view">
+  <header class="page-header">
+    <h1>{{ page.title }}</h1>
+    {% if page.updated_at %}
+    <span class="timestamp">Aktualisiert: {{ page.updated_at|replace("T", " ") }}</span>
+    {% endif %}
+  </header>
+  <div class="page-content-body">{{ page.content | safe }}</div>
+</section>
+{% endblock %}

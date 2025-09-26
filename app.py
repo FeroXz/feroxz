@@ -1,18 +1,21 @@
 import os
+import re
 import sqlite3
+import unicodedata
 from datetime import datetime
 from functools import wraps
 
 from flask import (
     Flask,
+    abort,
+    flash,
     g,
+    jsonify,
     redirect,
     render_template,
     request,
     session,
     url_for,
-    flash,
-    jsonify,
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
@@ -37,7 +40,17 @@ os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
 @app.context_processor
 def inject_globals():
-    return {"current_year": datetime.utcnow().year}
+    nav_pages = []
+    try:
+        db = get_db()
+        nav_pages = db.execute(
+            "SELECT title, slug FROM pages WHERE is_homepage = 0 ORDER BY title"
+        ).fetchall()
+    except sqlite3.OperationalError:
+        # Tabelle existiert noch nicht beim ersten Start.
+        nav_pages = []
+
+    return {"current_year": datetime.utcnow().year, "nav_pages": nav_pages}
 
 
 def get_db():
@@ -81,6 +94,19 @@ def init_db():
     )
     db.execute(
         """
+        CREATE TABLE IF NOT EXISTS pages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            slug TEXT UNIQUE NOT NULL,
+            content TEXT NOT NULL,
+            is_homepage INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        )
+        """
+    )
+    db.execute(
+        """
         CREATE TABLE IF NOT EXISTS admins (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE NOT NULL,
@@ -97,6 +123,24 @@ def init_db():
             (
                 DEFAULT_ADMIN["username"],
                 generate_password_hash(DEFAULT_ADMIN["password"]),
+            ),
+        )
+        db.commit()
+
+    cur = db.execute("SELECT id FROM pages WHERE is_homepage = 1 LIMIT 1")
+    if cur.fetchone() is None:
+        now = datetime.utcnow().isoformat()
+        db.execute(
+            """
+            INSERT INTO pages (title, slug, content, is_homepage, created_at, updated_at)
+            VALUES (?, ?, ?, 1, ?, ?)
+            """,
+            (
+                "Startseite",
+                "startseite",
+                "<p>Willkommen in deinem Reptilien-CMS. Passe diesen Text im Adminbereich an, um deine eigene Startseite zu gestalten.</p>",
+                now,
+                now,
             ),
         )
         db.commit()
@@ -118,15 +162,27 @@ def login_required(view):
     return wrapped_view
 
 
+def slugify(value: str) -> str:
+    value = unicodedata.normalize("NFKD", value or "")
+    value = value.encode("ascii", "ignore").decode("ascii")
+    value = re.sub(r"[^a-zA-Z0-9\s-]", "", value)
+    value = re.sub(r"[\s_-]+", "-", value).strip("-").lower()
+    return value
+
+
 @app.route("/")
 def index():
-    posts = get_db().execute(
+    db = get_db()
+    page = db.execute(
+        "SELECT id, title, content, updated_at FROM pages WHERE is_homepage = 1 LIMIT 1"
+    ).fetchone()
+    posts = db.execute(
         "SELECT id, title, content, created_at, updated_at FROM posts ORDER BY created_at DESC"
     ).fetchall()
-    gallery = get_db().execute(
+    gallery = db.execute(
         "SELECT id, title, description, image_path FROM gallery_images ORDER BY created_at DESC"
     ).fetchall()
-    return render_template("index.html", posts=posts, gallery=gallery)
+    return render_template("index.html", page=page, posts=posts, gallery=gallery)
 
 
 @app.route("/admin/login", methods=["GET", "POST"])
@@ -164,7 +220,10 @@ def admin_dashboard():
     posts = get_db().execute(
         "SELECT id, title, created_at, updated_at FROM posts ORDER BY created_at DESC"
     ).fetchall()
-    return render_template("admin/dashboard.html", posts=posts)
+    page = get_db().execute(
+        "SELECT id, title, updated_at FROM pages WHERE is_homepage = 1 LIMIT 1"
+    ).fetchone()
+    return render_template("admin/dashboard.html", posts=posts, homepage=page)
 
 
 @app.route("/admin/post/new", methods=["GET", "POST"])
@@ -363,6 +422,171 @@ def admin_gallery_delete(image_id):
         flash("Bild wurde nicht gefunden.", "warning")
 
     return redirect(url_for("admin_gallery"))
+
+
+@app.route("/admin/pages")
+@login_required
+def admin_pages():
+    pages = get_db().execute(
+        """
+        SELECT id, title, slug, is_homepage, updated_at
+        FROM pages
+        ORDER BY is_homepage DESC, title
+        """
+    ).fetchall()
+    return render_template("admin/pages.html", pages=pages)
+
+
+def validate_slug(slug: str, page_id=None):
+    if not slug:
+        return False, "Bitte gib eine Adresse für die Seite an oder lasse sie automatisch erzeugen."
+    if slug in {"admin", "static", "uploads"}:
+        return False, "Dieser Slug ist reserviert."
+
+    db = get_db()
+    params = (slug,) if page_id is None else (slug, page_id)
+    query = (
+        "SELECT id FROM pages WHERE slug = ?"
+        if page_id is None
+        else "SELECT id FROM pages WHERE slug = ? AND id != ?"
+    )
+    existing = db.execute(query, params).fetchone()
+    if existing:
+        return False, "Es existiert bereits eine Seite mit dieser Adresse."
+    return True, ""
+
+
+@app.route("/admin/pages/new", methods=["GET", "POST"])
+@login_required
+def admin_pages_new():
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        slug_input = request.form.get("slug", "").strip()
+        content = request.form.get("content", "").strip()
+        is_homepage = request.form.get("is_homepage") == "on"
+
+        if not title or not content:
+            flash("Titel und Inhalt dürfen nicht leer sein.", "warning")
+        else:
+            slug = slugify(slug_input or title)
+            valid, message = validate_slug(slug)
+            if not valid:
+                flash(message, "danger")
+            else:
+                now = datetime.utcnow().isoformat()
+                db = get_db()
+                if is_homepage:
+                    db.execute("UPDATE pages SET is_homepage = 0 WHERE is_homepage = 1")
+                db.execute(
+                    """
+                    INSERT INTO pages (title, slug, content, is_homepage, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    """,
+                    (title, slug, content, 1 if is_homepage else 0, now, now),
+                )
+                db.commit()
+                flash("Seite wurde erstellt.", "success")
+                return redirect(url_for("admin_pages"))
+
+    return render_template("admin/edit_page.html", page=None)
+
+
+@app.route("/admin/pages/<int:page_id>/edit", methods=["GET", "POST"])
+@login_required
+def admin_pages_edit(page_id):
+    db = get_db()
+    page = db.execute(
+        "SELECT id, title, slug, content, is_homepage FROM pages WHERE id = ?",
+        (page_id,),
+    ).fetchone()
+
+    if page is None:
+        flash("Seite wurde nicht gefunden.", "danger")
+        return redirect(url_for("admin_pages"))
+
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        slug_input = request.form.get("slug", "").strip()
+        content = request.form.get("content", "").strip()
+        is_homepage_requested = request.form.get("is_homepage") == "on"
+
+        if not title or not content:
+            flash("Titel und Inhalt dürfen nicht leer sein.", "warning")
+        else:
+            slug = slugify(slug_input or title)
+            valid, message = validate_slug(slug, page_id=page_id)
+            if not valid:
+                flash(message, "danger")
+            elif page["is_homepage"] and not is_homepage_requested:
+                flash(
+                    "Lege zuerst eine andere Seite als Startseite fest, bevor du diese entfernst.",
+                    "warning",
+                )
+            else:
+                if is_homepage_requested and not page["is_homepage"]:
+                    db.execute("UPDATE pages SET is_homepage = 0 WHERE is_homepage = 1")
+
+                db.execute(
+                    """
+                    UPDATE pages
+                    SET title = ?, slug = ?, content = ?, is_homepage = ?, updated_at = ?
+                    WHERE id = ?
+                    """,
+                    (
+                        title,
+                        slug,
+                        content,
+                        1 if is_homepage_requested or page["is_homepage"] else 0,
+                        datetime.utcnow().isoformat(),
+                        page_id,
+                    ),
+                )
+                db.commit()
+                flash("Seite wurde aktualisiert.", "success")
+                return redirect(url_for("admin_pages"))
+
+    return render_template("admin/edit_page.html", page=page)
+
+
+@app.route("/admin/pages/<int:page_id>/delete", methods=["POST"])
+@login_required
+def admin_pages_delete(page_id):
+    db = get_db()
+    page = db.execute(
+        "SELECT id, title, is_homepage FROM pages WHERE id = ?",
+        (page_id,),
+    ).fetchone()
+
+    if page is None:
+        flash("Seite wurde nicht gefunden.", "danger")
+    elif page["is_homepage"]:
+        flash("Die Startseite kann nicht gelöscht werden.", "warning")
+    else:
+        db.execute("DELETE FROM pages WHERE id = ?", (page_id,))
+        db.commit()
+        flash("Seite wurde gelöscht.", "info")
+
+    return redirect(url_for("admin_pages"))
+
+
+@app.route("/<slug>")
+def page_detail(slug):
+    if slug in {"admin", "static"}:
+        abort(404)
+
+    page = get_db().execute(
+        """
+        SELECT id, title, content, updated_at
+        FROM pages
+        WHERE slug = ? AND is_homepage = 0
+        """,
+        (slug,),
+    ).fetchone()
+
+    if page is None:
+        abort(404)
+
+    return render_template("page.html", page=page)
 
 
 if __name__ == "__main__":

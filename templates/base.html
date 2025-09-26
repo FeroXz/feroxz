@@ -20,8 +20,12 @@
           <ul>
             <li><a href="{{ url_for('index') }}">Start</a></li>
             <li><a href="{{ url_for('index') }}#galerie">Galerie</a></li>
+            {% for item in nav_pages %}
+            <li><a href="{{ url_for('page_detail', slug=item.slug) }}">{{ item.title }}</a></li>
+            {% endfor %}
             {% if session.get('admin_id') %}
             <li><a href="{{ url_for('admin_dashboard') }}">Admin</a></li>
+            <li><a href="{{ url_for('admin_pages') }}">Seiten</a></li>
             <li><a href="{{ url_for('admin_gallery') }}">Galerie verwalten</a></li>
             <li><a href="{{ url_for('admin_logout') }}" class="logout">Logout</a></li>
             {% else %}
