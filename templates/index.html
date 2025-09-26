@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Startseite - Feroxz CMS{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-text">
+    <h1>Willkommen beim Feroxz CMS</h1>
+    <p>
+      Verwalte Inhalte in Sekundenschnelle mit einem einfachen, modernen und
+      mobilen Backend.
+    </p>
+    <a class="btn" href="{{ url_for('admin_login') }}">Zum Adminbereich</a>
+  </div>
+</section>
+<section class="posts-grid">
+  {% if posts %}
+  {% for post in posts %}
+  <article class="card">
+    <div class="card-header">
+      <h2>{{ post.title }}</h2>
+      <span class="timestamp">Aktualisiert: {{ post.updated_at|replace("T", " ") }}</span>
+    </div>
+    <div class="post-content">{{ post.content | safe }}</div>
+  </article>
+  {% endfor %}
+  {% else %}
+  <div class="empty-state">
+    <h2>Noch keine Beiträge vorhanden</h2>
+    <p>Logge dich ein, um den ersten Beitrag zu erstellen.</p>
+  </div>
+  {% endif %}
+</section>
+{% if gallery %}
+<section class="gallery" id="galerie">
+  <div class="gallery-header">
+    <h2>Galerie</h2>
+    <p>Eine Auswahl der neuesten Uploads.</p>
+  </div>
+  <div class="gallery-grid">
+    {% for image in gallery %}
+    <figure class="gallery-item">
+      <img
+        src="{{ url_for('static', filename=image.image_path) }}"
+        alt="{{ image.title or 'Galeriebild' }}"
+        loading="lazy"
+      />
+      {% if image.title or image.description %}
+      <figcaption>
+        {% if image.title %}<h3>{{ image.title }}</h3>{% endif %}
+        {% if image.description %}<p>{{ image.description }}</p>{% endif %}
+      </figcaption>
+      {% endif %}
+    </figure>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

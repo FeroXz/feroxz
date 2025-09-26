@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Galerie verwalten - Feroxz CMS{% endblock %}
+{% block content %}
+<section class="dashboard">
+  <div class="dashboard-header">
+    <h1>Galerie verwalten</h1>
+    <a class="btn" href="{{ url_for('admin_gallery_new') }}">Neues Bild</a>
+  </div>
+
+  {% if images %}
+  <div class="gallery-admin-grid">
+    {% for image in images %}
+    <article class="gallery-admin-card">
+      <img
+        src="{{ url_for('static', filename=image.image_path) }}"
+        alt="{{ image.title or 'Galeriebild' }}"
+        loading="lazy"
+      />
+      <div class="gallery-admin-body">
+        <h2>{{ image.title or 'Ohne Titel' }}</h2>
+        {% if image.description %}
+        <p>{{ image.description }}</p>
+        {% endif %}
+        <div class="card-actions">
+          <a class="link" href="{{ url_for('admin_gallery_edit', image_id=image.id) }}">Bearbeiten</a>
+          <form
+            method="post"
+            action="{{ url_for('admin_gallery_delete', image_id=image.id) }}"
+            onsubmit="return confirm('Bild wirklich löschen?');"
+          >
+            <button type="submit" class="link danger">Löschen</button>
+          </form>
+        </div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <h2>Noch keine Bilder</h2>
+    <p>Lade Bilder hoch, um sie in der Galerie anzuzeigen.</p>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}
