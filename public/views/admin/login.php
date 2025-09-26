@@ -1,6 +1,3 @@
-{% extends "base.html" %}
-{% block title %}Login - Feroxz CMS{% endblock %}
-{% block content %}
 <section class="auth-card">
   <h1>Anmeldung</h1>
   <form method="post" class="form">
@@ -17,4 +14,3 @@
     Umgebungsvariablen)
   </p>
 </section>
-{% endblock %}
