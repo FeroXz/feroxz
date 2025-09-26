@@ -3,10 +3,16 @@
 {% block content %}
 <section class="hero">
   <div class="hero-text">
-    <h1>Willkommen beim Feroxz CMS</h1>
+    <span class="badge">Pogona · Heloderma · Hakennasenottern</span>
+    <h1>Skalige Geschichten modern verwalten</h1>
     <p>
-      Verwalte Inhalte in Sekundenschnelle mit einem einfachen, modernen und
-      mobilen Backend.
+      Ein schnelles, terraristikfreundliches CMS, das Beiträge, Fotos und
+      Galerien ohne komplizierte Schlüssel handhabbar macht.
+    </p>
+    <p>
+      Perfekt, um Beobachtungen deiner Pogona vitticeps festzuhalten, Heloderma
+      farbenfroh in Szene zu setzen und Hakennasenottern in Bild und Text zu
+      präsentieren.
     </p>
     <a class="btn" href="{{ url_for('admin_login') }}">Zum Adminbereich</a>
   </div>
@@ -33,7 +39,7 @@
 <section class="gallery" id="galerie">
   <div class="gallery-header">
     <h2>Galerie</h2>
-    <p>Eine Auswahl der neuesten Uploads.</p>
+    <p>Eine Auswahl der neuesten reptilen Momente aus dem Terrarium.</p>
   </div>
   <div class="gallery-grid">
     {% for image in gallery %}
