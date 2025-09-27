@@ -709,8 +709,10 @@ function createAdmin(PDO $pdo, string $username, string $password): void
 function checkRequirements(string $databaseFile, string $uploadDir): array
 {
     $phpRequirement = [
-        'label' => 'PHP-Version ≥ 7.4',
-        'met' => version_compare(PHP_VERSION, '7.4.0', '>='),
+
+        'label' => 'PHP-Version ≥ 8.3',
+        'met' => version_compare(PHP_VERSION, '8.3.0', '>='),
+
         'current' => PHP_VERSION,
     ];
 
