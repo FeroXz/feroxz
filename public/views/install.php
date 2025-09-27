@@ -5,25 +5,13 @@
     Administratorzugangs und prüft, ob dein Webspace alle Voraussetzungen erfüllt.
   </p>
 
-  <?php $phpRequirement = $requirements['php'] ?? ['met' => false, 'label' => 'PHP-Version', 'current' => PHP_VERSION]; ?>
+
   <?php $extensions = $requirements['extensions'] ?? []; ?>
   <?php $paths = $requirements['paths'] ?? []; ?>
 
   <h2>Systemvoraussetzungen</h2>
   <div class="requirement-group">
-    <h3>PHP</h3>
-    <ul class="requirement-list">
-      <li class="requirement-item <?= !empty($phpRequirement['met']) ? 'ok' : 'error' ?>">
-        <strong><?= htmlspecialchars($phpRequirement['label'], ENT_QUOTES, 'UTF-8') ?></strong>
-        <span>
-          <?= !empty($phpRequirement['met']) ? 'erfüllt' : 'nicht erfüllt' ?>
-          (aktuell: <?= htmlspecialchars((string) ($phpRequirement['current'] ?? PHP_VERSION), ENT_QUOTES, 'UTF-8') ?>)
-        </span>
-      </li>
-    </ul>
-  </div>
 
-  <div class="requirement-group">
     <h3>PHP-Erweiterungen</h3>
     <ul class="requirement-list">
       <?php foreach ($extensions as $key => $extension): ?>

@@ -16,7 +16,6 @@ Ein leichtgewichtiges Content-Management-System auf PHP-Basis mit moderner Optik
 
 
 - PHP 8.3 oder höher (getestet mit PHP 8.3 und PHP 8.4)
-
 - Aktivierte Erweiterungen: `pdo_sqlite`, `sqlite3`, `fileinfo` (für Dateiuploads empfehlenswert)
 - Schreibrechte für den Ordner `static/uploads/`
 
