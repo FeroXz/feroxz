@@ -1,11 +1,3 @@
-node_modules/
-dist/
-*.log
-.DS_Store
-.cache/
-.vite/
-.env.local
-
-# Browser storage exports
-*.localstorage.json
-*.sessionstorage.json
+cms.db
+static/uploads/*
+!static/uploads/.gitignore
