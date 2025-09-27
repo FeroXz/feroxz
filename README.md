@@ -1,36 +1,63 @@
 # Feroxz Mini CMS
 
-Ein leichtgewichtiges Content-Management-System mit Flask, moderner Optik und einfachem Adminbereich.
+Ein leichtgewichtiges Content-Management-System auf PHP-Basis mit moderner Optik, Adminbereich und Unterstützung für Beiträge, Seiten und Mediengalerie.
 
 ## Features
 
-- Öffentliche Startseite mit Kartenlayout für Beiträge
-- Admin-Login mit Session-Verwaltung
-- Beiträge erstellen, bearbeiten und löschen
-- Moderne Glas-Effekt-Oberfläche optimiert für Desktop und Mobile
-- SQLite-Datenbank wird automatisch initialisiert
+- Öffentliche Startseite mit Kartenlayout für Blog-Beiträge
+- Individuelle Inhaltsseiten über frei wählbare Slugs
+- Galerie inkl. Datei-Uploads (z. B. Bilder) über das Backend
+- Passwortgeschützter Adminbereich mit Session-Verwaltung
+- SQLite-Datenbank wird automatisch initialisiert und benötigt keinen separaten Server
+- Genetik-Datenbank für *Pogona vitticeps* und *Heterodon nasicus* inkl. Rechner für mögliche Nachzuchten
 
-## Schnellstart
+## Anforderungen
+
+- PHP 7.4 oder höher (empfohlen: PHP 8.1)
+- Aktivierte Erweiterungen: `pdo_sqlite`, `sqlite3`, `fileinfo` (für Dateiuploads empfehlenswert)
+- Schreibrechte für den Ordner `static/uploads/`
+
+## Installation & Deployment auf Shared Hosting
+
+1. **Dateien hochladen**  
+   Übertrage per FTP/SFTP die Verzeichnisse `public/`, `static/` sowie die Projektwurzel (inkl. `cms.db`, falls bereits vorhanden) in dein Webverzeichnis. Die Datenbankdatei wird beim ersten Aufruf automatisch angelegt.
+2. **Dokument-Root setzen**  
+   Konfiguriere dein Hosting so, dass `public/` als Document Root dient. Nur so greifen die Routen und statischen Assets korrekt.
+3. **Schreibrechte anpassen**  
+   Stelle sicher, dass der Webserver in `static/uploads/` schreiben darf (`chmod 775 static/uploads` bzw. über das Hosting-Panel). Der Ordner wird automatisch erstellt, falls er fehlt.
+4. **Optionale Zugangsdaten setzen**  
+   Die Standard-Zugangsdaten lauten `admin` / `changeme`. Auf vielen Hostings kannst du in der `.htaccess` oder im Control Panel Umgebungsvariablen setzen:
+   ```apacheconf
+   SetEnv CMS_ADMIN_USERNAME deinname
+   SetEnv CMS_ADMIN_PASSWORD geheim
+   ```
+   Ohne Anpassung wird automatisch ein Administrator mit den Standardwerten angelegt.
+5. **Website aufrufen**  
+   Besuche deine Domain – die Startseite zeigt öffentliche Inhalte, `/admin` führt in den Login-Bereich.
+
+## Lokale Entwicklung
+
+Für lokale Tests kannst du den integrierten PHP-Server verwenden:
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-flask --app app run --debug
+php -S localhost:8000 -t public
 ```
 
-Standard-Login-Daten kannst du per Umgebungsvariablen anpassen:
+Die Anwendung erstellt beim ersten Aufruf `cms.db` in der Projektwurzel. Hochgeladene Dateien landen unter `static/uploads/`.
 
-```bash
-export CMS_ADMIN_USERNAME="deinname"
-export CMS_ADMIN_PASSWORD="geheim"
-export CMS_SECRET="zufallsstring"
-```
+## Genetik-Datenbank & Rechner
 
-## Tests
+- Im Adminbereich findest du unter „Genetik“ die hinterlegten Arten und kannst neue Gene hinzufügen oder bestehende bearbeiten.
+- Der öffentliche Bereich `/genetics` listet alle Arten, bietet Detailseiten zu den Genen und einen Rechner pro Art (z. B. `/genetics/pogona-vitticeps/calculator`).
+- Der Rechner unterstützt rezessive und (un-)vollständig dominante Vererbung, ermittelt die Wahrscheinlichkeiten pro Gen und fasst alle Kombinationen übersichtlich zusammen.
 
-Zur einfachen Prüfung kann der Code kompiliert werden:
+## Backup & Wartung
 
-```bash
-python -m compileall app.py
-```
+- Sichere regelmäßig `cms.db` sowie den Ordner `static/uploads/`.
+- Administrator-Passwörter lassen sich jederzeit über neue Umgebungsvariablen oder direkt in der Datenbank ändern (`admins`-Tabelle).
+
+## Troubleshooting
+
+- **500-Fehler direkt nach Upload:** Prüfe, ob die PHP-Version ausreichend hoch ist und die benötigten Erweiterungen aktiv sind.
+- **Upload funktioniert nicht:** Stelle sicher, dass `static/uploads/` für den Webserver beschreibbar ist.
+- **Login nicht möglich:** Lösche ggf. `cms.db`, um die Standard-Zugangsdaten neu anlegen zu lassen (Achtung: Inhalte gehen dabei verloren).
