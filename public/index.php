@@ -708,6 +708,7 @@ function createAdmin(PDO $pdo, string $username, string $password): void
 
 function checkRequirements(string $databaseFile, string $uploadDir): array
 {
+
     $extensions = [
         'pdo' => [
             'label' => 'PDO',
@@ -752,6 +753,7 @@ function checkRequirements(string $databaseFile, string $uploadDir): array
     ];
 
     return [
+
         'extensions' => $extensions,
         'paths' => $paths,
     ];
@@ -774,6 +776,7 @@ function requirementsExtensionsAvailable(array $requirements): bool
 
 function requirementsAreMet(array $requirements): bool
 {
+
     if (!requirementsExtensionsAvailable($requirements)) {
         return false;
     }
