@@ -34,18 +34,89 @@ if (!is_writable($uploadDir)) {
     @chmod($uploadDir, 0775);
 }
 
-$pdo = new PDO('sqlite:' . $databaseFile);
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-$pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-
-initializeDatabase($pdo);
-
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
 $path = '/' . trim($path, '/');
 if ($path !== '/' && str_ends_with($path, '/')) {
     $path = rtrim($path, '/');
 }
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+
+$requirements = checkRequirements($databaseFile, $uploadDir);
+$pdo = null;
+$databaseError = null;
+
+if (requirementsExtensionsAvailable($requirements)) {
+    try {
+        $pdo = new PDO('sqlite:' . $databaseFile);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    } catch (PDOException $exception) {
+        $databaseError = $exception->getMessage();
+    }
+}
+
+if ($pdo) {
+    initializeDatabase($pdo);
+}
+
+$isInstalled = $pdo ? cmsHasAdmin($pdo) : false;
+
+if ($path === '/install') {
+    if ($isInstalled) {
+        flash('Das CMS wurde bereits eingerichtet. Bitte melde dich an.', 'info');
+        redirect('/admin/login');
+    }
+
+    $canInstall = $pdo !== null && requirementsAreMet($requirements) && $databaseError === null;
+    $formData = [
+        'username' => trim($_POST['username'] ?? ''),
+    ];
+
+    if ($method === 'POST') {
+        if (!$canInstall) {
+            flash('Bitte erfülle zuerst alle Systemvoraussetzungen.', 'danger');
+        } else {
+            $username = trim($_POST['username'] ?? '');
+            $password = $_POST['password'] ?? '';
+            $confirmation = $_POST['password_confirmation'] ?? '';
+
+            if ($username === '' || $password === '') {
+                flash('Benutzername und Passwort dürfen nicht leer sein.', 'warning');
+            } elseif (strlen($password) < 8) {
+                flash('Das Passwort muss mindestens 8 Zeichen lang sein.', 'warning');
+            } elseif ($password !== $confirmation) {
+                flash('Die Passwortbestätigung stimmt nicht überein.', 'warning');
+            } else {
+                try {
+                    createAdmin($pdo, $username, $password);
+                    flash('Installation abgeschlossen. Du kannst dich jetzt anmelden.', 'success');
+                    redirect('/admin/login');
+                } catch (PDOException $exception) {
+                    flash('Benutzername ist bereits vergeben.', 'danger');
+                }
+            }
+        }
+    }
+
+    render('install', [
+        'pageTitle' => 'Feroxz CMS installieren',
+        'requirements' => $requirements,
+        'canInstall' => $canInstall,
+        'databaseError' => $databaseError,
+        'formData' => $formData,
+    ]);
+    exit;
+}
+
+if (!$isInstalled) {
+    redirect('/install');
+}
+
+if (!$pdo) {
+    http_response_code(500);
+    echo 'Die Datenbankverbindung konnte nicht hergestellt werden.';
+    exit;
+}
 
 if ($path === '/') {
     $posts = fetchAll($pdo, 'SELECT id, title, content, created_at, updated_at FROM posts ORDER BY created_at DESC');
@@ -620,6 +691,117 @@ function requireAdmin(): void
     }
 }
 
+function cmsHasAdmin(PDO $pdo): bool
+{
+    $stmt = $pdo->query('SELECT COUNT(*) FROM admins');
+    return (int) $stmt->fetchColumn() > 0;
+}
+
+function createAdmin(PDO $pdo, string $username, string $password): void
+{
+    $stmt = $pdo->prepare('INSERT INTO admins (username, password_hash) VALUES (:username, :password_hash)');
+    $stmt->execute([
+        'username' => $username,
+        'password_hash' => password_hash($password, PASSWORD_DEFAULT),
+    ]);
+}
+
+function checkRequirements(string $databaseFile, string $uploadDir): array
+{
+    $phpRequirement = [
+        'label' => 'PHP-Version ≥ 7.4',
+        'met' => version_compare(PHP_VERSION, '7.4.0', '>='),
+        'current' => PHP_VERSION,
+    ];
+
+    $extensions = [
+        'pdo' => [
+            'label' => 'PDO',
+            'required' => true,
+            'met' => extension_loaded('pdo'),
+        ],
+        'pdo_sqlite' => [
+            'label' => 'PDO_SQLite',
+            'required' => true,
+            'met' => extension_loaded('pdo_sqlite'),
+        ],
+        'sqlite3' => [
+            'label' => 'SQLite3',
+            'required' => true,
+            'met' => extension_loaded('sqlite3'),
+        ],
+        'fileinfo' => [
+            'label' => 'Fileinfo (für Uploads empfohlen)',
+            'required' => false,
+            'met' => extension_loaded('fileinfo'),
+        ],
+    ];
+
+    $databaseExists = file_exists($databaseFile);
+    $databaseTarget = $databaseExists ? $databaseFile : dirname($databaseFile);
+
+    $paths = [
+        'database' => [
+            'label' => $databaseExists ? 'Datenbankdatei beschreibbar' : 'Datenbankverzeichnis beschreibbar',
+            'path' => $databaseTarget,
+            'required' => true,
+            'met' => is_writable($databaseTarget),
+            'exists' => $databaseExists,
+        ],
+        'uploads' => [
+            'label' => 'Upload-Verzeichnis beschreibbar',
+            'path' => $uploadDir,
+            'required' => true,
+            'met' => is_dir($uploadDir) && is_writable($uploadDir),
+            'exists' => is_dir($uploadDir),
+        ],
+    ];
+
+    return [
+        'php' => $phpRequirement,
+        'extensions' => $extensions,
+        'paths' => $paths,
+    ];
+}
+
+function requirementsExtensionsAvailable(array $requirements): bool
+{
+    if (!isset($requirements['extensions']) || !is_array($requirements['extensions'])) {
+        return false;
+    }
+
+    foreach ($requirements['extensions'] as $extension) {
+        if (!empty($extension['required']) && empty($extension['met'])) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function requirementsAreMet(array $requirements): bool
+{
+    if (empty($requirements['php']['met'])) {
+        return false;
+    }
+
+    if (!requirementsExtensionsAvailable($requirements)) {
+        return false;
+    }
+
+    if (empty($requirements['paths']) || !is_array($requirements['paths'])) {
+        return false;
+    }
+
+    foreach ($requirements['paths'] as $path) {
+        if (!empty($path['required']) && empty($path['met'])) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 function currentTimestamp(): string
 {
     return date('Y-m-d H:i:s');
@@ -870,20 +1052,6 @@ function initializeDatabase(PDO $pdo): void
         username TEXT NOT NULL UNIQUE,
         password_hash TEXT NOT NULL
     )');
-
-    $defaultUsername = getenv('CMS_ADMIN_USERNAME') ?: 'admin';
-    $defaultPassword = getenv('CMS_ADMIN_PASSWORD') ?: 'changeme';
-
-    $stmt = $pdo->prepare('SELECT id FROM admins WHERE username = :username');
-    $stmt->execute(['username' => $defaultUsername]);
-    if (!$stmt->fetch()) {
-        $hash = password_hash($defaultPassword, PASSWORD_DEFAULT);
-        $insert = $pdo->prepare('INSERT INTO admins (username, password_hash) VALUES (:username, :password_hash)');
-        $insert->execute([
-            'username' => $defaultUsername,
-            'password_hash' => $hash,
-        ]);
-    }
 
     $speciesSeeds = [
         [
