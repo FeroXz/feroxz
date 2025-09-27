@@ -1,9 +1,3 @@
-storage/*.sqlite
-storage/*.db
-uploads/*
-!uploads/.gitignore
-.DS_Store
-.env
-.idea/
-.vscode/
-node_modules/
+cms.db
+static/uploads/*
+!static/uploads/.gitignore

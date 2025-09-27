@@ -1,84 +1,148 @@
-<?php include __DIR__ . '/../partials/header.php'; ?>
-<section class="admin-shell">
-<header class="admin-page-header">
-    <div>
-        <h1 class="admin-title">Admin-Dashboard</h1>
-        <p class="admin-subtitle">Behalte jedes Detail deines digitalen Terrariums im Blick – von aktiven Bartagamen bis zu den neuesten Anfragen.</p>
+<section class="dashboard">
+  <div class="dashboard-header">
+    <h1>Inhalte verwalten</h1>
+  </div>
+
+  <div class="dashboard-section">
+    <div class="dashboard-section-header">
+      <h2>Beiträge</h2>
+      <a class="btn" href="<?= htmlspecialchars(path('/admin/posts/new'), ENT_QUOTES, 'UTF-8') ?>">Neuer Beitrag</a>
     </div>
-    <div class="admin-meta">
-        <span class="badge">Pogona Pulse</span>
-        <span><?= count($animals) ?> Tiere aktiv</span>
+    <?php if (!empty($posts)): ?>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Titel</th>
+          <th>Erstellt</th>
+          <th>Aktualisiert</th>
+          <th class="actions">Aktionen</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php foreach ($posts as $post): ?>
+        <tr>
+          <td><?= htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8') ?></td>
+          <td><?= htmlspecialchars($post['created_at'], ENT_QUOTES, 'UTF-8') ?></td>
+          <td><?= htmlspecialchars($post['updated_at'], ENT_QUOTES, 'UTF-8') ?></td>
+          <td class="actions">
+            <a class="link" href="<?= htmlspecialchars(path('/admin/posts/' . (int) $post['id'] . '/edit'), ENT_QUOTES, 'UTF-8') ?>">Bearbeiten</a>
+            <form
+              method="post"
+              action="<?= htmlspecialchars(path('/admin/posts/' . (int) $post['id'] . '/delete'), ENT_QUOTES, 'UTF-8') ?>"
+              onsubmit="return confirm('Beitrag wirklich löschen?');"
+            >
+              <button type="submit" class="link danger">Löschen</button>
+            </form>
+          </td>
+        </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+    <?php else: ?>
+    <div class="empty-state">
+      <h3>Noch keine Beiträge</h3>
+      <p>Erstelle den ersten Beitrag, um die Seite zu füllen.</p>
     </div>
-</header>
-<?php include __DIR__ . '/nav.php'; ?>
-<div class="grid cards">
-    <div class="card">
-        <h3>Aktive Tiere</h3>
-        <p><?= count($animals) ?> Datensätze</p>
+    <?php endif; ?>
+  </div>
+
+  <div class="dashboard-section">
+    <div class="dashboard-section-header">
+      <h2>Seiten</h2>
+      <a class="btn" href="<?= htmlspecialchars(path('/admin/pages/new'), ENT_QUOTES, 'UTF-8') ?>">Neue Seite</a>
     </div>
-    <div class="card">
-        <h3>Abgabe-Einträge</h3>
-        <p><?= count($listings) ?> Inserate</p>
+    <?php if (!empty($pages)): ?>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Titel</th>
+          <th>Slug</th>
+          <th class="actions">Aktionen</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php foreach ($pages as $page): ?>
+        <tr>
+          <td><?= htmlspecialchars($page['title'], ENT_QUOTES, 'UTF-8') ?></td>
+          <td><code><?= htmlspecialchars($page['slug'], ENT_QUOTES, 'UTF-8') ?></code></td>
+          <td class="actions">
+            <a class="link" href="<?= htmlspecialchars(path('/admin/pages/' . (int) $page['id'] . '/edit'), ENT_QUOTES, 'UTF-8') ?>">Bearbeiten</a>
+            <form
+              method="post"
+              action="<?= htmlspecialchars(path('/admin/pages/' . (int) $page['id'] . '/delete'), ENT_QUOTES, 'UTF-8') ?>"
+              onsubmit="return confirm('Seite wirklich löschen?');"
+            >
+              <button type="submit" class="link danger">Löschen</button>
+            </form>
+          </td>
+        </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+    <?php else: ?>
+    <div class="empty-state">
+      <h3>Noch keine Seiten</h3>
+      <p>Lege deine erste Inhaltsseite an.</p>
     </div>
-    <div class="card">
-        <h3>Neue Anfragen</h3>
-        <p><?= count($inquiries) ?> Nachrichten</p>
+    <?php endif; ?>
+  </div>
+
+  <div class="dashboard-section">
+    <div class="dashboard-section-header">
+      <h2>Galerie</h2>
+      <a class="btn" href="<?= htmlspecialchars(path('/admin/gallery/new'), ENT_QUOTES, 'UTF-8') ?>">Neuer Eintrag</a>
     </div>
-    <div class="card">
-        <h3>Seiten</h3>
-        <p><?= count($pages) ?> Einträge</p>
+    <?php if (!empty($gallery)): ?>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Titel</th>
+          <th>Datei</th>
+          <th class="actions">Aktionen</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php foreach ($gallery as $item): ?>
+        <tr>
+          <td><?= htmlspecialchars($item['title'], ENT_QUOTES, 'UTF-8') ?></td>
+          <td>
+            <a
+              class="link"
+              href="<?= htmlspecialchars(asset('static/uploads/' . $item['filename']), ENT_QUOTES, 'UTF-8') ?>"
+              target="_blank"
+            >Download</a>
+          </td>
+          <td class="actions">
+            <a class="link" href="<?= htmlspecialchars(path('/admin/gallery/' . (int) $item['id'] . '/edit'), ENT_QUOTES, 'UTF-8') ?>">Bearbeiten</a>
+            <form
+              method="post"
+              action="<?= htmlspecialchars(path('/admin/gallery/' . (int) $item['id'] . '/delete'), ENT_QUOTES, 'UTF-8') ?>"
+              onsubmit="return confirm('Eintrag wirklich löschen?');"
+            >
+              <button type="submit" class="link danger">Löschen</button>
+            </form>
+          </td>
+        </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+    <?php else: ?>
+    <div class="empty-state">
+      <h3>Noch keine Galerie-Elemente</h3>
+      <p>Lade Bilder hoch, um deine Galerie zu füllen.</p>
     </div>
-    <div class="card">
-        <h3>News</h3>
-        <p><?= count($newsPosts) ?> Beiträge</p>
+    <?php endif; ?>
+  </div>
+
+  <div class="dashboard-section">
+    <div class="dashboard-section-header">
+      <h2>Genetik</h2>
+      <a class="btn" href="<?= htmlspecialchars(path('/admin/genetics'), ENT_QUOTES, 'UTF-8') ?>">Gene verwalten</a>
     </div>
-    <div class="card">
-        <h3>Zuchtpläne</h3>
-        <p><?= count($breedingPlans) ?> Projekte</p>
-    </div>
-    <div class="card">
-        <h3>Pflegeartikel</h3>
-        <p><?= count($careArticles) ?> Artikel</p>
-    </div>
-    <div class="card">
-        <h3>Genetische Arten</h3>
-        <p><?= isset($geneticSpecies) ? count($geneticSpecies) : 0 ?> Datensätze</p>
-    </div>
-    <div class="card">
-        <h3>Gene</h3>
-        <p><?= isset($geneticGenes) ? count($geneticGenes) : 0 ?> Einträge</p>
-    </div>
-</div>
-<section class="admin-section">
-    <h2>Letzte Anfragen</h2>
-    <div class="card">
-        <?php if (empty($inquiries)): ?>
-            Keine Anfragen vorhanden.
-        <?php else: ?>
-            <div class="table-responsive">
-                <table class="table">
-                <thead>
-                    <tr>
-                        <th>Datum</th>
-                        <th>Tier</th>
-                        <th>Name</th>
-                        <th>E-Mail</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach (array_slice($inquiries, 0, 5) as $inquiry): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($inquiry['created_at']) ?></td>
-                            <td><?= htmlspecialchars($inquiry['listing_title']) ?></td>
-                            <td><?= htmlspecialchars($inquiry['sender_name']) ?></td>
-                            <td><a href="mailto:<?= htmlspecialchars($inquiry['sender_email']) ?>">Kontakt aufnehmen</a></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-                </table>
-            </div>
-        <?php endif; ?>
-    </div>
+    <p>
+      Pflege die genetischen Eigenschaften für Bartagamen und Hakennasennattern und nutze sie im
+      öffentlichen Genetik-Rechner.
+    </p>
+    <a class="link" href="<?= htmlspecialchars(path('/genetics'), ENT_QUOTES, 'UTF-8') ?>" target="_blank">Genetik-Bereich ansehen</a>
+  </div>
 </section>
-</section>
-<?php include __DIR__ . '/../partials/footer.php'; ?>

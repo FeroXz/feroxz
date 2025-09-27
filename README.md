@@ -1,102 +1,57 @@
-# FeroxZ – PHP Reptile CMS
+# Feroxz Mini CMS
 
-FeroxZ ist ein leichtgewichtiges, auf PHP 8.3 und SQLite basierendes CMS für Reptilienhalter. Es vereint Tierverwaltung, Tierabgabe, private Tierakten sowie ein Admin-Backend mit granularen Berechtigungen. Alle Inhalte werden persistiert in einer lokalen SQLite-Datenbank gespeichert, Medien landen im Verzeichnis `uploads/`.
+Ein leichtgewichtiges Content-Management-System auf PHP-Basis mit moderner Optik, Adminbereich und Unterstützung für Beiträge, Seiten und Mediengalerie.
 
-## Version
+## Features
 
-<!--VERSION-START-->
-2025.10.02-183055+bf15ba6
-<!--VERSION-END-->
+- Öffentliche Startseite mit Kartenlayout für Blog-Beiträge
+- Individuelle Inhaltsseiten über frei wählbare Slugs
+- Galerie inkl. Datei-Uploads (z. B. Bilder) über das Backend
+- Passwortgeschützter Adminbereich mit Session-Verwaltung
+- SQLite-Datenbank wird automatisch initialisiert und benötigt keinen separaten Server
+- Genetik-Datenbank für *Pogona vitticeps* und *Heterodon nasicus* inkl. Rechner für mögliche Nachzuchten
+- Automatisch vorinitialisierter Administratorzugang (`admin` / `12345678`)
 
-## Kernfunktionen
+## Anforderungen
 
-- 🦎 **Tierverwaltung** mit Art, Genetik, Herkunft, Besonderheiten, Bildern, Showcase-Flag und optionalem Besitzer.
-- 🔒 **„Meine Tiere“** – angemeldete Benutzer sehen ausschließlich ihre privaten Tiere in einem separaten Bereich.
-- 📨 **Tierabgabe-Workflow** mit öffentlichen Inseraten, Kontaktformular und Nachrichteneingang für Administrator*innen.
-- ⚙️ **Einstellungen** für Seitentitel, Untertitel, Hero-/Abgabe-Text, Kontaktadresse und Footer (inkl. Versionshinweis).
-- 👥 **Benutzer- & Rechteverwaltung**: Admins können weitere Accounts mit eingeschränkten Rechten (Tiere, Adoption, Einstellungen) anlegen.
-- 📈 **Dashboard** mit Kennzahlen zu Bestand, Abgabeinträgen und neuen Anfragen.
-- 💾 **Persistente Speicherung** per SQLite – keine zusätzliche Server-Software notwendig.
+- PHP 8.3 oder höher (getestet mit PHP 8.3 und PHP 8.4)
+- Aktivierte Erweiterungen: `pdo_sqlite`, `sqlite3`, `fileinfo` (für Dateiuploads empfehlenswert)
+- Schreibrechte für den Ordner `static/uploads/`
 
-## Systemvoraussetzungen
+## Installation & Deployment auf Shared Hosting
 
-| Komponente | Anforderung |
-| ---------- | ----------- |
-| PHP        | ≥ 8.3 mit PDO-SQLite, session, fileinfo |
-| Webserver  | Apache, Nginx oder kompatibel (z. B. shared hosting) |
-| Dateirechte | Schreibrechte für `storage/` und `uploads/` |
+1. **Dateien hochladen**
+   Übertrage per FTP/SFTP die Verzeichnisse `public/`, `static/` sowie die Projektwurzel (inkl. `cms.db`, falls bereits vorhanden) in dein Webverzeichnis. Die Datenbankdatei wird beim ersten Aufruf automatisch angelegt.
+2. **Dokument-Root setzen**
+   Konfiguriere dein Hosting so, dass `public/` als Document Root dient. Nur so greifen die Routen und statischen Assets korrekt.
+3. **Schreibrechte anpassen**
+   Stelle sicher, dass der Webserver in `static/uploads/` schreiben darf (`chmod 775 static/uploads` bzw. über das Hosting-Panel). Der Ordner wird automatisch erstellt, falls er fehlt.
+4. **Website aufrufen**
+   Nach dem Upload erreichst du die Startseite direkt. Der Adminbereich unter `/admin` nutzt standardmäßig den Login `admin` / `12345678`. Ändere das Passwort nach dem ersten Anmelden im Benutzerbereich.
 
-## Installation
+## Lokale Entwicklung
 
-1. **Dateien hochladen** – den Inhalt dieses Repositories auf den Webspace kopieren (z. B. via FTP oder Git-Deploy).
-2. **Verzeichnisse beschreibbar machen**:
-   ```bash
-   chmod -R 775 storage uploads
-   ```
-3. **Aufruf im Browser** – `index.php` unter `public/` dient als Front-Controller. Richte den Dokumentenstamm deines Webservers auf `public/` aus.
-4. **Erstanmeldung** – Standard-Zugangsdaten: Benutzername `admin`, Passwort `12345678`. Nach dem Login können weitere Benutzer erstellt und Passwörter geändert werden.
-
-> Hinweis: Beim ersten Start wird automatisch eine SQLite-Datenbank unter `storage/database.sqlite` angelegt sowie ein Admin-Benutzer erzeugt.
-
-## Ordnerstruktur
-
-```
-feroxz/
-├── app/                 # PHP-Logik, Datenbank, Helper
-├── public/
-│   ├── assets/          # Stylesheet
-│   ├── index.php        # Front-Controller
-│   └── views/           # Öffentliche und Admin-Templates
-├── storage/             # SQLite-Datenbank (wird zur Laufzeit angelegt)
-├── uploads/             # Hochgeladene Medien (per .gitignore ausgenommen)
-└── README.md
-```
-
-## Adminbereich & Workflows
-
-- **Dashboard** – Überblick über Tiere, Abgabeinträge und eingegangene Nachrichten.
-- **Tiere** – CRUD für Tiere inkl. Upload und Zuordnung zu Benutzer*innen.
-- **Tierabgabe** – Inserate verwalten, Tiere aus dem Bestand übernehmen, Preis/Status pflegen.
-- **Anfragen** – Einsicht in alle Adoption-Anfragen, direkte Antwort via `mailto:`.
-- **Einstellungen** – Seitentexte und Kontaktadresse aktualisieren.
-- **Benutzer** – Nur für Admins sichtbar. Neue Benutzer mit selektiven Rechten anlegen.
-
-## Styling
-
-Das Theme nutzt Glas-/Neon-Akzente inspiriert von tropischen Terrarien. Anpassungen erfolgen im Stylesheet `public/assets/style.css`.
-
-## Entwicklung (lokal)
-
-Ein PHP-Entwicklungsserver reicht aus:
+Für lokale Tests kannst du den integrierten PHP-Server verwenden:
 
 ```bash
-cd public
-php -S localhost:8000
+php -S localhost:8000 -t public
 ```
 
-Danach im Browser `http://localhost:8000/index.php` öffnen.
+Die Anwendung erstellt beim ersten Aufruf `cms.db` in der Projektwurzel. Hochgeladene Dateien landen unter `static/uploads/`.
 
-## Tests
+## Genetik-Datenbank & Rechner
 
-Syntax-Check der PHP-Dateien:
+- Im Adminbereich findest du unter „Genetik“ die hinterlegten Arten und kannst neue Gene hinzufügen oder bestehende bearbeiten.
+- Der öffentliche Bereich `/genetics` listet alle Arten, bietet Detailseiten zu den Genen und einen Rechner pro Art (z. B. `/genetics/pogona-vitticeps/calculator`).
+- Der Rechner unterstützt rezessive und (un-)vollständig dominante Vererbung, ermittelt die Wahrscheinlichkeiten pro Gen und fasst alle Kombinationen übersichtlich zusammen.
 
-```bash
-find public app -name "*.php" -print0 | xargs -0 -n1 php -l
-```
+## Backup & Wartung
 
-## Standard-Login
+- Sichere regelmäßig `cms.db` sowie den Ordner `static/uploads/`.
+- Administrator-Passwörter lassen sich jederzeit über neue Umgebungsvariablen oder direkt in der Datenbank ändern (`admins`-Tabelle).
 
-- Benutzername: `admin`
-- Passwort: `12345678`
+## Troubleshooting
 
-Bitte ändere das Passwort nach der ersten Anmeldung über die Benutzerverwaltung.
-
-## Automatisches Versioning
-
-Damit bei jedem Push die Versionsnummer in `README.md` und dem Footer aktualisiert wird, nutzt das Projekt ein Git-Pre-Push-Hook.
-
-```bash
-git config core.hooksPath scripts/git-hooks
-```
-
-Der Hook führt `php scripts/update-version.php` aus, erzeugt eine Build-Zeitstempel-Version (UTC + Git-Commit) und schreibt diese in die Datei `VERSION` sowie in den Versionsabschnitt dieses README. Die Konstante `APP_VERSION` lädt denselben Wert und blendet ihn im Footer ein.
+- **500-Fehler direkt nach Upload:** Prüfe, ob die PHP-Version ausreichend hoch ist und die benötigten Erweiterungen aktiv sind.
+- **Upload funktioniert nicht:** Stelle sicher, dass `static/uploads/` für den Webserver beschreibbar ist.
+- **Login nicht möglich:** Nutze den Standardzugang `admin` / `12345678` oder lösche `cms.db`, um die Datenbank beim nächsten Aufruf frisch erstellen zu lassen (alle Inhalte gehen dabei verloren).
