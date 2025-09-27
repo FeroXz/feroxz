@@ -20,6 +20,7 @@ Ein leichtgewichtiges Content-Management-System auf PHP-Basis mit moderner Optik
 
 ## Installation & Deployment auf Shared Hosting
 
+
 1. **Dateien hochladen**
    Übertrage per FTP/SFTP die Verzeichnisse `public/`, `static/` sowie die Projektwurzel (inkl. `cms.db`, falls bereits vorhanden) in dein Webverzeichnis. Die Datenbankdatei wird beim ersten Aufruf automatisch angelegt.
 2. **Dokument-Root setzen**

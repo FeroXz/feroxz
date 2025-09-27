@@ -5,11 +5,13 @@
     <p class="scientific"><?= htmlspecialchars($species['scientific_name'], ENT_QUOTES, 'UTF-8') ?></p>
     <?php endif; ?>
     <div class="actions">
+
       <a
         class="button"
         href="<?= htmlspecialchars(path('/genetics/' . $species['slug'] . '/calculator'), ENT_QUOTES, 'UTF-8') ?>"
       >Zum Genetik-Rechner</a>
       <a class="button secondary" href="<?= htmlspecialchars(path('/genetics'), ENT_QUOTES, 'UTF-8') ?>">Zurück zur Übersicht</a>
+
     </div>
   </header>
 

@@ -5,11 +5,13 @@
     Administratorzugangs und prüft, ob dein Webspace alle Voraussetzungen erfüllt.
   </p>
 
+
   <?php $extensions = $requirements['extensions'] ?? []; ?>
   <?php $paths = $requirements['paths'] ?? []; ?>
 
   <h2>Systemvoraussetzungen</h2>
   <div class="requirement-group">
+
     <h3>PHP-Erweiterungen</h3>
     <ul class="requirement-list">
       <?php foreach ($extensions as $key => $extension): ?>

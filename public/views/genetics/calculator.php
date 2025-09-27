@@ -10,6 +10,7 @@
         href="<?= htmlspecialchars(path('/genetics/' . $species['slug']), ENT_QUOTES, 'UTF-8') ?>"
       >Zurück zur Art</a>
       <a class="button" href="<?= htmlspecialchars(path('/genetics'), ENT_QUOTES, 'UTF-8') ?>">Weitere Arten</a>
+
     </div>
   </header>
 

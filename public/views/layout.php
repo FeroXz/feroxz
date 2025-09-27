@@ -10,11 +10,14 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
       rel="stylesheet"
     />
+
     <link rel="stylesheet" href="<?= htmlspecialchars(asset('static/css/style.css'), ENT_QUOTES, 'UTF-8') ?>" />
+
   </head>
   <body>
     <header class="site-header">
       <div class="container header-content">
+
         <a class="brand" href="<?= htmlspecialchars(path('/'), ENT_QUOTES, 'UTF-8') ?>">Feroxz CMS</a>
         <nav>
           <ul>
@@ -26,6 +29,7 @@
             <li><a href="<?= htmlspecialchars(path('/admin/logout'), ENT_QUOTES, 'UTF-8') ?>" class="logout">Logout</a></li>
             <?php else: ?>
             <li><a href="<?= htmlspecialchars(path('/admin/login'), ENT_QUOTES, 'UTF-8') ?>">Login</a></li>
+
             <?php endif; ?>
           </ul>
         </nav>

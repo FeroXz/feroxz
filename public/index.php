@@ -22,6 +22,7 @@ if (!function_exists('str_ends_with')) {
 
 session_start();
 
+
 $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
 $scriptDir = str_replace('\\', '/', dirname($scriptName));
 if ($scriptDir === '/' || $scriptDir === '\\' || $scriptDir === '.' || $scriptDir === '') {
@@ -30,6 +31,7 @@ if ($scriptDir === '/' || $scriptDir === '\\' || $scriptDir === '.' || $scriptDi
     $basePath = rtrim($scriptDir, '/');
 }
 $GLOBALS['basePath'] = $basePath;
+
 
 $baseDir = dirname(__DIR__);
 $databaseFile = $baseDir . '/cms.db';
@@ -43,6 +45,7 @@ if (!is_writable($uploadDir)) {
     @chmod($uploadDir, 0775);
 }
 
+
 $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
 
 if ($basePath !== '' && $basePath !== '/') {
@@ -54,6 +57,7 @@ if ($basePath !== '' && $basePath !== '/') {
 }
 
 $path = '/' . ltrim($requestPath, '/');
+
 if ($path !== '/' && str_ends_with($path, '/')) {
     $path = rtrim($path, '/');
 }
@@ -688,12 +692,14 @@ function render404(): void
 
 function redirect(string $location): void
 {
+
     if ($location !== '' && $location[0] === '/' && !str_starts_with($location, '//')) {
         $basePath = basePath();
         if ($basePath !== '') {
             $location = $basePath . $location;
         }
     }
+
 
     header('Location: ' . $location);
     exit;
@@ -729,6 +735,7 @@ function asset(string $assetPath): string
     return path('/' . ltrim($assetPath, '/'));
 }
 
+
 function flash(string $message, string $type = 'info'): void
 {
     if (!isset($_SESSION['flashes']) || !is_array($_SESSION['flashes'])) {
@@ -763,6 +770,7 @@ function createAdmin(PDO $pdo, string $username, string $password): void
 
 function checkRequirements(string $databaseFile, string $uploadDir): array
 {
+
     $extensions = [
         'pdo' => [
             'label' => 'PDO',
@@ -807,6 +815,7 @@ function checkRequirements(string $databaseFile, string $uploadDir): array
     ];
 
     return [
+
         'extensions' => $extensions,
         'paths' => $paths,
     ];
@@ -829,6 +838,7 @@ function requirementsExtensionsAvailable(array $requirements): bool
 
 function requirementsAreMet(array $requirements): bool
 {
+
     if (!requirementsExtensionsAvailable($requirements)) {
         return false;
     }

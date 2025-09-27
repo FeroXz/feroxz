@@ -12,7 +12,9 @@
     <?php foreach ($species as $entry): ?>
     <article class="card">
       <h2>
+
         <a href="<?= htmlspecialchars(path('/genetics/' . $entry['slug']), ENT_QUOTES, 'UTF-8') ?>">
+
           <?= htmlspecialchars($entry['name'], ENT_QUOTES, 'UTF-8') ?>
         </a>
       </h2>
@@ -23,11 +25,13 @@
       <p><?= nl2br(htmlspecialchars($entry['description'], ENT_QUOTES, 'UTF-8')) ?></p>
       <?php endif; ?>
       <div class="actions">
+
         <a class="button" href="<?= htmlspecialchars(path('/genetics/' . $entry['slug']), ENT_QUOTES, 'UTF-8') ?>">Gene anzeigen</a>
         <a
           class="button secondary"
           href="<?= htmlspecialchars(path('/genetics/' . $entry['slug'] . '/calculator'), ENT_QUOTES, 'UTF-8') ?>"
         >Genetik-Rechner</a>
+
       </div>
     </article>
     <?php endforeach; ?>

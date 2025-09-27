@@ -8,10 +8,12 @@
       <?php endif; ?>
     </h1>
     <div class="actions">
+
       <a
         class="button secondary"
         href="<?= htmlspecialchars(path('/admin/genetics/species/' . $species['slug']), ENT_QUOTES, 'UTF-8') ?>"
       >Zurück</a>
+
     </div>
   </header>
 
