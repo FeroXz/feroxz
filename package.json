@@ -1,17 +1,25 @@
 {
-  "name": "feroxz-site",
+  "name": "feroxz-react-cms",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "build:images": "php scripts/generate-responsive-images.php",
-    "audit": "npm run audit:lighthouse && npm run audit:html && npm run audit:schema",
-    "audit:lighthouse": "lhci autorun --config=./scripts/lhci.config.js",
-    "audit:html": "html-validator --url http://localhost:8080 --format text --is-local --validator https://validator.w3.org/nu/ > reports/html-validation.txt",
-    "audit:schema": "node scripts/schema-check.mjs"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "clsx": "^2.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.23.0"
   },
   "devDependencies": {
-    "@lhci/cli": "^0.11.0",
-    "html-validator-cli": "^7.1.1",
-    "node-fetch": "^3.3.2"
+    "@vitejs/plugin-react": "^4.3.1",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.34.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.6",
+    "vite": "^5.2.0"
   }
 }
