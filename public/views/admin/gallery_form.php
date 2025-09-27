@@ -1,7 +1,7 @@
 <section class="editor">
   <div class="editor-header">
     <h1><?= htmlspecialchars($heading, ENT_QUOTES, 'UTF-8') ?></h1>
-    <a class="link" href="<?= htmlspecialchars(path('/admin'), ENT_QUOTES, 'UTF-8') ?>">Zurück</a>
+    <a class="link" href="/admin">Zurück</a>
   </div>
   <form method="post" class="form" enctype="multipart/form-data">
     <label for="title">Titel</label>
@@ -20,11 +20,7 @@
     <?php if (!empty($item['filename'])): ?>
     <p class="hint">
       Aktuelle Datei:
-      <a
-        class="link"
-        href="<?= htmlspecialchars(asset('static/uploads/' . $item['filename']), ENT_QUOTES, 'UTF-8') ?>"
-        target="_blank"
-      >Ansehen</a>
+      <a class="link" href="/static/uploads/<?= htmlspecialchars($item['filename'], ENT_QUOTES, 'UTF-8') ?>" target="_blank">Ansehen</a>
     </p>
     <?php endif; ?>
     <input type="file" id="file" name="file" <?= empty($item) ? 'required' : '' ?> />

@@ -22,15 +22,6 @@ if (!function_exists('str_ends_with')) {
 
 session_start();
 
-$scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
-$scriptDir = str_replace('\\', '/', dirname($scriptName));
-if ($scriptDir === '/' || $scriptDir === '\\' || $scriptDir === '.' || $scriptDir === '') {
-    $basePath = '';
-} else {
-    $basePath = rtrim($scriptDir, '/');
-}
-$GLOBALS['basePath'] = $basePath;
-
 $baseDir = dirname(__DIR__);
 $databaseFile = $baseDir . '/cms.db';
 $uploadDir = $baseDir . '/static/uploads';
@@ -43,17 +34,8 @@ if (!is_writable($uploadDir)) {
     @chmod($uploadDir, 0775);
 }
 
-$requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
-
-if ($basePath !== '' && $basePath !== '/') {
-    if ($requestPath === $basePath || $requestPath === $basePath . '/') {
-        $requestPath = '/';
-    } elseif (str_starts_with($requestPath, $basePath . '/')) {
-        $requestPath = substr($requestPath, strlen($basePath));
-    }
-}
-
-$path = '/' . ltrim($requestPath, '/');
+$path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
+$path = '/' . trim($path, '/');
 if ($path !== '/' && str_ends_with($path, '/')) {
     $path = rtrim($path, '/');
 }
@@ -688,45 +670,8 @@ function render404(): void
 
 function redirect(string $location): void
 {
-    if ($location !== '' && $location[0] === '/' && !str_starts_with($location, '//')) {
-        $basePath = basePath();
-        if ($basePath !== '') {
-            $location = $basePath . $location;
-        }
-    }
-
     header('Location: ' . $location);
     exit;
-}
-
-function basePath(): string
-{
-    $basePath = $GLOBALS['basePath'] ?? '';
-    if ($basePath === '/' || $basePath === '\\' || $basePath === '.' || $basePath === '') {
-        return '';
-    }
-
-    return $basePath;
-}
-
-function path(string $path = '/'): string
-{
-    $normalized = '/' . ltrim($path, '/');
-    if ($normalized === '//') {
-        $normalized = '/';
-    }
-
-    $basePath = basePath();
-    if ($normalized === '/') {
-        return $basePath === '' ? '/' : $basePath;
-    }
-
-    return ($basePath === '' ? '' : $basePath) . $normalized;
-}
-
-function asset(string $assetPath): string
-{
-    return path('/' . ltrim($assetPath, '/'));
 }
 
 function flash(string $message, string $type = 'info'): void

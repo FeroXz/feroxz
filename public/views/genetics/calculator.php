@@ -5,11 +5,8 @@
     <p class="scientific"><?= htmlspecialchars($species['scientific_name'], ENT_QUOTES, 'UTF-8') ?></p>
     <?php endif; ?>
     <div class="actions">
-      <a
-        class="button secondary"
-        href="<?= htmlspecialchars(path('/genetics/' . $species['slug']), ENT_QUOTES, 'UTF-8') ?>"
-      >Zurück zur Art</a>
-      <a class="button" href="<?= htmlspecialchars(path('/genetics'), ENT_QUOTES, 'UTF-8') ?>">Weitere Arten</a>
+      <a class="button secondary" href="/genetics/<?= htmlspecialchars($species['slug'], ENT_QUOTES, 'UTF-8') ?>">Zurück zur Art</a>
+      <a class="button" href="/genetics">Weitere Arten</a>
     </div>
   </header>
 

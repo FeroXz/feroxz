@@ -1,7 +1,7 @@
 <section class="editor">
   <div class="editor-header">
     <h1><?= htmlspecialchars($heading, ENT_QUOTES, 'UTF-8') ?></h1>
-    <a class="link" href="<?= htmlspecialchars(path('/admin'), ENT_QUOTES, 'UTF-8') ?>">Zurück</a>
+    <a class="link" href="/admin">Zurück</a>
   </div>
   <form method="post" class="form">
     <label for="title">Titel</label>

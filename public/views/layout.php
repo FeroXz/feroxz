@@ -10,22 +10,22 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="<?= htmlspecialchars(asset('static/css/style.css'), ENT_QUOTES, 'UTF-8') ?>" />
+    <link rel="stylesheet" href="/static/css/style.css" />
   </head>
   <body>
     <header class="site-header">
       <div class="container header-content">
-        <a class="brand" href="<?= htmlspecialchars(path('/'), ENT_QUOTES, 'UTF-8') ?>">Feroxz CMS</a>
+        <a class="brand" href="/">Feroxz CMS</a>
         <nav>
           <ul>
-            <li><a href="<?= htmlspecialchars(path('/'), ENT_QUOTES, 'UTF-8') ?>">Start</a></li>
-            <li><a href="<?= htmlspecialchars(path('/gallery'), ENT_QUOTES, 'UTF-8') ?>">Galerie</a></li>
-            <li><a href="<?= htmlspecialchars(path('/genetics'), ENT_QUOTES, 'UTF-8') ?>">Genetik</a></li>
+            <li><a href="/">Start</a></li>
+            <li><a href="/gallery">Galerie</a></li>
+            <li><a href="/genetics">Genetik</a></li>
             <?php if (!empty($_SESSION['admin'])): ?>
-            <li><a href="<?= htmlspecialchars(path('/admin'), ENT_QUOTES, 'UTF-8') ?>">Admin</a></li>
-            <li><a href="<?= htmlspecialchars(path('/admin/logout'), ENT_QUOTES, 'UTF-8') ?>" class="logout">Logout</a></li>
+            <li><a href="/admin">Admin</a></li>
+            <li><a href="/admin/logout" class="logout">Logout</a></li>
             <?php else: ?>
-            <li><a href="<?= htmlspecialchars(path('/admin/login'), ENT_QUOTES, 'UTF-8') ?>">Login</a></li>
+            <li><a href="/admin/login">Login</a></li>
             <?php endif; ?>
           </ul>
         </nav>

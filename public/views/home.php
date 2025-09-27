@@ -5,7 +5,7 @@
       Verwalte Inhalte in Sekundenschnelle mit einem einfachen, modernen und
       mobilen Backend.
     </p>
-    <a class="btn" href="<?= htmlspecialchars(path('/admin/login'), ENT_QUOTES, 'UTF-8') ?>">Zum Adminbereich</a>
+    <a class="btn" href="/admin/login">Zum Adminbereich</a>
   </div>
 </section>
 <section class="posts-grid">
