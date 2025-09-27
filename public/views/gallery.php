@@ -10,8 +10,16 @@
   <div class="gallery-grid">
     <?php foreach ($items as $item): ?>
     <figure class="gallery-item">
-      <a href="/static/uploads/<?= htmlspecialchars($item['filename'], ENT_QUOTES, 'UTF-8') ?>" target="_blank">
-        <img src="/static/uploads/<?= htmlspecialchars($item['filename'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($item['title'], ENT_QUOTES, 'UTF-8') ?>" />
+
+      <a
+        href="<?= htmlspecialchars(asset('static/uploads/' . $item['filename']), ENT_QUOTES, 'UTF-8') ?>"
+        target="_blank"
+      >
+        <img
+          src="<?= htmlspecialchars(asset('static/uploads/' . $item['filename']), ENT_QUOTES, 'UTF-8') ?>"
+          alt="<?= htmlspecialchars($item['title'], ENT_QUOTES, 'UTF-8') ?>"
+        />
+
       </a>
       <figcaption>
         <strong><?= htmlspecialchars($item['title'], ENT_QUOTES, 'UTF-8') ?></strong>

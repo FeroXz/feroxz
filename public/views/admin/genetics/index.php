@@ -21,8 +21,17 @@
         <td><?= htmlspecialchars($entry['scientific_name'] ?? '', ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= (int) ($entry['gene_count'] ?? 0) ?></td>
         <td>
-          <a class="button" href="/admin/genetics/species/<?= htmlspecialchars($entry['slug'], ENT_QUOTES, 'UTF-8') ?>">Gene verwalten</a>
-          <a class="button secondary" href="/genetics/<?= htmlspecialchars($entry['slug'], ENT_QUOTES, 'UTF-8') ?>" target="_blank">Öffnen</a>
+
+          <a
+            class="button"
+            href="<?= htmlspecialchars(path('/admin/genetics/species/' . $entry['slug']), ENT_QUOTES, 'UTF-8') ?>"
+          >Gene verwalten</a>
+          <a
+            class="button secondary"
+            href="<?= htmlspecialchars(path('/genetics/' . $entry['slug']), ENT_QUOTES, 'UTF-8') ?>"
+            target="_blank"
+          >Öffnen</a>
+
         </td>
       </tr>
       <?php endforeach; ?>

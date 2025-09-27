@@ -2,8 +2,12 @@
   <header class="page-header">
     <h1>Gene verwalten – <?= htmlspecialchars($species['name'], ENT_QUOTES, 'UTF-8') ?></h1>
     <div class="actions">
-      <a class="button" href="/admin/genetics/species/<?= htmlspecialchars($species['slug'], ENT_QUOTES, 'UTF-8') ?>/genes/new">Neues Gen</a>
-      <a class="button secondary" href="/admin/genetics">Zurück</a>
+      <a
+        class="button"
+        href="<?= htmlspecialchars(path('/admin/genetics/species/' . $species['slug'] . '/genes/new'), ENT_QUOTES, 'UTF-8') ?>"
+      >Neues Gen</a>
+      <a class="button secondary" href="<?= htmlspecialchars(path('/admin/genetics'), ENT_QUOTES, 'UTF-8') ?>">Zurück</a>
+
     </div>
   </header>
 
@@ -30,8 +34,17 @@
         <td><?= htmlspecialchars($gene['heterozygous_label'], ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= htmlspecialchars($gene['homozygous_label'], ENT_QUOTES, 'UTF-8') ?></td>
         <td class="actions">
-          <a class="button" href="/admin/genetics/species/<?= htmlspecialchars($species['slug'], ENT_QUOTES, 'UTF-8') ?>/genes/<?= (int) $gene['id'] ?>/edit">Bearbeiten</a>
-          <form method="post" action="/admin/genetics/species/<?= htmlspecialchars($species['slug'], ENT_QUOTES, 'UTF-8') ?>/genes/<?= (int) $gene['id'] ?>/delete" onsubmit="return confirm('Dieses Gen wirklich löschen?');">
+
+          <a
+            class="button"
+            href="<?= htmlspecialchars(path('/admin/genetics/species/' . $species['slug'] . '/genes/' . (int) $gene['id'] . '/edit'), ENT_QUOTES, 'UTF-8') ?>"
+          >Bearbeiten</a>
+          <form
+            method="post"
+            action="<?= htmlspecialchars(path('/admin/genetics/species/' . $species['slug'] . '/genes/' . (int) $gene['id'] . '/delete'), ENT_QUOTES, 'UTF-8') ?>"
+            onsubmit="return confirm('Dieses Gen wirklich löschen?');"
+          >
+
             <button type="submit" class="button danger">Löschen</button>
           </form>
         </td>

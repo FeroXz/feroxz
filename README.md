@@ -14,12 +14,12 @@ Ein leichtgewichtiges Content-Management-System auf PHP-Basis mit moderner Optik
 
 ## Anforderungen
 
-
 - PHP 8.3 oder höher (getestet mit PHP 8.3 und PHP 8.4)
 - Aktivierte Erweiterungen: `pdo_sqlite`, `sqlite3`, `fileinfo` (für Dateiuploads empfehlenswert)
 - Schreibrechte für den Ordner `static/uploads/`
 
 ## Installation & Deployment auf Shared Hosting
+
 
 1. **Dateien hochladen**
    Übertrage per FTP/SFTP die Verzeichnisse `public/`, `static/` sowie die Projektwurzel (inkl. `cms.db`, falls bereits vorhanden) in dein Webverzeichnis. Die Datenbankdatei wird beim ersten Aufruf automatisch angelegt.

@@ -6,7 +6,9 @@
   <div class="dashboard-section">
     <div class="dashboard-section-header">
       <h2>Beiträge</h2>
-      <a class="btn" href="/admin/posts/new">Neuer Beitrag</a>
+
+      <a class="btn" href="<?= htmlspecialchars(path('/admin/posts/new'), ENT_QUOTES, 'UTF-8') ?>">Neuer Beitrag</a>
+
     </div>
     <?php if (!empty($posts)): ?>
     <table class="table">
@@ -25,10 +27,12 @@
           <td><?= htmlspecialchars($post['created_at'], ENT_QUOTES, 'UTF-8') ?></td>
           <td><?= htmlspecialchars($post['updated_at'], ENT_QUOTES, 'UTF-8') ?></td>
           <td class="actions">
-            <a class="link" href="/admin/posts/<?= (int) $post['id'] ?>/edit">Bearbeiten</a>
+
+            <a class="link" href="<?= htmlspecialchars(path('/admin/posts/' . (int) $post['id'] . '/edit'), ENT_QUOTES, 'UTF-8') ?>">Bearbeiten</a>
             <form
               method="post"
-              action="/admin/posts/<?= (int) $post['id'] ?>/delete"
+              action="<?= htmlspecialchars(path('/admin/posts/' . (int) $post['id'] . '/delete'), ENT_QUOTES, 'UTF-8') ?>"
+
               onsubmit="return confirm('Beitrag wirklich löschen?');"
             >
               <button type="submit" class="link danger">Löschen</button>
@@ -49,7 +53,9 @@
   <div class="dashboard-section">
     <div class="dashboard-section-header">
       <h2>Seiten</h2>
-      <a class="btn" href="/admin/pages/new">Neue Seite</a>
+
+      <a class="btn" href="<?= htmlspecialchars(path('/admin/pages/new'), ENT_QUOTES, 'UTF-8') ?>">Neue Seite</a>
+
     </div>
     <?php if (!empty($pages)): ?>
     <table class="table">
@@ -66,10 +72,12 @@
           <td><?= htmlspecialchars($page['title'], ENT_QUOTES, 'UTF-8') ?></td>
           <td><code><?= htmlspecialchars($page['slug'], ENT_QUOTES, 'UTF-8') ?></code></td>
           <td class="actions">
-            <a class="link" href="/admin/pages/<?= (int) $page['id'] ?>/edit">Bearbeiten</a>
+
+            <a class="link" href="<?= htmlspecialchars(path('/admin/pages/' . (int) $page['id'] . '/edit'), ENT_QUOTES, 'UTF-8') ?>">Bearbeiten</a>
             <form
               method="post"
-              action="/admin/pages/<?= (int) $page['id'] ?>/delete"
+              action="<?= htmlspecialchars(path('/admin/pages/' . (int) $page['id'] . '/delete'), ENT_QUOTES, 'UTF-8') ?>"
+
               onsubmit="return confirm('Seite wirklich löschen?');"
             >
               <button type="submit" class="link danger">Löschen</button>
@@ -90,7 +98,9 @@
   <div class="dashboard-section">
     <div class="dashboard-section-header">
       <h2>Galerie</h2>
-      <a class="btn" href="/admin/gallery/new">Neuer Eintrag</a>
+
+      <a class="btn" href="<?= htmlspecialchars(path('/admin/gallery/new'), ENT_QUOTES, 'UTF-8') ?>">Neuer Eintrag</a>
+
     </div>
     <?php if (!empty($gallery)): ?>
     <table class="table">
@@ -105,12 +115,20 @@
         <?php foreach ($gallery as $item): ?>
         <tr>
           <td><?= htmlspecialchars($item['title'], ENT_QUOTES, 'UTF-8') ?></td>
-          <td><a class="link" href="/static/uploads/<?= htmlspecialchars($item['filename'], ENT_QUOTES, 'UTF-8') ?>" target="_blank">Download</a></td>
+
+          <td>
+            <a
+              class="link"
+              href="<?= htmlspecialchars(asset('static/uploads/' . $item['filename']), ENT_QUOTES, 'UTF-8') ?>"
+              target="_blank"
+            >Download</a>
+          </td>
           <td class="actions">
-            <a class="link" href="/admin/gallery/<?= (int) $item['id'] ?>/edit">Bearbeiten</a>
+            <a class="link" href="<?= htmlspecialchars(path('/admin/gallery/' . (int) $item['id'] . '/edit'), ENT_QUOTES, 'UTF-8') ?>">Bearbeiten</a>
             <form
               method="post"
-              action="/admin/gallery/<?= (int) $item['id'] ?>/delete"
+              action="<?= htmlspecialchars(path('/admin/gallery/' . (int) $item['id'] . '/delete'), ENT_QUOTES, 'UTF-8') ?>"
+
               onsubmit="return confirm('Eintrag wirklich löschen?');"
             >
               <button type="submit" class="link danger">Löschen</button>
@@ -131,12 +149,16 @@
   <div class="dashboard-section">
     <div class="dashboard-section-header">
       <h2>Genetik</h2>
-      <a class="btn" href="/admin/genetics">Gene verwalten</a>
+
+      <a class="btn" href="<?= htmlspecialchars(path('/admin/genetics'), ENT_QUOTES, 'UTF-8') ?>">Gene verwalten</a>
+
     </div>
     <p>
       Pflege die genetischen Eigenschaften für Bartagamen und Hakennasennattern und nutze sie im
       öffentlichen Genetik-Rechner.
     </p>
-    <a class="link" href="/genetics" target="_blank">Genetik-Bereich ansehen</a>
+
+    <a class="link" href="<?= htmlspecialchars(path('/genetics'), ENT_QUOTES, 'UTF-8') ?>" target="_blank">Genetik-Bereich ansehen</a>
+
   </div>
 </section>
