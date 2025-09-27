@@ -708,6 +708,12 @@ function createAdmin(PDO $pdo, string $username, string $password): void
 
 function checkRequirements(string $databaseFile, string $uploadDir): array
 {
+    $phpRequirement = [
+        'label' => 'PHP-Version ≥ 8.3',
+        'met' => version_compare(PHP_VERSION, '8.3.0', '>='),
+        'current' => PHP_VERSION,
+    ];
+
     $extensions = [
         'pdo' => [
             'label' => 'PDO',
@@ -752,6 +758,7 @@ function checkRequirements(string $databaseFile, string $uploadDir): array
     ];
 
     return [
+        'php' => $phpRequirement,
         'extensions' => $extensions,
         'paths' => $paths,
     ];
@@ -774,6 +781,10 @@ function requirementsExtensionsAvailable(array $requirements): bool
 
 function requirementsAreMet(array $requirements): bool
 {
+    if (empty($requirements['php']['met'])) {
+        return false;
+    }
+
     if (!requirementsExtensionsAvailable($requirements)) {
         return false;
     }
