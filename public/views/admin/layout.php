@@ -17,6 +17,7 @@
                 <a href="<?= url('admin/posts') ?>">Beiträge</a>
                 <a href="<?= url('admin/pages') ?>">Seiten</a>
                 <a href="<?= url('admin/gallery') ?>">Galerie</a>
+                <a href="<?= url('admin/animals') ?>">Tiere</a>
                 <a href="<?= url('admin/genetics') ?>">Genetik</a>
                 <a href="<?= url('home') ?>" target="_blank">Zur Website</a>
                 <a href="<?= url('logout') ?>">Logout (<?= htmlspecialchars($_SESSION['username'] ?? 'Admin') ?>)</a>

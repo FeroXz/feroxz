@@ -7,7 +7,8 @@ Ein leichtgewichtiges PHP-CMS mit SQLite-Backend, das speziell für Shared-Hosti
 - PHP-Frontcontroller (`public/index.php`) mit sessionbasierter Authentifizierung
 - CRUD-Workflows für Beiträge, Seiten und Galerieeinträge (inkl. Datei-Uploads)
 - Genetik-Datenbank für *Pogona vitticeps* und *Heterodon nasicus* mit erweiterbarer Genverwaltung
-- Punnett-Quadrat-Rechner für rezessive, co-dominante und dominante Gene
+- Tierverwaltung inklusive Alter, Herkunft, Notizen und Bilder – Tiere können direkt im Rechner ausgewählt werden
+- Punnett-Quadrat-Rechner für rezessive, co-dominante und dominante Gene mit MorphMarket-ähnlicher Ausgabe
 - Persistente Speicherung in `storage/cms.sqlite` via PDO/SQLite
 - Standard-Admin-Login: `admin` / `12345678`
 
@@ -15,7 +16,7 @@ Ein leichtgewichtiges PHP-CMS mit SQLite-Backend, das speziell für Shared-Hosti
 
 | Komponente | Mindestversion |
 |------------|----------------|
-| PHP        | 8.1+ (getestet mit 8.2/8.3) |
+| PHP        | 8.1+ (getestet mit 8.3/8.4) |
 | SQLite     | 3 |
 
 Zusätzlich müssen die PHP-Erweiterungen `pdo_sqlite` und `sqlite3` aktiviert sein. Für Datei-Uploads benötigt das Verzeichnis `public/uploads` Schreibrechte.
@@ -25,7 +26,8 @@ Zusätzlich müssen die PHP-Erweiterungen `pdo_sqlite` und `sqlite3` aktiviert s
 1. **Dateien hochladen** – Über FTP oder das Hosting-Panel das Repository nach `public_html` (oder einen anderen Webroot) kopieren.
 2. **Berechtigungen setzen** – Die Verzeichnisse `storage/` und `public/uploads/` für den Webserver schreibbar machen (z. B. `chmod 775`).
 3. **Datenbank wird automatisch erstellt** – Beim ersten Aufruf legt das CMS `storage/cms.sqlite` an, erstellt Tabellen und füllt Demodaten.
-4. **Anmelden** – Rufe `/public/index.php?route=login` auf und melde dich mit `admin` / `12345678` an. Ändere das Passwort direkt in der Datenbank oder erweitere den Code um eine Passwort-Änderungs-Funktion.
+4. **Installer ausführen (optional)** – Wenn du einen frischen Admin anlegen möchtest, rufe `/public/index.php?route=install` auf und folge den Hinweisen. Der Standard-Login `admin` / `12345678` steht weiterhin bereit.
+5. **Genetik & Tiere pflegen** – Im Admin-Bereich unter „Genetik“ Gene/Arten verwalten und unter „Tiere“ eigene Tiere mit Genetikzuordnung erfassen. Diese können im Genetik-Rechner direkt ausgewählt werden.
 
 ## Struktur
 

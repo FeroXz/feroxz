@@ -15,30 +15,77 @@
 
 <?php if ($selectedSpecies): ?>
 <section class="card">
-    <h3>Eltern-Genotypen für <?= htmlspecialchars($selectedSpecies['common_name']) ?></h3>
+    <h3>Eltern-Genetik für <?= htmlspecialchars($selectedSpecies['common_name']) ?></h3>
+    <p class="help-text">Wähle optional eines deiner gespeicherten Tiere je Elternteil aus oder stelle die Gene manuell zusammen. Lass Gene im Auswahlfeld frei, wenn sie beim Tier nicht auftreten.</p>
     <form method="post" action="<?= url('genetics/calculator', ['species_id' => $selectedSpecies['id']]) ?>">
-        <div class="grid">
-            <?php foreach ($genes as $gene): ?>
-                <div class="card">
-                    <h4><?= htmlspecialchars($gene['name']) ?> <span class="badge inheritance-<?= htmlspecialchars($gene['inheritance']) ?>"><?= htmlspecialchars($gene['inheritance']) ?></span></h4>
-                    <label>Elter A</label>
-                    <select name="parent_a[<?= $gene['id'] ?>]">
-                        <?php foreach (genotypeOptions($gene['inheritance']) as $value => $label): ?>
-                            <option value="<?= $value ?>" <?= (($parentA[$gene['id']] ?? '') === $value) ? 'selected' : '' ?>><?= htmlspecialchars($label) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                    <label>Elter B</label>
-                    <select name="parent_b[<?= $gene['id'] ?>]">
-                        <?php foreach (genotypeOptions($gene['inheritance']) as $value => $label): ?>
-                            <option value="<?= $value ?>" <?= (($parentB[$gene['id']] ?? '') === $value) ? 'selected' : '' ?>><?= htmlspecialchars($label) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-            <?php endforeach; ?>
+        <div class="grid parents">
+            <div class="card">
+                <h4>Elter A</h4>
+                <label for="parent-a-animal">Tier auswählen</label>
+                <select id="parent-a-animal" name="parent_a_animal">
+                    <option value="">Manuelle Auswahl</option>
+                    <?php foreach ($animals as $animal): ?>
+                        <option value="<?= $animal['id'] ?>" <?= ($parentAnimalSelection['a'] ?? null) === $animal['id'] ? 'selected' : '' ?>><?= htmlspecialchars($animal['name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <label for="parent-a-genes">Gene von Elter A</label>
+                <select id="parent-a-genes" name="parent_a_genes[]" multiple size="<?= max(6, min(12, count($genes) * 2)) ?>">
+                    <?php foreach ($genes as $gene): ?>
+                        <optgroup label="<?= htmlspecialchars($gene['name']) ?> (<?= htmlspecialchars($gene['inheritance']) ?>)">
+                            <?php foreach (geneSelectionOptions($gene) as $value => $label): ?>
+                                <?php $optionValue = $gene['id'] . ':' . $value; ?>
+                                <option value="<?= $optionValue ?>" <?= in_array($optionValue, $parentAValues, true) ? 'selected' : '' ?>><?= htmlspecialchars($label) ?></option>
+                            <?php endforeach; ?>
+                        </optgroup>
+                    <?php endforeach; ?>
+                </select>
+                <p class="help-text">Aktuelle Auswahl: <?= htmlspecialchars(summarizeGeneStates($genes, $parentA)) ?></p>
+            </div>
+            <div class="card">
+                <h4>Elter B</h4>
+                <label for="parent-b-animal">Tier auswählen</label>
+                <select id="parent-b-animal" name="parent_b_animal">
+                    <option value="">Manuelle Auswahl</option>
+                    <?php foreach ($animals as $animal): ?>
+                        <option value="<?= $animal['id'] ?>" <?= ($parentAnimalSelection['b'] ?? null) === $animal['id'] ? 'selected' : '' ?>><?= htmlspecialchars($animal['name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <label for="parent-b-genes">Gene von Elter B</label>
+                <select id="parent-b-genes" name="parent_b_genes[]" multiple size="<?= max(6, min(12, count($genes) * 2)) ?>">
+                    <?php foreach ($genes as $gene): ?>
+                        <optgroup label="<?= htmlspecialchars($gene['name']) ?> (<?= htmlspecialchars($gene['inheritance']) ?>)">
+                            <?php foreach (geneSelectionOptions($gene) as $value => $label): ?>
+                                <?php $optionValue = $gene['id'] . ':' . $value; ?>
+                                <option value="<?= $optionValue ?>" <?= in_array($optionValue, $parentBValues, true) ? 'selected' : '' ?>><?= htmlspecialchars($label) ?></option>
+                            <?php endforeach; ?>
+                        </optgroup>
+                    <?php endforeach; ?>
+                </select>
+                <p class="help-text">Aktuelle Auswahl: <?= htmlspecialchars(summarizeGeneStates($genes, $parentB)) ?></p>
+            </div>
         </div>
         <button class="button" type="submit">Punnett-Quadrat berechnen</button>
     </form>
 </section>
+
+<?php if (!empty($animals)): ?>
+<section class="card">
+    <h3>Gespeicherte Tiere</h3>
+    <div class="calculator-summary">
+        <?php foreach ($animals as $animal): ?>
+            <div class="variant">
+                <div>
+                    <strong><?= htmlspecialchars($animal['name']) ?></strong><br>
+                    <small><?= htmlspecialchars($animal['age'] ? $animal['age'] : 'Alter unbekannt') ?></small>
+                </div>
+                <div class="probability">
+                    <?= htmlspecialchars(summarizeGeneStates($genes, buildAnimalGenotypeMap($genes, $animal['genotypes'] ?? []))) ?>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</section>
+<?php endif; ?>
 <?php endif; ?>
 
 <?php if (!empty($calculation['combinations'])): ?>

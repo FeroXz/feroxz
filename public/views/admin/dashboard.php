@@ -17,6 +17,10 @@
             <h3>Genetik-Arten</h3>
             <p><?= $speciesCount ?></p>
         </div>
+        <div class="card">
+            <h3>Tiere</h3>
+            <p><?= $animalCount ?></p>
+        </div>
     </div>
 </section>
 <section class="card">

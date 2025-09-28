@@ -91,7 +91,8 @@ switch ($route) {
             'postCount' => countAll($pdo, 'posts'),
             'pageCount' => countAll($pdo, 'pages'),
             'galleryCount' => countAll($pdo, 'gallery_items'),
-            'speciesCount' => countAll($pdo, 'species')
+            'speciesCount' => countAll($pdo, 'species'),
+            'animalCount' => countAll($pdo, 'animals')
         ]);
         break;
     case 'admin/posts':
@@ -109,6 +110,10 @@ switch ($route) {
     case 'admin/genetics':
         requireAdmin();
         handleGeneticsAdmin($pdo, $method);
+        break;
+    case 'admin/animals':
+        requireAdmin();
+        handleAnimals($pdo, $method);
         break;
     default:
         notFound();
@@ -167,6 +172,38 @@ function initializeDatabase(PDO $pdo): void
         description TEXT,
         visuals TEXT,
         FOREIGN KEY (species_id) REFERENCES species(id) ON DELETE CASCADE
+    )');
+
+    $pdo->exec('CREATE TABLE IF NOT EXISTS animals (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        species_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        slug TEXT UNIQUE,
+        age TEXT,
+        origin TEXT,
+        genetics_notes TEXT,
+        special_notes TEXT,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (species_id) REFERENCES species(id) ON DELETE CASCADE
+    )');
+
+    $pdo->exec('CREATE TABLE IF NOT EXISTS animal_genotypes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        animal_id INTEGER NOT NULL,
+        gene_id INTEGER NOT NULL,
+        genotype TEXT NOT NULL,
+        FOREIGN KEY (animal_id) REFERENCES animals(id) ON DELETE CASCADE,
+        FOREIGN KEY (gene_id) REFERENCES genes(id) ON DELETE CASCADE,
+        UNIQUE (animal_id, gene_id)
+    )');
+
+    $pdo->exec('CREATE TABLE IF NOT EXISTS animal_images (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        animal_id INTEGER NOT NULL,
+        image_path TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (animal_id) REFERENCES animals(id) ON DELETE CASCADE
     )');
 
     if ((int)$pdo->query('SELECT COUNT(*) FROM users')->fetchColumn() === 0) {
@@ -760,6 +797,135 @@ function handleGeneticsAdmin(PDO $pdo, string $method): void
     ]);
 }
 
+function handleAnimals(PDO $pdo, string $method): void
+{
+    if ($method === 'POST') {
+        $action = $_POST['action'] ?? '';
+
+        if ($action === 'delete-animal') {
+            $id = (int)($_POST['id'] ?? 0);
+            if ($id) {
+                deleteAnimal($pdo, $id);
+                setFlash('Tier entfernt.', 'success');
+            }
+            header('Location: ' . url('admin/animals'));
+            exit;
+        }
+
+        if ($action === 'save-animal') {
+            $id = (int)($_POST['id'] ?? 0);
+            $speciesId = (int)($_POST['species_id'] ?? 0);
+            $name = trim($_POST['name'] ?? '');
+            $age = trim($_POST['age'] ?? '');
+            $origin = trim($_POST['origin'] ?? '');
+            $geneticsNotes = trim($_POST['genetics_notes'] ?? '');
+            $specialNotes = trim($_POST['special_notes'] ?? '');
+            $genotypeInput = $_POST['genotypes'] ?? [];
+            $removeImages = $_POST['remove_images'] ?? [];
+
+            if ($speciesId === 0 || $name === '') {
+                setFlash('Bitte einen Namen und eine Art für das Tier wählen.', 'error');
+                header('Location: ' . url('admin/animals', ['id' => $id ?: null]));
+                exit;
+            }
+
+            $animalId = saveAnimal($pdo, [
+                'id' => $id,
+                'species_id' => $speciesId,
+                'name' => $name,
+                'age' => $age,
+                'origin' => $origin,
+                'genetics_notes' => $geneticsNotes,
+                'special_notes' => $specialNotes
+            ]);
+
+            $genes = fetchGenesForSpecies($pdo, $speciesId);
+            $geneMap = [];
+            foreach ($genes as $gene) {
+                $geneMap[$gene['id']] = $gene;
+            }
+
+            $pdo->prepare('DELETE FROM animal_genotypes WHERE animal_id = ?')->execute([$animalId]);
+            foreach ($genotypeInput as $geneId => $value) {
+                $geneId = (int)$geneId;
+                if (!isset($geneMap[$geneId])) {
+                    continue;
+                }
+                $state = in_array($value, ['dominant', 'heterozygous', 'recessive'], true) ? $value : null;
+                if ($state === null) {
+                    continue;
+                }
+                $defaultState = defaultGenotypeForInheritance($geneMap[$geneId]['inheritance']);
+                if ($state === $defaultState) {
+                    continue;
+                }
+                $stmt = $pdo->prepare('INSERT INTO animal_genotypes (animal_id, gene_id, genotype) VALUES (?, ?, ?)');
+                $stmt->execute([$animalId, $geneId, $state]);
+            }
+
+            if (!empty($removeImages)) {
+                foreach ($removeImages as $imageId) {
+                    $imageId = (int)$imageId;
+                    deleteAnimalImage($pdo, $animalId, $imageId);
+                }
+            }
+
+            if (!empty($_FILES['images']) && is_array($_FILES['images']['name'])) {
+                $fileCount = count($_FILES['images']['name']);
+                for ($i = 0; $i < $fileCount; $i++) {
+                    $file = [
+                        'name' => $_FILES['images']['name'][$i],
+                        'type' => $_FILES['images']['type'][$i],
+                        'tmp_name' => $_FILES['images']['tmp_name'][$i],
+                        'error' => $_FILES['images']['error'][$i],
+                        'size' => $_FILES['images']['size'][$i]
+                    ];
+                    if ($file['error'] !== UPLOAD_ERR_OK) {
+                        continue;
+                    }
+                    $path = handleUpload($file);
+                    if ($path !== '') {
+                        $stmt = $pdo->prepare('INSERT INTO animal_images (animal_id, image_path, created_at) VALUES (?, ?, ?)');
+                        $stmt->execute([$animalId, $path, date(DATE_ATOM)]);
+                    }
+                }
+            }
+
+            setFlash($id ? 'Tier aktualisiert.' : 'Tier angelegt.', 'success');
+            header('Location: ' . url('admin/animals', ['id' => $animalId]));
+            exit;
+        }
+    }
+
+    $animals = fetchAnimals($pdo);
+    $species = fetchSpecies($pdo);
+    $genesBySpecies = [];
+    foreach ($species as $sp) {
+        $genesBySpecies[$sp['id']] = fetchGenesForSpecies($pdo, $sp['id']);
+    }
+
+    $editId = isset($_GET['id']) ? (int)$_GET['id'] : null;
+    $editAnimal = null;
+    $editGenotypes = [];
+    $editImages = [];
+    if ($editId) {
+        $editAnimal = findAnimal($pdo, $editId);
+        if ($editAnimal) {
+            $editGenotypes = fetchAnimalGenotypes($pdo, $editId);
+            $editImages = fetchAnimalImages($pdo, $editId);
+        }
+    }
+
+    renderAdmin('animals/index', [
+        'animals' => $animals,
+        'species' => $species,
+        'genesBySpecies' => $genesBySpecies,
+        'editAnimal' => $editAnimal,
+        'editGenotypes' => $editGenotypes,
+        'editImages' => $editImages
+    ]);
+}
+
 function fetchAllGenes(PDO $pdo): array
 {
     $stmt = $pdo->query('SELECT g.*, s.common_name FROM genes g JOIN species s ON s.id = g.species_id ORDER BY s.common_name, g.name');
@@ -768,6 +934,193 @@ function fetchAllGenes(PDO $pdo): array
         $gene['visuals'] = $gene['visuals'] ? json_decode($gene['visuals'], true) : [];
     }
     return $genes;
+}
+
+function fetchAnimals(PDO $pdo): array
+{
+    $stmt = $pdo->query('SELECT a.*, s.common_name, s.latin_name FROM animals a JOIN species s ON s.id = a.species_id ORDER BY a.created_at DESC');
+    $animals = $stmt->fetchAll();
+    foreach ($animals as &$animal) {
+        $animal['genotypes'] = fetchAnimalGenotypes($pdo, $animal['id']);
+        $animal['images'] = fetchAnimalImages($pdo, $animal['id']);
+    }
+    return $animals;
+}
+
+function fetchAnimalsBySpecies(PDO $pdo, int $speciesId): array
+{
+    $stmt = $pdo->prepare('SELECT a.* FROM animals a WHERE a.species_id = ? ORDER BY a.name ASC');
+    $stmt->execute([$speciesId]);
+    $animals = $stmt->fetchAll();
+    foreach ($animals as &$animal) {
+        $animal['genotypes'] = fetchAnimalGenotypes($pdo, $animal['id']);
+        $animal['images'] = fetchAnimalImages($pdo, $animal['id']);
+    }
+    return $animals;
+}
+
+function findAnimal(PDO $pdo, int $id): ?array
+{
+    $stmt = $pdo->prepare('SELECT * FROM animals WHERE id = ?');
+    $stmt->execute([$id]);
+    $animal = $stmt->fetch();
+    return $animal ?: null;
+}
+
+function saveAnimal(PDO $pdo, array $data): int
+{
+    $now = date(DATE_ATOM);
+    if (!empty($data['id'])) {
+        $stmt = $pdo->prepare('UPDATE animals SET species_id = ?, name = ?, slug = ?, age = ?, origin = ?, genetics_notes = ?, special_notes = ?, updated_at = ? WHERE id = ?');
+        $slug = $data['slug'] ?? slugify($data['name']);
+        $stmt->execute([
+            $data['species_id'],
+            $data['name'],
+            $slug,
+            $data['age'],
+            $data['origin'],
+            $data['genetics_notes'],
+            $data['special_notes'],
+            $now,
+            $data['id']
+        ]);
+        return (int)$data['id'];
+    }
+
+    $stmt = $pdo->prepare('INSERT INTO animals (species_id, name, slug, age, origin, genetics_notes, special_notes, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    $slug = $data['slug'] ?? slugify($data['name']);
+    $stmt->execute([
+        $data['species_id'],
+        $data['name'],
+        $slug,
+        $data['age'],
+        $data['origin'],
+        $data['genetics_notes'],
+        $data['special_notes'],
+        $now,
+        $now
+    ]);
+
+    return (int)$pdo->lastInsertId();
+}
+
+function deleteAnimal(PDO $pdo, int $id): void
+{
+    $images = fetchAnimalImages($pdo, $id);
+    foreach ($images as $image) {
+        $relative = ltrim(parse_url($image['image_path'], PHP_URL_PATH), '/');
+        $path = __DIR__ . '/' . $relative;
+        if (is_file($path)) {
+            @unlink($path);
+        }
+    }
+    $pdo->prepare('DELETE FROM animals WHERE id = ?')->execute([$id]);
+}
+
+function fetchAnimalGenotypes(PDO $pdo, int $animalId): array
+{
+    $stmt = $pdo->prepare('SELECT gene_id, genotype FROM animal_genotypes WHERE animal_id = ?');
+    $stmt->execute([$animalId]);
+    $rows = $stmt->fetchAll();
+    $map = [];
+    foreach ($rows as $row) {
+        $map[(int)$row['gene_id']] = $row['genotype'];
+    }
+    return $map;
+}
+
+function fetchAnimalImages(PDO $pdo, int $animalId): array
+{
+    $stmt = $pdo->prepare('SELECT id, image_path FROM animal_images WHERE animal_id = ? ORDER BY created_at ASC');
+    $stmt->execute([$animalId]);
+    return $stmt->fetchAll();
+}
+
+function deleteAnimalImage(PDO $pdo, int $animalId, int $imageId): void
+{
+    $stmt = $pdo->prepare('SELECT image_path FROM animal_images WHERE id = ? AND animal_id = ?');
+    $stmt->execute([$imageId, $animalId]);
+    $image = $stmt->fetch();
+    if ($image) {
+        $pdo->prepare('DELETE FROM animal_images WHERE id = ?')->execute([$imageId]);
+        $relative = ltrim(parse_url($image['image_path'], PHP_URL_PATH), '/');
+        $path = __DIR__ . '/' . $relative;
+        if (is_file($path)) {
+            @unlink($path);
+        }
+    }
+}
+
+function defaultGenotypeForInheritance(string $inheritance): string
+{
+    return match ($inheritance) {
+        'recessive' => 'dominant',
+        default => 'recessive'
+    };
+}
+
+function defaultSelectionsForGenes(array $genes): array
+{
+    $defaults = [];
+    foreach ($genes as $gene) {
+        $defaults[$gene['id']] = defaultGenotypeForInheritance($gene['inheritance']);
+    }
+    return $defaults;
+}
+
+function parseParentSelections($values, array $genes): array
+{
+    if (!is_array($values)) {
+        $values = $values === null ? [] : [$values];
+    }
+    $selections = defaultSelectionsForGenes($genes);
+    $geneIds = array_column($genes, 'id');
+    $validGeneIds = array_flip($geneIds);
+
+    foreach ($values as $value) {
+        if (!is_string($value) || strpos($value, ':') === false) {
+            continue;
+        }
+        [$geneId, $state] = explode(':', $value, 2);
+        $geneId = (int)$geneId;
+        if (!isset($validGeneIds[$geneId])) {
+            continue;
+        }
+        if (!in_array($state, ['dominant', 'heterozygous', 'recessive'], true)) {
+            continue;
+        }
+        $selections[$geneId] = $state;
+    }
+
+    return $selections;
+}
+
+function selectionValuesFromMap(array $map, array $genes): array
+{
+    $values = [];
+    $defaults = defaultSelectionsForGenes($genes);
+    foreach ($map as $geneId => $state) {
+        $default = $defaults[$geneId] ?? null;
+        if ($default === null) {
+            continue;
+        }
+        if ($state === $default) {
+            continue;
+        }
+        $values[] = $geneId . ':' . $state;
+    }
+    return $values;
+}
+
+function buildAnimalGenotypeMap(array $genes, array $stored): array
+{
+    $map = defaultSelectionsForGenes($genes);
+    foreach ($stored as $geneId => $state) {
+        if (isset($map[$geneId]) && in_array($state, ['dominant', 'heterozygous', 'recessive'], true)) {
+            $map[$geneId] = $state;
+        }
+    }
+    return $map;
 }
 
 function handleGeneticsCalculator(PDO $pdo, string $method): void
@@ -782,6 +1135,10 @@ function handleGeneticsCalculator(PDO $pdo, string $method): void
     ];
     $parentASelections = [];
     $parentBSelections = [];
+    $parentAValues = [];
+    $parentBValues = [];
+    $parentAnimalSelection = ['a' => null, 'b' => null];
+    $availableAnimals = [];
 
     if ($selectedSpeciesId) {
         foreach ($speciesList as $sp) {
@@ -792,13 +1149,38 @@ function handleGeneticsCalculator(PDO $pdo, string $method): void
         }
         if ($selectedSpecies) {
             $genes = fetchGenesForSpecies($pdo, $selectedSpeciesId);
+            $availableAnimals = fetchAnimalsBySpecies($pdo, $selectedSpeciesId);
         }
     }
 
     if ($method === 'POST' && $selectedSpecies) {
-        $parentASelections = $_POST['parent_a'] ?? [];
-        $parentBSelections = $_POST['parent_b'] ?? [];
+        $parentAAnimalId = (int)($_POST['parent_a_animal'] ?? 0);
+        $parentBAnimalId = (int)($_POST['parent_b_animal'] ?? 0);
+        $parentAnimalSelection = ['a' => $parentAAnimalId ?: null, 'b' => $parentBAnimalId ?: null];
+
+        $animalsById = [];
+        foreach ($availableAnimals as $animal) {
+            $animalsById[$animal['id']] = $animal;
+        }
+
+        if ($parentAAnimalId && isset($animalsById[$parentAAnimalId])) {
+            $parentASelections = buildAnimalGenotypeMap($genes, $animalsById[$parentAAnimalId]['genotypes'] ?? []);
+        } else {
+            $parentASelections = parseParentSelections($_POST['parent_a_genes'] ?? [], $genes);
+        }
+
+        if ($parentBAnimalId && isset($animalsById[$parentBAnimalId])) {
+            $parentBSelections = buildAnimalGenotypeMap($genes, $animalsById[$parentBAnimalId]['genotypes'] ?? []);
+        } else {
+            $parentBSelections = parseParentSelections($_POST['parent_b_genes'] ?? [], $genes);
+        }
+
+        $parentAValues = selectionValuesFromMap($parentASelections, $genes);
+        $parentBValues = selectionValuesFromMap($parentBSelections, $genes);
         $calculation = computeGenetics($genes, $parentASelections, $parentBSelections);
+    } elseif ($selectedSpecies) {
+        $parentASelections = defaultSelectionsForGenes($genes);
+        $parentBSelections = defaultSelectionsForGenes($genes);
     }
 
     render('genetics/calculator', [
@@ -808,6 +1190,10 @@ function handleGeneticsCalculator(PDO $pdo, string $method): void
         'calculation' => $calculation,
         'parentA' => $parentASelections,
         'parentB' => $parentBSelections,
+        'parentAValues' => $parentAValues,
+        'parentBValues' => $parentBValues,
+        'parentAnimalSelection' => $parentAnimalSelection,
+        'animals' => $availableAnimals,
         'pages' => fetchPages($pdo)
     ]);
 }
@@ -1241,4 +1627,61 @@ function genotypeOptions(string $inheritance): array
         'heterozygous' => 'Träger',
         'recessive' => 'Normal'
     ];
+}
+
+function geneSelectionOptions(array $gene): array
+{
+    $options = genotypeOptions($gene['inheritance']);
+    $choices = [];
+    foreach ($options as $key => $label) {
+        $choices[$key] = $gene['name'] . ' – ' . $label;
+    }
+    return $choices;
+}
+
+function describeGeneState(array $gene, string $state): string
+{
+    $inheritance = $gene['inheritance'];
+    $name = $gene['name'];
+    return match ($inheritance) {
+        'recessive' => match ($state) {
+            'recessive' => $name,
+            'heterozygous' => 'het ' . $name,
+            default => 'normal ' . $name
+        },
+        'co-dominant' => match ($state) {
+            'dominant' => 'Super ' . $name,
+            'heterozygous' => $name,
+            default => 'normal ' . $name
+        },
+        default => match ($state) {
+            'dominant' => $name,
+            'heterozygous' => $name,
+            default => 'normal ' . $name
+        }
+    };
+}
+
+function summarizeGeneStates(array $genes, array $map): string
+{
+    $defaults = defaultSelectionsForGenes($genes);
+    $labels = [];
+    foreach ($genes as $gene) {
+        $geneId = $gene['id'];
+        $state = $map[$geneId] ?? ($defaults[$geneId] ?? null);
+        $default = $defaults[$geneId] ?? null;
+        if ($state === null || $default === null) {
+            continue;
+        }
+        if ($state === $default) {
+            continue;
+        }
+        $labels[] = describeGeneState($gene, $state);
+    }
+
+    if (empty($labels)) {
+        return 'Normal / Wildtyp';
+    }
+
+    return implode(', ', $labels);
 }
