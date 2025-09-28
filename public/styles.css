@@ -345,6 +345,11 @@ textarea {
   transition: border 0.2s ease, box-shadow 0.2s ease;
 }
 
+.input-error {
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18) !important;
+}
+
 input:focus,
 select:focus,
 textarea:focus {
@@ -379,6 +384,55 @@ textarea {
 
 .grid.parents {
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.gene-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.gene-search {
+  display: flex;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.gene-search input {
+  flex: 1;
+}
+
+.gene-search .button {
+  flex-shrink: 0;
+}
+
+.selected-genes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.selected-gene {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--border);
+  background: var(--surface-muted);
+}
+
+.selected-gene-name {
+  font-weight: 600;
+  min-width: 160px;
+}
+
+.no-genes {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
 }
 
 .table-responsive {
