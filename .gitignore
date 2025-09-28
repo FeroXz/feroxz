@@ -1,0 +1,10 @@
+/vendor/
+node_modules/
+*.log
+.DS_Store
+storage/*.sqlite
+storage/*.db
+public/uploads/*
+!public/uploads/.gitignore
+uploads_tmp/
+.env
