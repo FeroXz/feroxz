@@ -8,6 +8,7 @@ Ein leichtgewichtiges PHP-CMS mit SQLite-Backend, das speziell für Shared-Hosti
 - CRUD-Workflows für Beiträge, Seiten und Galerieeinträge (inkl. Datei-Uploads)
 - Genetik-Datenbank für *Pogona vitticeps* und *Heterodon nasicus* mit erweiterbarer Genverwaltung
 - Tierverwaltung inklusive Alter, Herkunft, Notizen und Bilder – Tiere können direkt im Rechner ausgewählt werden
+- Öffentliche Tierübersicht mit kuratierten Showcase-Karten für ausgewählte Tiere
 - Punnett-Quadrat-Rechner für rezessive, co-dominante und dominante Gene mit MorphMarket-ähnlicher Ausgabe
 - Persistente Speicherung in `storage/cms.sqlite` via PDO/SQLite
 - Standard-Admin-Login: `admin` / `12345678`

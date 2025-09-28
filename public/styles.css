@@ -278,6 +278,24 @@ form label {
   margin: 0.75rem 0 0.25rem;
 }
 
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+  font-weight: 500;
+}
+
+.checkbox-field input[type="checkbox"] {
+  width: auto;
+  height: auto;
+  accent-color: var(--accent);
+}
+
+.checkbox-field span {
+  font-weight: 500;
+}
+
 form input[type="text"],
 form input[type="password"],
 form textarea,
@@ -336,6 +354,10 @@ form textarea {
   margin-left: 0.5rem;
 }
 
+.badge.success {
+  background: var(--success);
+}
+
 .gallery-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -358,6 +380,93 @@ form textarea {
 
 .gallery-item .content {
   padding: 1rem;
+}
+
+.showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.75rem;
+  margin-top: 1.5rem;
+}
+
+.showcase-card {
+  background: var(--light);
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: 0 18px 35px -25px rgba(17, 24, 39, 0.4);
+  display: flex;
+  flex-direction: column;
+}
+
+.showcase-card__media {
+  position: relative;
+  padding-top: 62%;
+  background: rgba(148, 163, 184, 0.25);
+}
+
+.showcase-card__media img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.showcase-card__placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(26, 77, 122, 0.85), rgba(15, 145, 86, 0.85));
+  color: #fff;
+  font-size: 2.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.showcase-card__body {
+  padding: 1.25rem 1.5rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.showcase-card__body h3 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.showcase-card__species {
+  margin: 0;
+  font-weight: 600;
+  color: var(--primary);
+  opacity: 0.85;
+}
+
+.showcase-card__species span {
+  font-weight: 500;
+  color: inherit;
+  opacity: 0.8;
+}
+
+.showcase-card__facts {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.showcase-card__facts strong {
+  font-weight: 600;
+  color: var(--text);
+}
+
+body.dark-mode .showcase-card__placeholder {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(34, 197, 94, 0.8));
 }
 
 .badge.inheritance-recessive {

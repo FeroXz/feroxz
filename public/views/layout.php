@@ -14,6 +14,7 @@
         <div class="header-controls">
             <nav class="main-nav">
                 <a href="<?= url('home') ?>">Start</a>
+                <a href="<?= url('animals') ?>">Tiere</a>
                 <a href="<?= url('gallery') ?>">Galerie</a>
                 <a href="<?= url('genetics') ?>">Genetik</a>
                 <?php foreach ($pages as $navPage): ?>

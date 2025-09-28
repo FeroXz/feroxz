@@ -30,6 +30,11 @@
                 <label for="animal-special-notes">Besonderheiten</label>
                 <textarea id="animal-special-notes" name="special_notes" rows="3" placeholder="Charakter, Gesundheit, Bemerkungen ..."><?= $isEditing ? htmlspecialchars($editAnimal['special_notes'] ?? '') : '' ?></textarea>
 
+                <label class="checkbox-field">
+                    <input type="checkbox" name="is_showcased" value="1" <?= $isEditing ? (!empty($editAnimal['is_showcased']) ? 'checked' : '') : '' ?>>
+                    <span>In der öffentlichen Tierübersicht anzeigen</span>
+                </label>
+
                 <fieldset>
                     <legend>Genetik</legend>
                     <p class="help-text">Wähle die passenden Genotypen aus. Nicht ausgewählte Gene werden als Standard interpretiert.</p>
@@ -89,6 +94,7 @@
                                 <th>Art</th>
                                 <th>Alter</th>
                                 <th>Genetik</th>
+                                <th>Übersicht</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -101,6 +107,7 @@
                                     <td><?= htmlspecialchars($animal['common_name']) ?></td>
                                     <td><?= htmlspecialchars(isset($animal['age']) && $animal['age'] !== '' ? $animal['age'] : '–') ?></td>
                                     <td><?= htmlspecialchars(summarizeGeneStates($genesForSpecies, $genotypeMap)) ?></td>
+                                    <td><?= !empty($animal['is_showcased']) ? '<span class="badge success">Ja</span>' : '–' ?></td>
                                     <td class="actions">
                                         <a class="button small" href="<?= url('admin/animals', ['id' => $animal['id']]) ?>">Bearbeiten</a>
                                         <form method="post" action="<?= url('admin/animals') ?>" onsubmit="return confirm('Tier wirklich löschen?');">

@@ -56,6 +56,21 @@ switch ($route) {
             'pages' => fetchPages($pdo)
         ]);
         break;
+    case 'animals':
+        $showcased = fetchShowcasedAnimals($pdo);
+        $genesBySpecies = [];
+        foreach ($showcased as $animal) {
+            $speciesId = (int)$animal['species_id'];
+            if (!isset($genesBySpecies[$speciesId])) {
+                $genesBySpecies[$speciesId] = fetchGenesForSpecies($pdo, $speciesId);
+            }
+        }
+        render('animals/index', [
+            'animals' => $showcased,
+            'genesBySpecies' => $genesBySpecies,
+            'pages' => fetchPages($pdo)
+        ]);
+        break;
     case 'genetics':
         render('genetics/index', [
             'species' => fetchSpecies($pdo),
@@ -183,6 +198,7 @@ function initializeDatabase(PDO $pdo): void
         origin TEXT,
         genetics_notes TEXT,
         special_notes TEXT,
+        is_showcased INTEGER NOT NULL DEFAULT 0,
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL,
         FOREIGN KEY (species_id) REFERENCES species(id) ON DELETE CASCADE
@@ -205,6 +221,19 @@ function initializeDatabase(PDO $pdo): void
         created_at TEXT NOT NULL,
         FOREIGN KEY (animal_id) REFERENCES animals(id) ON DELETE CASCADE
     )');
+
+    // Ensure showcase column exists when updating from previous versions
+    $columns = $pdo->query('PRAGMA table_info(animals)')->fetchAll();
+    $hasShowcaseColumn = false;
+    foreach ($columns as $column) {
+        if (($column['name'] ?? '') === 'is_showcased') {
+            $hasShowcaseColumn = true;
+            break;
+        }
+    }
+    if (!$hasShowcaseColumn) {
+        $pdo->exec('ALTER TABLE animals ADD COLUMN is_showcased INTEGER NOT NULL DEFAULT 0');
+    }
 
     if ((int)$pdo->query('SELECT COUNT(*) FROM users')->fetchColumn() === 0) {
         $stmt = $pdo->prepare('INSERT INTO users (username, password_hash, created_at) VALUES (?, ?, ?)');
@@ -820,6 +849,7 @@ function handleAnimals(PDO $pdo, string $method): void
             $origin = trim($_POST['origin'] ?? '');
             $geneticsNotes = trim($_POST['genetics_notes'] ?? '');
             $specialNotes = trim($_POST['special_notes'] ?? '');
+            $isShowcased = isset($_POST['is_showcased']) ? 1 : 0;
             $genotypeInput = $_POST['genotypes'] ?? [];
             $removeImages = $_POST['remove_images'] ?? [];
 
@@ -836,7 +866,8 @@ function handleAnimals(PDO $pdo, string $method): void
                 'age' => $age,
                 'origin' => $origin,
                 'genetics_notes' => $geneticsNotes,
-                'special_notes' => $specialNotes
+                'special_notes' => $specialNotes,
+                'is_showcased' => $isShowcased
             ]);
 
             $genes = fetchGenesForSpecies($pdo, $speciesId);
@@ -947,6 +978,17 @@ function fetchAnimals(PDO $pdo): array
     return $animals;
 }
 
+function fetchShowcasedAnimals(PDO $pdo): array
+{
+    $stmt = $pdo->query('SELECT a.*, s.common_name, s.latin_name FROM animals a JOIN species s ON s.id = a.species_id WHERE a.is_showcased = 1 ORDER BY datetime(a.updated_at) DESC');
+    $animals = $stmt->fetchAll();
+    foreach ($animals as &$animal) {
+        $animal['genotypes'] = fetchAnimalGenotypes($pdo, $animal['id']);
+        $animal['images'] = fetchAnimalImages($pdo, $animal['id']);
+    }
+    return $animals;
+}
+
 function fetchAnimalsBySpecies(PDO $pdo, int $speciesId): array
 {
     $stmt = $pdo->prepare('SELECT a.* FROM animals a WHERE a.species_id = ? ORDER BY a.name ASC');
@@ -971,7 +1013,7 @@ function saveAnimal(PDO $pdo, array $data): int
 {
     $now = date(DATE_ATOM);
     if (!empty($data['id'])) {
-        $stmt = $pdo->prepare('UPDATE animals SET species_id = ?, name = ?, slug = ?, age = ?, origin = ?, genetics_notes = ?, special_notes = ?, updated_at = ? WHERE id = ?');
+        $stmt = $pdo->prepare('UPDATE animals SET species_id = ?, name = ?, slug = ?, age = ?, origin = ?, genetics_notes = ?, special_notes = ?, is_showcased = ?, updated_at = ? WHERE id = ?');
         $slug = $data['slug'] ?? slugify($data['name']);
         $stmt->execute([
             $data['species_id'],
@@ -981,13 +1023,14 @@ function saveAnimal(PDO $pdo, array $data): int
             $data['origin'],
             $data['genetics_notes'],
             $data['special_notes'],
+            (int)!empty($data['is_showcased']),
             $now,
             $data['id']
         ]);
         return (int)$data['id'];
     }
 
-    $stmt = $pdo->prepare('INSERT INTO animals (species_id, name, slug, age, origin, genetics_notes, special_notes, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    $stmt = $pdo->prepare('INSERT INTO animals (species_id, name, slug, age, origin, genetics_notes, special_notes, is_showcased, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
     $slug = $data['slug'] ?? slugify($data['name']);
     $stmt->execute([
         $data['species_id'],
@@ -997,6 +1040,7 @@ function saveAnimal(PDO $pdo, array $data): int
         $data['origin'],
         $data['genetics_notes'],
         $data['special_notes'],
+        (int)!empty($data['is_showcased']),
         $now,
         $now
     ]);
