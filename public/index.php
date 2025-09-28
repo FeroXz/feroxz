@@ -843,6 +843,10 @@ function computeGenetics(array $genes, array $parentA, array $parentB): array
         }
 
         $total = max(array_sum($punnett), 1);
+        $probabilities = [];
+        foreach ($punnett as $genotype => $count) {
+            $probabilities[$genotype] = $count / $total;
+        }
         $variants = [];
         foreach ($punnett as $genotype => $count) {
             $phenotype = matchPhenotype($inheritance, $genotype, $visuals);
@@ -852,7 +856,7 @@ function computeGenetics(array $genes, array $parentA, array $parentB): array
                 'phenotype' => $phenotype,
                 'probability' => round($fraction * 100, 2),
                 'fraction' => $fraction,
-                'descriptor' => descriptorForVariant($gene, $genotype, $phenotype)
+                'descriptor' => descriptorForVariant($gene, $genotype, $phenotype, $probabilities)
             ];
         }
 
@@ -872,7 +876,7 @@ function computeGenetics(array $genes, array $parentA, array $parentB): array
         foreach ($combinations as $combo) {
             foreach ($variants as $variant) {
                 $descriptors = $combo['descriptors'];
-                if ($variant['descriptor'] !== '') {
+                if (!empty($variant['descriptor'])) {
                     $descriptors[] = $variant['descriptor'];
                 }
                 $newCombinations[] = [
@@ -887,9 +891,8 @@ function computeGenetics(array $genes, array $parentA, array $parentB): array
 
     $aggregated = [];
     foreach ($combinations as $combo) {
-        $descriptors = $combo['descriptors'];
-        usort($descriptors, 'sortDescriptors');
-        $key = implode('||', $descriptors);
+        $descriptors = normalizeDescriptors($combo['descriptors']);
+        $key = descriptorsKey($descriptors);
         if (!isset($aggregated[$key])) {
             $aggregated[$key] = [
                 'probability' => 0,
@@ -919,25 +922,68 @@ function computeGenetics(array $genes, array $parentA, array $parentB): array
     ];
 }
 
-function sortDescriptors(string $a, string $b): int
+function normalizeDescriptors(array $descriptors): array
 {
-    $weight = function (string $value): int {
-        $lower = strtolower($value);
-        if (str_starts_with($lower, 'het ')) {
-            return 1;
-        }
-        if (str_contains($lower, 'normal')) {
-            return 2;
-        }
-        return 0;
-    };
+    $filtered = array_values(array_filter($descriptors, function ($descriptor) {
+        return !empty($descriptor);
+    }));
 
-    $weightA = $weight($a);
-    $weightB = $weight($b);
+    usort($filtered, 'compareDescriptors');
+
+    return $filtered;
+}
+
+function compareDescriptors(array $a, array $b): int
+{
+    $weights = [
+        'visual' => 0,
+        'het' => 1,
+        'possible_het' => 2,
+        'normal' => 3,
+        'text' => 4
+    ];
+
+    $typeA = $a['type'] ?? 'text';
+    $typeB = $b['type'] ?? 'text';
+    $weightA = $weights[$typeA] ?? 99;
+    $weightB = $weights[$typeB] ?? 99;
+
     if ($weightA === $weightB) {
-        return strnatcasecmp($a, $b);
+        $geneCompare = strnatcasecmp($a['gene'] ?? '', $b['gene'] ?? '');
+        if ($geneCompare !== 0) {
+            return $geneCompare;
+        }
+
+        $labelCompare = strnatcasecmp($a['label'] ?? '', $b['label'] ?? '');
+        if ($labelCompare !== 0) {
+            return $labelCompare;
+        }
+
+        $chanceA = $a['chance'] ?? 0;
+        $chanceB = $b['chance'] ?? 0;
+
+        return $chanceA <=> $chanceB;
     }
+
     return $weightA <=> $weightB;
+}
+
+function descriptorsKey(array $descriptors): string
+{
+    $normalized = array_map(function ($descriptor) {
+        $base = [
+            'type' => $descriptor['type'] ?? 'text',
+            'gene' => $descriptor['gene'] ?? '',
+            'label' => $descriptor['label'] ?? ''
+        ];
+        if (isset($descriptor['chance'])) {
+            $base['chance'] = round($descriptor['chance'], 4);
+        }
+
+        return $base;
+    }, $descriptors);
+
+    return md5(json_encode($normalized));
 }
 
 function formatDescriptorLabel(array $descriptors): string
@@ -948,58 +994,145 @@ function formatDescriptorLabel(array $descriptors): string
 
     $visuals = [];
     $hets = [];
-    $others = [];
+    $possibles = [];
 
     foreach ($descriptors as $descriptor) {
-        $lower = strtolower($descriptor);
-        if (str_starts_with($lower, 'het ')) {
-            $hets[] = $descriptor;
-        } elseif (str_contains($lower, 'normal')) {
-            $others[] = ucfirst($descriptor);
-        } else {
-            $visuals[] = $descriptor;
+        $type = $descriptor['type'] ?? 'text';
+        $label = trim($descriptor['label'] ?? '');
+
+        switch ($type) {
+            case 'visual':
+                $visuals[] = $label;
+                break;
+            case 'het':
+                $hets[] = $label !== '' ? $label : ('Het ' . ($descriptor['gene'] ?? ''));
+                break;
+            case 'possible_het':
+                $possibles[] = formatPossibleHetLabel($descriptor);
+                break;
+            case 'text':
+            case 'normal':
+                if ($label !== '') {
+                    $visuals[] = $label;
+                }
+                break;
         }
     }
 
-    $parts = array_filter(array_merge($visuals, $hets, $others));
+    $parts = array_filter(array_merge($visuals, $hets, $possibles));
+
     $label = trim(implode(' ', $parts));
 
     return $label !== '' ? $label : 'Normal';
 }
 
-function descriptorForVariant(array $gene, string $genotype, string $phenotype): string
+function formatPossibleHetLabel(array $descriptor): string
+{
+    $chance = max(min($descriptor['chance'] ?? 0, 1), 0);
+    $percent = $chance * 100;
+    $precision = $percent >= 10 ? 1 : 2;
+    $formatted = rtrim(rtrim(number_format($percent, $precision), '0'), '.');
+    if ($formatted === '') {
+        $formatted = '0';
+    }
+
+    $gene = $descriptor['gene'] ?? '';
+    if ($gene === '') {
+        $gene = trim(preg_replace('/^Het\s+/i', '', $descriptor['label'] ?? ''));
+    }
+
+    return $formatted . '% pos het ' . $gene;
+}
+
+function descriptorForVariant(array $gene, string $genotype, string $phenotype, array $probabilities): ?array
 {
     $inheritance = $gene['inheritance'];
     $name = $gene['name'];
+    $visuals = $gene['visuals'] ?? [];
     $phenotype = trim($phenotype);
-    $phenotypeLower = strtolower($phenotype);
 
     if ($inheritance === 'recessive') {
-        return match ($genotype) {
-            'aa' => $phenotype !== '' ? $phenotype : $name,
-            'Aa' => 'het ' . $name,
-            default => ''
-        };
+        if ($genotype === 'aa') {
+            $label = $phenotype !== '' ? $phenotype : $name;
+            return [
+                'type' => 'visual',
+                'gene' => $name,
+                'label' => $label
+            ];
+        }
+
+        if ($genotype === 'Aa') {
+            $hetLabel = $visuals['heterozygous'] ?? ('Het ' . $name);
+            $probAA = $probabilities['AA'] ?? 0;
+            $probAa = $probabilities['Aa'] ?? 0;
+            $nonVisual = $probAA + $probAa;
+
+            if ($probAA <= 0 || $nonVisual <= 0) {
+                return [
+                    'type' => 'het',
+                    'gene' => $name,
+                    'label' => $hetLabel
+                ];
+            }
+
+            $chance = $probAa / $nonVisual;
+
+            if ($chance >= 0.999) {
+                return [
+                    'type' => 'het',
+                    'gene' => $name,
+                    'label' => $hetLabel
+                ];
+            }
+
+            return [
+                'type' => 'possible_het',
+                'gene' => $name,
+                'label' => $hetLabel,
+                'chance' => $chance
+            ];
+        }
+
+        return null;
     }
 
     if ($inheritance === 'co-dominant') {
         if ($genotype === 'AA') {
-            return $phenotype !== '' ? $phenotype : ('Super ' . $name);
+            $label = $phenotype !== '' ? $phenotype : ($visuals['dominant'] ?? ('Super ' . $name));
+            return [
+                'type' => 'visual',
+                'gene' => $name,
+                'label' => $label
+            ];
         }
+
         if ($genotype === 'Aa') {
-            return $phenotype !== '' ? $phenotype : $name;
+            $label = $phenotype !== '' ? $phenotype : ($visuals['heterozygous'] ?? $name);
+            return [
+                'type' => 'visual',
+                'gene' => $name,
+                'label' => $label
+            ];
         }
-        return '';
+
+        return null;
     }
 
-    if ($genotype === 'AA' || $genotype === 'Aa') {
-        if ($phenotype === '' || str_contains($phenotypeLower, 'normal')) {
-            return $name;
-        }
-        return $phenotype;
+    if ($genotype === 'aa') {
+        return null;
     }
 
-    return '';
+    $labelKey = $genotype === 'AA' ? 'dominant' : 'heterozygous';
+    $label = $visuals[$labelKey] ?? $phenotype;
+    if ($label === '') {
+        $label = $gene['name'];
+    }
+
+    return [
+        'type' => 'visual',
+        'gene' => $name,
+        'label' => $label
+    ];
 }
 
 function genotypeToAlleles(string $inheritance, string $state): array
