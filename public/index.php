@@ -30,7 +30,6 @@ switch ($route) {
     case 'home':
         render('home', [
             'posts' => fetchPosts($pdo, 6),
-            'pages' => fetchPages($pdo),
             'gallery' => fetchGalleryItems($pdo, 6)
         ]);
         break;
@@ -40,7 +39,7 @@ switch ($route) {
         if (!$post) {
             notFound();
         }
-        render('post', ['post' => $post, 'pages' => fetchPages($pdo)]);
+        render('post', ['post' => $post]);
         break;
     case 'page':
         $slug = $_GET['slug'] ?? '';
@@ -48,12 +47,11 @@ switch ($route) {
         if (!$page) {
             notFound();
         }
-        render('page', ['page' => $page, 'pages' => fetchPages($pdo)]);
+        render('page', ['page' => $page]);
         break;
     case 'gallery':
         render('gallery', [
-            'items' => fetchGalleryItems($pdo),
-            'pages' => fetchPages($pdo)
+            'items' => fetchGalleryItems($pdo)
         ]);
         break;
     case 'animals':
@@ -67,14 +65,12 @@ switch ($route) {
         }
         render('animals/index', [
             'animals' => $showcased,
-            'genesBySpecies' => $genesBySpecies,
-            'pages' => fetchPages($pdo)
+            'genesBySpecies' => $genesBySpecies
         ]);
         break;
     case 'genetics':
         render('genetics/index', [
-            'species' => fetchSpecies($pdo),
-            'pages' => fetchPages($pdo)
+            'species' => fetchSpecies($pdo)
         ]);
         break;
     case 'genetics/species':
@@ -86,8 +82,7 @@ switch ($route) {
         $genes = fetchGenesForSpecies($pdo, $species['id']);
         render('genetics/species', [
             'species' => $species,
-            'genes' => $genes,
-            'pages' => fetchPages($pdo)
+            'genes' => $genes
         ]);
         break;
     case 'genetics/calculator':
@@ -101,7 +96,7 @@ switch ($route) {
         header('Location: ' . url('login'));
         exit;
     case 'admin':
-        requireAdmin();
+        requireAdmin($pdo);
         renderAdmin('dashboard', [
             'postCount' => countAll($pdo, 'posts'),
             'pageCount' => countAll($pdo, 'pages'),
@@ -111,24 +106,28 @@ switch ($route) {
         ]);
         break;
     case 'admin/posts':
-        requireAdmin();
+        requireAdmin($pdo, 'posts');
         handlePosts($pdo, $method);
         break;
     case 'admin/pages':
-        requireAdmin();
+        requireAdmin($pdo, 'pages');
         handlePages($pdo, $method);
         break;
     case 'admin/gallery':
-        requireAdmin();
+        requireAdmin($pdo, 'gallery');
         handleGallery($pdo, $method);
         break;
     case 'admin/genetics':
-        requireAdmin();
+        requireAdmin($pdo, 'genetics');
         handleGeneticsAdmin($pdo, $method);
         break;
     case 'admin/animals':
-        requireAdmin();
+        requireAdmin($pdo, 'animals');
         handleAnimals($pdo, $method);
+        break;
+    case 'admin/users':
+        requireAdmin($pdo, 'users');
+        handleUsers($pdo, $method);
         break;
     default:
         notFound();
@@ -140,6 +139,8 @@ function initializeDatabase(PDO $pdo): void
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE NOT NULL,
         password_hash TEXT NOT NULL,
+        role TEXT NOT NULL DEFAULT "admin",
+        permissions TEXT,
         created_at TEXT NOT NULL
     )');
 
@@ -158,7 +159,11 @@ function initializeDatabase(PDO $pdo): void
         title TEXT NOT NULL,
         slug TEXT UNIQUE NOT NULL,
         content TEXT NOT NULL,
-        updated_at TEXT NOT NULL
+        parent_id INTEGER,
+        menu_order INTEGER NOT NULL DEFAULT 0,
+        is_visible INTEGER NOT NULL DEFAULT 1,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (parent_id) REFERENCES pages(id) ON DELETE SET NULL
     )');
 
     $pdo->exec('CREATE TABLE IF NOT EXISTS gallery_items (
@@ -222,30 +227,51 @@ function initializeDatabase(PDO $pdo): void
         FOREIGN KEY (animal_id) REFERENCES animals(id) ON DELETE CASCADE
     )');
 
-    // Ensure showcase column exists when updating from previous versions
-    $columns = $pdo->query('PRAGMA table_info(animals)')->fetchAll();
-    $hasShowcaseColumn = false;
-    foreach ($columns as $column) {
-        if (($column['name'] ?? '') === 'is_showcased') {
-            $hasShowcaseColumn = true;
-            break;
-        }
-    }
-    if (!$hasShowcaseColumn) {
-        $pdo->exec('ALTER TABLE animals ADD COLUMN is_showcased INTEGER NOT NULL DEFAULT 0');
-    }
+    ensureColumn($pdo, 'animals', 'is_showcased', 'ALTER TABLE animals ADD COLUMN is_showcased INTEGER NOT NULL DEFAULT 0');
+    ensureColumn($pdo, 'users', 'role', 'ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT "admin"');
+    ensureColumn($pdo, 'users', 'permissions', 'ALTER TABLE users ADD COLUMN permissions TEXT');
+    ensureColumn($pdo, 'pages', 'parent_id', 'ALTER TABLE pages ADD COLUMN parent_id INTEGER');
+    ensureColumn($pdo, 'pages', 'menu_order', 'ALTER TABLE pages ADD COLUMN menu_order INTEGER NOT NULL DEFAULT 0');
+    ensureColumn($pdo, 'pages', 'is_visible', 'ALTER TABLE pages ADD COLUMN is_visible INTEGER NOT NULL DEFAULT 1');
+
+    $pdo->exec('UPDATE pages SET menu_order = id WHERE COALESCE(menu_order, 0) = 0');
+    $pdo->exec('UPDATE users SET role = COALESCE(role, "admin")');
 
     if ((int)$pdo->query('SELECT COUNT(*) FROM users')->fetchColumn() === 0) {
-        $stmt = $pdo->prepare('INSERT INTO users (username, password_hash, created_at) VALUES (?, ?, ?)');
+        $stmt = $pdo->prepare('INSERT INTO users (username, password_hash, role, permissions, created_at) VALUES (?, ?, ?, ?, ?)');
         $stmt->execute([
             'admin',
             password_hash('12345678', PASSWORD_DEFAULT),
+            'admin',
+            null,
             date(DATE_ATOM)
         ]);
     }
 
     if ((int)$pdo->query('SELECT COUNT(*) FROM posts')->fetchColumn() === 0) {
         seedContent($pdo);
+    }
+
+    seedGeneticsData($pdo);
+}
+
+function tableHasColumn(PDO $pdo, string $table, string $column): bool
+{
+    $stmt = $pdo->prepare('PRAGMA table_info(' . $table . ')');
+    $stmt->execute();
+    $columns = $stmt->fetchAll();
+    foreach ($columns as $col) {
+        if (($col['name'] ?? '') === $column) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function ensureColumn(PDO $pdo, string $table, string $column, string $alterSql): void
+{
+    if (!tableHasColumn($pdo, $table, $column)) {
+        $pdo->exec($alterSql);
     }
 }
 
@@ -295,106 +321,382 @@ function seedContent(PDO $pdo): void
         $stmt->execute($item);
     }
 
-    $speciesStmt = $pdo->prepare('INSERT INTO species (slug, latin_name, common_name, description, habitat, care_notes) VALUES (?, ?, ?, ?, ?, ?)');
-    $speciesStmt->execute([
-        'pogona-vitticeps',
-        'Pogona vitticeps',
-        'Bartagame',
-        'Die Bartagame zählt zu den beliebtesten Terrarientieren. Dank zahlreicher Morphen lässt sich eine Vielzahl an Farbschlägen züchten.',
-        'Trockene Busch- und Steppengebiete im Osten Australiens.',
-        'Temperaturtagsbereich 28–32 °C mit lokalem Hotspot bis 42 °C. UVB-Versorgung und abwechslungsreiche Ernährung sind essenziell.'
-    ]);
-    $pogonaId = (int)$pdo->lastInsertId();
+}
 
-    $speciesStmt->execute([
-        'heterodon-nasicus',
-        'Heterodon nasicus',
-        'Westliche Hakennatter',
-        'Bekannt für ihre upturned Schnauze und ein breites Spektrum an Farbmutationen.',
-        'Trockene Prärien Nordamerikas mit sandigen Böden für Grabaktivität.',
-        'Tagsüber 26–29 °C, Sonnenplatz bis 34 °C, Nachtabsenkung auf 22 °C. Substrat zum Eingraben sowie abwechslungsreiche Nagetierkost.'
-    ]);
-    $heterodonId = (int)$pdo->lastInsertId();
+function seedGeneticsData(PDO $pdo): void
+{
+    $speciesData = [
+        'pogona-vitticeps' => [
+            'latin_name' => 'Pogona vitticeps',
+            'common_name' => 'Bartagame',
+            'description' => 'Die Bartagame zählt zu den beliebtesten Terrarientieren und bietet eine beeindruckende Vielfalt an Farbmorphen. Viele Linien stammen aus gezielten Nachzuchten mit dokumentierter Genetik.',
+            'habitat' => 'Trockene Busch- und Steppengebiete Ostaustraliens mit intensiver Sonneneinstrahlung.',
+            'care_notes' => 'Tagestemperaturen 28–32 °C mit Sonnenplatz bis 42 °C, UVB-Strahlung, abwechslungsreiche Ernährung aus Pflanzen und Insekten sowie strukturierte Kletter- und Grabmöglichkeiten.',
+            'genes' => [
+                [
+                    'name' => 'Albino',
+                    'inheritance' => 'recessive',
+                    'description' => 'Amelanistische Linie, die sämtliche schwarzen Pigmente verliert. Die Tiere zeigen rote Augen, warme Gelbtöne und sind lichtempfindlicher – UVB-Versorgung muss behutsam erfolgen.',
+                    'visuals' => [
+                        'dominant' => 'Normal',
+                        'heterozygous' => 'Het Albino',
+                        'recessive' => 'Albino (amelanistisch)'
+                    ]
+                ],
+                [
+                    'name' => 'Hypomelanistic',
+                    'inheritance' => 'recessive',
+                    'description' => 'Reduzierter Melaninanteil sorgt für klarere Pastellfarben, glasige Krallen und kontrastarme Zeichnungen. Häufig Grundlage für knallige Designer-Linien.',
+                    'visuals' => [
+                        'dominant' => 'Normal',
+                        'heterozygous' => 'Het Hypomelanistic',
+                        'recessive' => 'Hypomelanistic (Hypo)'
+                    ]
+                ],
+                [
+                    'name' => 'Translucent',
+                    'inheritance' => 'recessive',
+                    'description' => 'Teiltransparentes Schuppenkleid mit dunklen, oft bläulich schimmernden Augen. Jungtiere besitzen häufig einen intensiven blauen Bauch, der mit dem Alter aufhellt.',
+                    'visuals' => [
+                        'dominant' => 'Normal',
+                        'heterozygous' => 'Het Translucent',
+                        'recessive' => 'Translucent'
+                    ]
+                ],
+                [
+                    'name' => 'Leatherback',
+                    'inheritance' => 'co-dominant',
+                    'description' => 'Co-dominante Schuppenmutation mit reduzierten, glatteren Schuppen. Heterozygote Tiere zeigen kräftigere Farben; homozygote „Silkbacks“ sind komplett glatt und benötigen erhöhte Pflege.',
+                    'visuals' => [
+                        'dominant' => 'Silkback (glatt)',
+                        'heterozygous' => 'Leatherback',
+                        'recessive' => 'Normal'
+                    ]
+                ],
+                [
+                    'name' => 'Dunner',
+                    'inheritance' => 'dominant',
+                    'description' => 'Dominantes Muster-Gen, das eine chaotische Zeichnung, rundere Schuppen und eine verstärkte Rückenfärbung erzeugt. Homozygote Tiere wirken intensiver, vererben das Merkmal aber identisch.',
+                    'visuals' => [
+                        'dominant' => 'Dunner (homozygot)',
+                        'heterozygous' => 'Dunner',
+                        'recessive' => 'Normal'
+                    ]
+                ],
+                [
+                    'name' => 'German Giant',
+                    'inheritance' => 'dominant',
+                    'description' => 'Aus deutschen Großlinien selektierte Bartagamen, die 20–30 % größer werden und massiger bauen. Fütterung und Platzangebot müssen angepasst werden.',
+                    'visuals' => [
+                        'dominant' => 'German Giant (XXL)',
+                        'heterozygous' => 'German Giant',
+                        'recessive' => 'Normalgröße'
+                    ]
+                ],
+                [
+                    'name' => 'Zero',
+                    'inheritance' => 'recessive',
+                    'description' => 'Komplett melanin- und patternlose Bartagamen mit hellem bis grauem Grundton. Oft als Grundlage für Designer-Linien wie Wero genutzt.',
+                    'visuals' => [
+                        'dominant' => 'Normal',
+                        'heterozygous' => 'Het Zero',
+                        'recessive' => 'Zero (patternlos)'
+                    ]
+                ],
+                [
+                    'name' => 'Witblits',
+                    'inheritance' => 'recessive',
+                    'description' => 'Rezessive Pastell-Linie mit nahezu weißem Körper und feinem Muster. Kombiniert sich eindrucksvoll mit Hypo- und Translucent-Genetik.',
+                    'visuals' => [
+                        'dominant' => 'Normal',
+                        'heterozygous' => 'Het Witblits',
+                        'recessive' => 'Witblits'
+                    ]
+                ],
+                [
+                    'name' => 'Wero',
+                    'inheritance' => 'recessive',
+                    'description' => 'Kombinationslinie aus Zero und Witblits, die reinerbig vollständig weiß erscheint und nur minimale Musterung zulässt.',
+                    'visuals' => [
+                        'dominant' => 'Normal',
+                        'heterozygous' => 'Het Wero',
+                        'recessive' => 'Wero (weiß)'
+                    ]
+                ],
+                [
+                    'name' => 'Paradox',
+                    'inheritance' => 'dominant',
+                    'description' => 'Unvorhersehbare Farbsprenkel in ansonsten einfarbigen Linien. Die Mutation wirkt dominant, doch das Ausmaß der Paradox-Flecken variiert stark.',
+                    'visuals' => [
+                        'dominant' => 'Paradox (stark)',
+                        'heterozygous' => 'Paradox',
+                        'recessive' => 'Normal'
+                    ]
+                ],
+                [
+                    'name' => 'Citrus',
+                    'inheritance' => 'dominant',
+                    'description' => 'Selektionslinie für intensive Gelb- und Orangetöne. Häufig mit Hypo kombiniert, um satte Citrus-Farben mit hoher Deckkraft zu erzielen.',
+                    'visuals' => [
+                        'dominant' => 'Citrus (homozygot)',
+                        'heterozygous' => 'Citrus',
+                        'recessive' => 'Normalfärbung'
+                    ]
+                ],
+                [
+                    'name' => 'Red Monster',
+                    'inheritance' => 'dominant',
+                    'description' => 'Extrem rote Linie, die über viele Generationen auf hohe Rotintensität selektiert wurde. Tiere zeigen besonders kräftige Kopf- und Bartfärbung.',
+                    'visuals' => [
+                        'dominant' => 'Red Monster (intensiv)',
+                        'heterozygous' => 'Red Monster',
+                        'recessive' => 'Normal'
+                    ]
+                ],
+                [
+                    'name' => 'Sunburst',
+                    'inheritance' => 'dominant',
+                    'description' => 'Goldgelbe Linie mit starker Kopfzeichnung. Durch Kombination mit Hypo und Leatherback entstehen brilliante Hochglanzfarben.',
+                    'visuals' => [
+                        'dominant' => 'Sunburst (homozygot)',
+                        'heterozygous' => 'Sunburst',
+                        'recessive' => 'Normal'
+                    ]
+                ],
+                [
+                    'name' => 'Microscale',
+                    'inheritance' => 'co-dominant',
+                    'description' => 'Verwandt mit Leatherback, erzeugt aber extrem kleine Schuppen. Homozygote Tiere wirken nahezu glatt, behalten aber eine feine Struktur.',
+                    'visuals' => [
+                        'dominant' => 'Super Microscale',
+                        'heterozygous' => 'Microscale',
+                        'recessive' => 'Normal'
+                    ]
+                ]
+            ]
+        ],
+        'heterodon-nasicus' => [
+            'latin_name' => 'Heterodon nasicus',
+            'common_name' => 'Westliche Hakennatter',
+            'description' => 'Die westliche Hakennatter begeistert durch ihre upturned Schnauze, ein ruhiges Temperament und eine Vielzahl rezessiver wie co-dominanter Morphen.',
+            'habitat' => 'Prärie- und Halbwüsten Nordamerikas mit lockeren Sandböden für Grabaktivität.',
+            'care_notes' => 'Tagsüber 26–29 °C mit Sonnenplatz bis 34 °C, Nachtabsenkung 21–23 °C. Grober Sand-Lehm-Mix zum Wühlen und abwechslungsreiche Fütterung mit Mäusen, gelegentlich Amphibien.',
+            'genes' => [
+                [
+                    'name' => 'Albino',
+                    'inheritance' => 'recessive',
+                    'description' => 'Fehlendes Melanin sorgt für gelb-rosa Tiere mit rubinroten Augen. Häufig Basis für Coral- und Extreme-Red-Linien.',
+                    'visuals' => [
+                        'dominant' => 'Normal',
+                        'heterozygous' => 'Het Albino',
+                        'recessive' => 'Albino'
+                    ]
+                ],
+                [
+                    'name' => 'Axanthic',
+                    'inheritance' => 'recessive',
+                    'description' => 'Unterdrückt gelbe Pigmente und erzeugt silbrig-graue Tiere mit starkem Kontrast. Grundlage für Snow- und Stormtrooper-Projekte.',
+                    'visuals' => [
+                        'dominant' => 'Normal',
+                        'heterozygous' => 'Het Axanthic',
+                        'recessive' => 'Axanthic'
+                    ]
+                ],
+                [
+                    'name' => 'Lavender',
+                    'inheritance' => 'recessive',
+                    'description' => 'Pastellfarbene Variante mit lavendelfarbenem Grundton und hellen Augen. Entwickelt sich mit dem Alter zu kühlen Violett- und Graunuancen.',
+                    'visuals' => [
+                        'dominant' => 'Normal',
+                        'heterozygous' => 'Het Lavender',
+                        'recessive' => 'Lavender'
+                    ]
+                ],
+                [
+                    'name' => 'Toffee Belly',
+                    'inheritance' => 'recessive',
+                    'description' => 'Sorgt für karamellfarbene Unterseite, warme Grundfarben und rubinrote Augen. In Kombination mit Albino entsteht der beliebte Toffee Glow.',
+                    'visuals' => [
+                        'dominant' => 'Normal',
+                        'heterozygous' => 'Het Toffee Belly',
+                        'recessive' => 'Toffee Belly'
+                    ]
+                ],
+                [
+                    'name' => 'Hypomelanistic',
+                    'inheritance' => 'recessive',
+                    'description' => 'Reduziert schwarze Pigmente und sorgt für weichere Zeichnungen. Häufig mit Anaconda oder Arctic kombiniert, um Ghost-Linien zu erhalten.',
+                    'visuals' => [
+                        'dominant' => 'Normal',
+                        'heterozygous' => 'Het Hypo',
+                        'recessive' => 'Hypomelanistic'
+                    ]
+                ],
+                [
+                    'name' => 'Sable',
+                    'inheritance' => 'recessive',
+                    'description' => 'Dunkelt Tiere stark ein und erzeugt kaffeebraune bis schwarze Grundfarben mit reduziertem Muster. In Superform entstehen fast einfarbige Tiere.',
+                    'visuals' => [
+                        'dominant' => 'Normal',
+                        'heterozygous' => 'Het Sable',
+                        'recessive' => 'Sable'
+                    ]
+                ],
+                [
+                    'name' => 'Leucistic',
+                    'inheritance' => 'recessive',
+                    'description' => 'Seltene Linie, die nahezu pigmentlose Tiere mit schwarzen Augen hervorbringt. Benötigt sorgfältige Aufzucht, da Jungtiere sensibel reagieren.',
+                    'visuals' => [
+                        'dominant' => 'Normal',
+                        'heterozygous' => 'Het Leucistic',
+                        'recessive' => 'Leucistic'
+                    ]
+                ],
+                [
+                    'name' => 'Extreme Red Albino',
+                    'inheritance' => 'recessive',
+                    'description' => 'Line-bred Variante der Albinos mit intensiv roter Grundfarbe und roten Augen. Zeigt besonders kräftige Bauchfärbung.',
+                    'visuals' => [
+                        'dominant' => 'Normal',
+                        'heterozygous' => 'Het Extreme Red Albino',
+                        'recessive' => 'Extreme Red Albino'
+                    ]
+                ],
+                [
+                    'name' => 'Arctic',
+                    'inheritance' => 'co-dominant',
+                    'description' => 'Erzeugt weiß-graue Tiere mit kräftigen Sattelflecken. Homozygote Super Arctics besitzen eisige Kontraste und oft einen blauen Schimmer.',
+                    'visuals' => [
+                        'dominant' => 'Super Arctic',
+                        'heterozygous' => 'Arctic',
+                        'recessive' => 'Normal'
+                    ]
+                ],
+                [
+                    'name' => 'Anaconda',
+                    'inheritance' => 'co-dominant',
+                    'description' => 'Reduziert die Rückenzeichnung zu wenigen großen Flecken. Die Superform „Superconda“ ist nahezu patternlos und zeigt einfarbige Flanken.',
+                    'visuals' => [
+                        'dominant' => 'Superconda',
+                        'heterozygous' => 'Anaconda',
+                        'recessive' => 'Normal'
+                    ]
+                ],
+                [
+                    'name' => 'Conda Arctic',
+                    'inheritance' => 'co-dominant',
+                    'description' => 'Projektname für Tiere, die sowohl Anaconda als auch Arctic tragen. In Superformen entstehen nahezu weiße Patternless-Snows.',
+                    'visuals' => [
+                        'dominant' => 'Super Arctic Superconda',
+                        'heterozygous' => 'Conda Arctic',
+                        'recessive' => 'Normal'
+                    ]
+                ],
+                [
+                    'name' => 'Coral',
+                    'inheritance' => 'dominant',
+                    'description' => 'Selektionslinie, die Albino-bedingte Rosa- und Orangetöne intensiviert. Besonders gefragt für farbintensive Extreme-Red-Combos.',
+                    'visuals' => [
+                        'dominant' => 'Coral (homozygot)',
+                        'heterozygous' => 'Coral',
+                        'recessive' => 'Normal'
+                    ]
+                ],
+                [
+                    'name' => 'Smoke',
+                    'inheritance' => 'dominant',
+                    'description' => 'Verdunkelt die Grundfarbe zu kalten Grautönen und verstärkt den Kontrast. Lässt sich hervorragend mit Axanthic und Arctic kombinieren.',
+                    'visuals' => [
+                        'dominant' => 'Smoke (homozygot)',
+                        'heterozygous' => 'Smoke',
+                        'recessive' => 'Normal'
+                    ]
+                ]
+            ]
+        ]
+    ];
 
-    $geneStmt = $pdo->prepare('INSERT INTO genes (species_id, name, inheritance, description, visuals) VALUES (?, ?, ?, ?, ?)');
-    $geneStmt->execute([
-        $pogonaId,
-        'Albino',
-        'recessive',
-        'Rezessive Mutation ohne Melanin. Tiere zeigen eine helle Grundfärbung mit roten Augen.',
-        json_encode([
-            'dominant' => 'Normal',
-            'heterozygous' => 'Het Albino',
-            'recessive' => 'Albino'
-        ], JSON_UNESCAPED_UNICODE)
-    ]);
-    $geneStmt->execute([
-        $pogonaId,
-        'Hypomelanistic',
-        'recessive',
-        'Reduzierter Melaninanteil sorgt für pastellfarbene Tiere mit klaren Nägeln.',
-        json_encode([
-            'dominant' => 'Normal',
-            'heterozygous' => 'Het Hypo',
-            'recessive' => 'Hypo'
-        ], JSON_UNESCAPED_UNICODE)
-    ]);
-    $geneStmt->execute([
-        $pogonaId,
-        'Translucent',
-        'co-dominant',
-        'Teiltransparentes Schuppenkleid, dunkle Augen und verstärkte Blautöne im Bauchbereich.',
-        json_encode([
-            'dominant' => 'Super Translucent',
-            'heterozygous' => 'Translucent',
-            'recessive' => 'Normal'
-        ], JSON_UNESCAPED_UNICODE)
+    foreach ($speciesData as $slug => $data) {
+        $speciesId = upsertSpecies($pdo, $slug, $data);
+        foreach ($data['genes'] as $gene) {
+            upsertGene($pdo, $speciesId, $gene);
+        }
+    }
+}
+
+function upsertSpecies(PDO $pdo, string $slug, array $data): int
+{
+    $stmt = $pdo->prepare('SELECT id FROM species WHERE slug = ?');
+    $stmt->execute([$slug]);
+    $id = $stmt->fetchColumn();
+
+    if ($id) {
+        $update = $pdo->prepare('UPDATE species SET latin_name = ?, common_name = ?, description = ?, habitat = ?, care_notes = ? WHERE id = ?');
+        $update->execute([
+            $data['latin_name'],
+            $data['common_name'],
+            $data['description'],
+            $data['habitat'],
+            $data['care_notes'],
+            $id
+        ]);
+        return (int)$id;
+    }
+
+    $insert = $pdo->prepare('INSERT INTO species (slug, latin_name, common_name, description, habitat, care_notes) VALUES (?, ?, ?, ?, ?, ?)');
+    $insert->execute([
+        $slug,
+        $data['latin_name'],
+        $data['common_name'],
+        $data['description'],
+        $data['habitat'],
+        $data['care_notes']
     ]);
 
-    $geneStmt->execute([
-        $heterodonId,
-        'Albino',
-        'recessive',
-        'Rezessive Mutation mit pink-gelber Zeichnung und roten Augen.',
-        json_encode([
-            'dominant' => 'Normal',
-            'heterozygous' => 'Het Albino',
-            'recessive' => 'Albino'
-        ], JSON_UNESCAPED_UNICODE)
-    ]);
-    $geneStmt->execute([
-        $heterodonId,
-        'Anaconda',
-        'co-dominant',
-        'Co-dominante Mutation mit reduzierter Fleckung. Super-Form („Superconda“) ist nahezu zeichnungslos.',
-        json_encode([
-            'dominant' => 'Superconda',
-            'heterozygous' => 'Anaconda',
-            'recessive' => 'Normal'
-        ], JSON_UNESCAPED_UNICODE)
-    ]);
-    $geneStmt->execute([
-        $heterodonId,
-        'Toffee Belly',
-        'recessive',
-        'Rezessive Mutation, die für karamellfarbene Unterseite und wärmere Grundfarben sorgt.',
-        json_encode([
-            'dominant' => 'Normal',
-            'heterozygous' => 'Het Toffee Belly',
-            'recessive' => 'Toffee Belly'
-        ], JSON_UNESCAPED_UNICODE)
+    return (int)$pdo->lastInsertId();
+}
+
+function upsertGene(PDO $pdo, int $speciesId, array $gene): void
+{
+    $stmt = $pdo->prepare('SELECT id FROM genes WHERE species_id = ? AND name = ?');
+    $stmt->execute([$speciesId, $gene['name']]);
+    $id = $stmt->fetchColumn();
+    $visualsJson = json_encode($gene['visuals'], JSON_UNESCAPED_UNICODE);
+
+    if ($id) {
+        $update = $pdo->prepare('UPDATE genes SET inheritance = ?, description = ?, visuals = ? WHERE id = ?');
+        $update->execute([
+            $gene['inheritance'],
+            $gene['description'],
+            $visualsJson,
+            $id
+        ]);
+        return;
+    }
+
+    $insert = $pdo->prepare('INSERT INTO genes (species_id, name, inheritance, description, visuals) VALUES (?, ?, ?, ?, ?)');
+    $insert->execute([
+        $speciesId,
+        $gene['name'],
+        $gene['inheritance'],
+        $gene['description'],
+        $visualsJson
     ]);
 }
 
 function render(string $view, array $params = [], string $layout = 'layout'): void
 {
+    global $pdo;
     $viewFile = __DIR__ . '/views/' . $view . '.php';
     if (!file_exists($viewFile)) {
         notFound();
     }
 
+    if (!array_key_exists('pages', $params)) {
+        $params['pages'] = fetchMenuPages($pdo);
+    }
+
     extract($params);
-    $pages ??= [];
     ob_start();
     include $viewFile;
     $content = ob_get_clean();
@@ -404,7 +706,191 @@ function render(string $view, array $params = [], string $layout = 'layout'): vo
 
 function renderAdmin(string $view, array $params = []): void
 {
+    global $pdo;
+    if (!array_key_exists('currentUser', $params)) {
+        $params['currentUser'] = currentUser($pdo);
+    }
+    if (!array_key_exists('navItems', $params)) {
+        $params['navItems'] = adminNavigation($params['currentUser']);
+    }
+
     render('admin/' . $view, $params, 'admin/layout');
+}
+
+function fetchMenuPages(PDO $pdo): array
+{
+    $stmt = $pdo->query('SELECT id, title, slug, parent_id, menu_order, is_visible FROM pages WHERE is_visible = 1 ORDER BY menu_order ASC, title ASC');
+    $pages = $stmt->fetchAll();
+    return buildPageTree($pages);
+}
+
+function fetchPagesFlat(PDO $pdo): array
+{
+    $stmt = $pdo->query('SELECT * FROM pages ORDER BY menu_order ASC, title ASC');
+    return $stmt->fetchAll();
+}
+
+function buildPageTree(array $pages): array
+{
+    $indexed = [];
+    foreach ($pages as $page) {
+        $page['children'] = [];
+        $indexed[$page['id']] = $page;
+    }
+
+    foreach ($indexed as $id => &$page) {
+        $parentId = $page['parent_id'] ?? null;
+        if ($parentId && isset($indexed[$parentId])) {
+            $indexed[$parentId]['children'][] = &$page;
+        }
+    }
+    unset($page);
+
+    $tree = [];
+    foreach ($indexed as $page) {
+        $parentId = $page['parent_id'] ?? null;
+        if (!$parentId || !isset($indexed[$parentId])) {
+            $tree[] = $page;
+        }
+    }
+
+    return $tree;
+}
+
+function flattenPageTree(array $tree, int $depth = 0, array &$result = []): array
+{
+    foreach ($tree as $node) {
+        $result[] = $node + ['depth' => $depth];
+        if (!empty($node['children'])) {
+            flattenPageTree($node['children'], $depth + 1, $result);
+        }
+    }
+
+    return $result;
+}
+
+function resolveParentId(PDO $pdo, ?int $pageId, ?int $parentId): ?int
+{
+    if (!$parentId) {
+        return null;
+    }
+
+    if ($pageId && $parentId === $pageId) {
+        return null;
+    }
+
+    $current = $parentId;
+    while ($current) {
+        $stmt = $pdo->prepare('SELECT id, parent_id FROM pages WHERE id = ?');
+        $stmt->execute([$current]);
+        $row = $stmt->fetch();
+        if (!$row) {
+            return null;
+        }
+        if ($pageId && (int)$row['id'] === $pageId) {
+            return null;
+        }
+        $current = isset($row['parent_id']) && $row['parent_id'] ? (int)$row['parent_id'] : 0;
+    }
+
+    return (int)$parentId;
+}
+
+function nextMenuOrder(PDO $pdo): int
+{
+    $max = (int)$pdo->query('SELECT MAX(menu_order) FROM pages')->fetchColumn();
+    return $max + 10;
+}
+
+function currentUser(PDO $pdo): ?array
+{
+    if (!isset($_SESSION['user_id'])) {
+        return null;
+    }
+
+    $stmt = $pdo->prepare('SELECT * FROM users WHERE id = ?');
+    $stmt->execute([$_SESSION['user_id']]);
+    $user = $stmt->fetch();
+
+    if ($user) {
+        $permissions = $user['permissions'] ?? null;
+        $user['permissions'] = $permissions ? json_decode($permissions, true) : [];
+        if (!is_array($user['permissions'])) {
+            $user['permissions'] = [];
+        }
+    } else {
+        $user = null;
+    }
+    return $user;
+}
+
+function permissionLabels(): array
+{
+    return [
+        'posts' => 'Beiträge verwalten',
+        'pages' => 'Seiten & Menü',
+        'gallery' => 'Galerie',
+        'animals' => 'Tiere',
+        'genetics' => 'Genetikdaten',
+        'users' => 'Benutzerverwaltung'
+    ];
+}
+
+function normalizePermissions($values): array
+{
+    $allowed = array_keys(permissionLabels());
+    $normalized = [];
+    if (is_array($values)) {
+        foreach ($values as $value) {
+            if (in_array($value, $allowed, true)) {
+                $normalized[$value] = true;
+            }
+        }
+    }
+    return $normalized;
+}
+
+function userHasPermission(?array $user, string $permission): bool
+{
+    if (!$user) {
+        return false;
+    }
+
+    if (($user['role'] ?? '') === 'admin') {
+        return true;
+    }
+
+    $permissions = $user['permissions'] ?? [];
+    return !empty($permissions[$permission]);
+}
+
+function adminNavigation(?array $user): array
+{
+    $items = [
+        ['label' => 'Dashboard', 'route' => 'admin', 'permission' => null],
+        ['label' => 'Beiträge', 'route' => 'admin/posts', 'permission' => 'posts'],
+        ['label' => 'Seiten & Menü', 'route' => 'admin/pages', 'permission' => 'pages'],
+        ['label' => 'Galerie', 'route' => 'admin/gallery', 'permission' => 'gallery'],
+        ['label' => 'Tiere', 'route' => 'admin/animals', 'permission' => 'animals'],
+        ['label' => 'Genetik', 'route' => 'admin/genetics', 'permission' => 'genetics'],
+        ['label' => 'Benutzer', 'route' => 'admin/users', 'permission' => 'users']
+    ];
+
+    $available = [];
+    foreach ($items as $item) {
+        if ($item['permission'] === null) {
+            if ($user) {
+                $available[] = $item;
+            }
+            continue;
+        }
+
+        if (userHasPermission($user, $item['permission'])) {
+            $available[] = $item;
+        }
+    }
+
+    return $available;
 }
 
 function baseUrl(): string
@@ -443,8 +929,7 @@ function findPostBySlug(PDO $pdo, string $slug): ?array
 
 function fetchPages(PDO $pdo): array
 {
-    $stmt = $pdo->query('SELECT * FROM pages ORDER BY title ASC');
-    return $stmt->fetchAll();
+    return fetchPagesFlat($pdo);
 }
 
 function findPageBySlug(PDO $pdo, string $slug): ?array
@@ -495,12 +980,21 @@ function countAll(PDO $pdo, string $table): int
     return (int)$pdo->query('SELECT COUNT(*) FROM ' . $table)->fetchColumn();
 }
 
-function requireAdmin(): void
+function requireAdmin(PDO $pdo, ?string $permission = null): array
 {
-    if (!isset($_SESSION['user_id'])) {
+    $user = currentUser($pdo);
+    if (!$user) {
         header('Location: ' . url('login'));
         exit;
     }
+
+    if ($permission !== null && !userHasPermission($user, $permission)) {
+        setFlash('Für diesen Bereich fehlen die Berechtigungen.', 'error');
+        header('Location: ' . url('admin'));
+        exit;
+    }
+
+    return $user;
 }
 
 function handleLogin(PDO $pdo, string $method): void
@@ -525,7 +1019,7 @@ function handleLogin(PDO $pdo, string $method): void
         setFlash('Ungültige Zugangsdaten.', 'error');
     }
 
-    render('login', ['pages' => fetchPages($pdo)]);
+    render('login');
 }
 
 function setFlash(string $message, string $type = 'info'): void
@@ -608,12 +1102,10 @@ function handlePages(PDO $pdo, string $method): void
     if ($method === 'POST') {
         $action = $_POST['action'] ?? 'create';
         $id = (int)($_POST['id'] ?? 0);
-        $title = trim($_POST['title'] ?? '');
-        $slug = slugify($_POST['slug'] ?? $title);
-        $content = trim($_POST['content'] ?? '');
         $now = date(DATE_ATOM);
 
         if ($action === 'delete' && $id) {
+            $pdo->prepare('UPDATE pages SET parent_id = NULL WHERE parent_id = ?')->execute([$id]);
             $stmt = $pdo->prepare('DELETE FROM pages WHERE id = ?');
             $stmt->execute([$id]);
             setFlash('Seite wurde gelöscht.', 'success');
@@ -621,22 +1113,52 @@ function handlePages(PDO $pdo, string $method): void
             exit;
         }
 
-        if ($title === '' || $content === '') {
-            setFlash('Titel und Inhalt sind erforderlich.', 'error');
+        if ($action === 'update-menu' && $id) {
+            $menuOrder = (int)($_POST['menu_order'] ?? 0);
+            $isVisible = isset($_POST['is_visible']) ? 1 : 0;
+            $parentId = resolveParentId($pdo, $id, (int)($_POST['parent_id'] ?? 0));
+            if ($menuOrder === 0) {
+                $menuOrder = nextMenuOrder($pdo);
+            }
+            $stmt = $pdo->prepare('UPDATE pages SET parent_id = ?, menu_order = ?, is_visible = ?, updated_at = ? WHERE id = ?');
+            $stmt->execute([$parentId, $menuOrder, $isVisible, $now, $id]);
+            setFlash('Menüeinstellungen aktualisiert.', 'success');
             header('Location: ' . url('admin/pages'));
             exit;
         }
 
-        if ($id) {
-            $stmt = $pdo->prepare('UPDATE pages SET title = ?, slug = ?, content = ?, updated_at = ? WHERE id = ?');
-            $stmt->execute([$title, $slug, $content, $now, $id]);
-            setFlash('Seite aktualisiert.', 'success');
-        } else {
-            $stmt = $pdo->prepare('INSERT INTO pages (title, slug, content, updated_at) VALUES (?, ?, ?, ?)');
-            $stmt->execute([$title, $slug, $content, $now]);
-            setFlash('Seite erstellt.', 'success');
+        if ($action === 'create' || $action === 'update') {
+            $title = trim($_POST['title'] ?? '');
+            $slug = slugify($_POST['slug'] ?? $title);
+            $content = trim($_POST['content'] ?? '');
+            $menuOrder = isset($_POST['menu_order']) ? (int)$_POST['menu_order'] : nextMenuOrder($pdo);
+            if ($menuOrder === 0) {
+                $menuOrder = nextMenuOrder($pdo);
+            }
+            $isVisible = isset($_POST['is_visible']) ? 1 : 0;
+            $parentId = resolveParentId($pdo, $id ?: null, (int)($_POST['parent_id'] ?? 0));
+
+            if ($title === '' || $content === '') {
+                setFlash('Titel und Inhalt sind erforderlich.', 'error');
+                header('Location: ' . url('admin/pages'));
+                exit;
+            }
+
+            if ($id) {
+                $stmt = $pdo->prepare('UPDATE pages SET title = ?, slug = ?, content = ?, parent_id = ?, menu_order = ?, is_visible = ?, updated_at = ? WHERE id = ?');
+                $stmt->execute([$title, $slug, $content, $parentId, $menuOrder, $isVisible, $now, $id]);
+                setFlash('Seite aktualisiert.', 'success');
+            } else {
+                $stmt = $pdo->prepare('INSERT INTO pages (title, slug, content, parent_id, menu_order, is_visible, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)');
+                $stmt->execute([$title, $slug, $content, $parentId, $menuOrder, $isVisible, $now]);
+                setFlash('Seite erstellt.', 'success');
+            }
+
+            header('Location: ' . url('admin/pages'));
+            exit;
         }
 
+        setFlash('Unbekannte Aktion.', 'error');
         header('Location: ' . url('admin/pages'));
         exit;
     }
@@ -649,9 +1171,17 @@ function handlePages(PDO $pdo, string $method): void
         $editPage = $stmt->fetch();
     }
 
+    $pagesFlat = fetchPagesFlat($pdo);
+    $pageTree = buildPageTree($pagesFlat);
+    $parentChoices = flattenPageTree($pageTree);
+
     renderAdmin('pages/index', [
-        'pagesList' => fetchPages($pdo),
-        'editPage' => $editPage
+        'pageTree' => $pageTree,
+        'parentOptions' => array_values(array_filter($parentChoices, function ($page) use ($editId) {
+            return !$editId || (int)$page['id'] !== $editId;
+        })),
+        'editPage' => $editPage,
+        'defaultMenuOrder' => nextMenuOrder($pdo)
     ]);
 }
 
@@ -957,6 +1487,160 @@ function handleAnimals(PDO $pdo, string $method): void
     ]);
 }
 
+function handleUsers(PDO $pdo, string $method): void
+{
+    $currentUser = currentUser($pdo);
+
+    if ($method === 'POST') {
+        $action = $_POST['action'] ?? 'save';
+        $id = (int)($_POST['id'] ?? 0);
+
+        if ($action === 'delete' && $id) {
+            if ($currentUser && (int)$currentUser['id'] === $id) {
+                setFlash('Du kannst dich nicht selbst löschen.', 'error');
+                header('Location: ' . url('admin/users'));
+                exit;
+            }
+
+            if (countAdmins($pdo, $id) === 0) {
+                setFlash('Der letzte Administrator kann nicht gelöscht werden.', 'error');
+                header('Location: ' . url('admin/users'));
+                exit;
+            }
+
+            $stmt = $pdo->prepare('DELETE FROM users WHERE id = ?');
+            $stmt->execute([$id]);
+            setFlash('Benutzer entfernt.', 'success');
+            header('Location: ' . url('admin/users'));
+            exit;
+        }
+
+        if ($action === 'save') {
+            $username = trim($_POST['username'] ?? '');
+            $role = $_POST['role'] === 'admin' ? 'admin' : 'editor';
+            $permissions = $role === 'admin' ? [] : normalizePermissions($_POST['permissions'] ?? []);
+            $password = $_POST['password'] ?? '';
+            $confirm = $_POST['password_confirm'] ?? '';
+
+            if ($username === '') {
+                setFlash('Der Benutzername darf nicht leer sein.', 'error');
+                header('Location: ' . url('admin/users', ['id' => $id ?: null]));
+                exit;
+            }
+
+            if ($id === 0 && $password === '') {
+                setFlash('Für neue Benutzer muss ein Passwort gesetzt werden.', 'error');
+                header('Location: ' . url('admin/users'));
+                exit;
+            }
+
+            if ($password !== '' && $password !== $confirm) {
+                setFlash('Die Passwörter stimmen nicht überein.', 'error');
+                header('Location: ' . url('admin/users', ['id' => $id ?: null]));
+                exit;
+            }
+
+            if ($id && $role !== 'admin' && countAdmins($pdo, $id) === 0) {
+                setFlash('Der letzte Administrator kann nicht herabgestuft werden.', 'error');
+                header('Location: ' . url('admin/users', ['id' => $id]));
+                exit;
+            }
+
+            $stmt = $pdo->prepare('SELECT id FROM users WHERE username = ? AND id != ?');
+            $stmt->execute([$username, $id]);
+            if ($stmt->fetch()) {
+                setFlash('Benutzername ist bereits vergeben.', 'error');
+                header('Location: ' . url('admin/users', ['id' => $id ?: null]));
+                exit;
+            }
+
+            $permissionsJson = $role === 'admin' ? null : json_encode($permissions, JSON_UNESCAPED_UNICODE);
+
+            if ($id) {
+                $params = [$username, $role, $permissionsJson, $id];
+                $pdo->prepare('UPDATE users SET username = ?, role = ?, permissions = ? WHERE id = ?')->execute($params);
+                if ($password !== '') {
+                    $pdo->prepare('UPDATE users SET password_hash = ? WHERE id = ?')->execute([password_hash($password, PASSWORD_DEFAULT), $id]);
+                }
+                if ($currentUser && (int)$currentUser['id'] === $id) {
+                    $_SESSION['username'] = $username;
+                }
+                setFlash('Benutzer aktualisiert.', 'success');
+                $targetId = $id;
+            } else {
+                $stmt = $pdo->prepare('INSERT INTO users (username, password_hash, role, permissions, created_at) VALUES (?, ?, ?, ?, ?)');
+                $stmt->execute([
+                    $username,
+                    password_hash($password, PASSWORD_DEFAULT),
+                    $role,
+                    $permissionsJson,
+                    date(DATE_ATOM)
+                ]);
+                $targetId = (int)$pdo->lastInsertId();
+                setFlash('Benutzer angelegt.', 'success');
+            }
+
+            header('Location: ' . url('admin/users', ['id' => $targetId]));
+            exit;
+        }
+
+        setFlash('Unbekannte Aktion.', 'error');
+        header('Location: ' . url('admin/users'));
+        exit;
+    }
+
+    $editId = isset($_GET['id']) ? (int)$_GET['id'] : null;
+    $editUser = $editId ? findUser($pdo, $editId) : null;
+
+    renderAdmin('users/index', [
+        'users' => fetchUsers($pdo),
+        'editUser' => $editUser,
+        'permissionLabels' => permissionLabels(),
+        'activeUser' => $currentUser
+    ]);
+}
+
+function fetchUsers(PDO $pdo): array
+{
+    $stmt = $pdo->query('SELECT id, username, role, permissions, created_at FROM users ORDER BY username ASC');
+    $users = $stmt->fetchAll();
+    foreach ($users as &$user) {
+        $perms = $user['permissions'] ?? null;
+        $user['permissions'] = $perms ? json_decode($perms, true) : [];
+        if (!is_array($user['permissions'])) {
+            $user['permissions'] = [];
+        }
+    }
+    return $users;
+}
+
+function findUser(PDO $pdo, int $id): ?array
+{
+    $stmt = $pdo->prepare('SELECT id, username, role, permissions, created_at FROM users WHERE id = ?');
+    $stmt->execute([$id]);
+    $user = $stmt->fetch();
+    if (!$user) {
+        return null;
+    }
+    $perms = $user['permissions'] ?? null;
+    $user['permissions'] = $perms ? json_decode($perms, true) : [];
+    if (!is_array($user['permissions'])) {
+        $user['permissions'] = [];
+    }
+    return $user;
+}
+
+function countAdmins(PDO $pdo, ?int $excludeId = null): int
+{
+    if ($excludeId) {
+        $stmt = $pdo->prepare('SELECT COUNT(*) FROM users WHERE role = "admin" AND id != ?');
+        $stmt->execute([$excludeId]);
+        return (int)$stmt->fetchColumn();
+    }
+
+    return (int)$pdo->query('SELECT COUNT(*) FROM users WHERE role = "admin"')->fetchColumn();
+}
+
 function fetchAllGenes(PDO $pdo): array
 {
     $stmt = $pdo->query('SELECT g.*, s.common_name FROM genes g JOIN species s ON s.id = g.species_id ORDER BY s.common_name, g.name');
@@ -1237,8 +1921,7 @@ function handleGeneticsCalculator(PDO $pdo, string $method): void
         'parentAValues' => $parentAValues,
         'parentBValues' => $parentBValues,
         'parentAnimalSelection' => $parentAnimalSelection,
-        'animals' => $availableAnimals,
-        'pages' => fetchPages($pdo)
+        'animals' => $availableAnimals
     ]);
 }
 

@@ -12,15 +12,13 @@
     <div class="container">
         <h1>Feroxz Admin</h1>
         <div class="header-controls">
-            <nav>
-                <a href="<?= url('admin') ?>">Dashboard</a>
-                <a href="<?= url('admin/posts') ?>">Beiträge</a>
-                <a href="<?= url('admin/pages') ?>">Seiten</a>
-                <a href="<?= url('admin/gallery') ?>">Galerie</a>
-                <a href="<?= url('admin/animals') ?>">Tiere</a>
-                <a href="<?= url('admin/genetics') ?>">Genetik</a>
+            <nav class="admin-nav">
+                <?php $currentRoute = $_GET['route'] ?? ''; ?>
+                <?php foreach ($navItems as $item): ?>
+                    <a href="<?= url($item['route']) ?>" class="<?= $currentRoute === $item['route'] ? 'active' : '' ?>"><?= htmlspecialchars($item['label']) ?></a>
+                <?php endforeach; ?>
                 <a href="<?= url('home') ?>" target="_blank">Zur Website</a>
-                <a href="<?= url('logout') ?>">Logout (<?= htmlspecialchars($_SESSION['username'] ?? 'Admin') ?>)</a>
+                <a href="<?= url('logout') ?>">Logout (<?= htmlspecialchars(($currentUser['username'] ?? '') ?: 'Admin') ?>)</a>
             </nav>
             <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">🌙 Dark Mode</button>
         </div>

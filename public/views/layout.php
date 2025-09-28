@@ -12,15 +12,33 @@
     <div class="container">
         <h1 class="logo"><a href="<?= url('home') ?>">Feroxz CMS</a></h1>
         <div class="header-controls">
+            <?php if (!function_exists('renderPageMenuItems')): ?>
+                <?php
+                function renderPageMenuItems(array $items): void
+                {
+                    foreach ($items as $item) {
+                        $hasChildren = !empty($item['children']);
+                        echo '<li>';
+                        echo '<a href="' . url('page', ['slug' => $item['slug']]) . '">' . htmlspecialchars($item['title']) . '</a>';
+                        if ($hasChildren) {
+                            echo '<ul>';
+                            renderPageMenuItems($item['children']);
+                            echo '</ul>';
+                        }
+                        echo '</li>';
+                    }
+                }
+                ?>
+            <?php endif; ?>
             <nav class="main-nav">
-                <a href="<?= url('home') ?>">Start</a>
-                <a href="<?= url('animals') ?>">Tiere</a>
-                <a href="<?= url('gallery') ?>">Galerie</a>
-                <a href="<?= url('genetics') ?>">Genetik</a>
-                <?php foreach ($pages as $navPage): ?>
-                    <a href="<?= url('page', ['slug' => $navPage['slug']]) ?>"><?= htmlspecialchars($navPage['title']) ?></a>
-                <?php endforeach; ?>
-                <a href="<?= url('login') ?>" class="login-link">Admin</a>
+                <ul class="main-nav__root">
+                    <li><a href="<?= url('home') ?>">Start</a></li>
+                    <li><a href="<?= url('animals') ?>">Tiere</a></li>
+                    <li><a href="<?= url('gallery') ?>">Galerie</a></li>
+                    <li><a href="<?= url('genetics') ?>">Genetik</a></li>
+                    <?php renderPageMenuItems($pages); ?>
+                    <li class="main-nav__admin"><a href="<?= url('login') ?>" class="login-link">Admin</a></li>
+                </ul>
             </nav>
             <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">🌙 Dark Mode</button>
         </div>
