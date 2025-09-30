@@ -5,6 +5,7 @@ define('BASE_PATH', dirname(__DIR__));
 define('STORAGE_PATH', BASE_PATH . '/storage');
 define('DB_PATH', STORAGE_PATH . '/cms.sqlite');
 define('UPLOAD_PATH', __DIR__ . '/uploads');
+define('FEROXZ_VERSION', '1.6.0');
 
 date_default_timezone_set('Europe/Berlin');
 

@@ -5,31 +5,33 @@
 
 <section class="card">
     <h3>Arten</h3>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Art</th>
-                <th>Slug</th>
-                <th>Aktionen</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($species as $sp): ?>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
                 <tr>
-                    <td><?= htmlspecialchars($sp['common_name']) ?> (<?= htmlspecialchars($sp['latin_name']) ?>)</td>
-                    <td><?= htmlspecialchars($sp['slug']) ?></td>
-                    <td>
-                        <a class="button secondary" href="<?= url('admin/genetics', ['species_id' => $sp['id'], 'tab' => 'species']) ?>">Bearbeiten</a>
-                        <form method="post" action="<?= url('admin/genetics') ?>" style="display:inline" onsubmit="return confirm('Diese Art inklusive Gene löschen?');">
-                            <input type="hidden" name="action" value="delete-species">
-                            <input type="hidden" name="id" value="<?= $sp['id'] ?>">
-                            <button class="button danger" type="submit">Löschen</button>
-                        </form>
-                    </td>
+                    <th>Art</th>
+                    <th>Slug</th>
+                    <th>Aktionen</th>
                 </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <?php foreach ($species as $sp): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($sp['common_name']) ?> (<?= htmlspecialchars($sp['latin_name']) ?>)</td>
+                        <td><?= htmlspecialchars($sp['slug']) ?></td>
+                        <td>
+                            <a class="button secondary" href="<?= url('admin/genetics', ['species_id' => $sp['id'], 'tab' => 'species']) ?>">Bearbeiten</a>
+                            <form method="post" action="<?= url('admin/genetics') ?>" style="display:inline" onsubmit="return confirm('Diese Art inklusive Gene löschen?');">
+                                <input type="hidden" name="action" value="delete-species">
+                                <input type="hidden" name="id" value="<?= $sp['id'] ?>">
+                                <button class="button danger" type="submit">Löschen</button>
+                            </form>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
 
     <h4><?= $editSpecies ? 'Art bearbeiten' : 'Neue Art anlegen' ?></h4>
     <form method="post" action="<?= url('admin/genetics') ?>">
@@ -59,33 +61,35 @@
 
 <section class="card">
     <h3>Gene</h3>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Gen</th>
-                <th>Art</th>
-                <th>Vererbung</th>
-                <th>Aktionen</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($genes as $gene): ?>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
                 <tr>
-                    <td><?= htmlspecialchars($gene['name']) ?></td>
-                    <td><?= htmlspecialchars($gene['common_name']) ?></td>
-                    <td><span class="badge inheritance-<?= htmlspecialchars($gene['inheritance']) ?>"><?= htmlspecialchars($gene['inheritance']) ?></span></td>
-                    <td>
-                        <a class="button secondary" href="<?= url('admin/genetics', ['gene_id' => $gene['id'], 'tab' => 'genes']) ?>">Bearbeiten</a>
-                        <form method="post" action="<?= url('admin/genetics') ?>" style="display:inline" onsubmit="return confirm('Gen wirklich löschen?');">
-                            <input type="hidden" name="action" value="delete-gene">
-                            <input type="hidden" name="id" value="<?= $gene['id'] ?>">
-                            <button class="button danger" type="submit">Löschen</button>
-                        </form>
-                    </td>
+                    <th>Gen</th>
+                    <th>Art</th>
+                    <th>Vererbung</th>
+                    <th>Aktionen</th>
                 </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <?php foreach ($genes as $gene): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($gene['name']) ?></td>
+                        <td><?= htmlspecialchars($gene['common_name']) ?></td>
+                        <td><span class="badge inheritance-<?= htmlspecialchars($gene['inheritance']) ?>"><?= htmlspecialchars($gene['inheritance']) ?></span></td>
+                        <td>
+                            <a class="button secondary" href="<?= url('admin/genetics', ['gene_id' => $gene['id'], 'tab' => 'genes']) ?>">Bearbeiten</a>
+                            <form method="post" action="<?= url('admin/genetics') ?>" style="display:inline" onsubmit="return confirm('Gen wirklich löschen?');">
+                                <input type="hidden" name="action" value="delete-gene">
+                                <input type="hidden" name="id" value="<?= $gene['id'] ?>">
+                                <button class="button danger" type="submit">Löschen</button>
+                            </form>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
 
     <h4><?= $editGene ? 'Gen bearbeiten' : 'Neues Gen anlegen' ?></h4>
     <form method="post" action="<?= url('admin/genetics') ?>">

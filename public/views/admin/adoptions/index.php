@@ -86,38 +86,40 @@ $edit = $editAdoption ?? null;
         <?php if (empty($adoptions)): ?>
             <p>Noch keine Tiere angelegt.</p>
         <?php else: ?>
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Art</th>
-                        <th>Status</th>
-                        <th>Preis</th>
-                        <th>Aktualisiert</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($adoptions as $animal): ?>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
                         <tr>
-                            <td><?= htmlspecialchars($animal['name']) ?></td>
-                            <td><?= htmlspecialchars($animal['species']) ?></td>
-                            <td><span class="badge badge--<?= htmlspecialchars($animal['status']) ?>"><?= htmlspecialchars($statusLabels[$animal['status']] ?? $animal['status']) ?></span></td>
-                            <td><?= htmlspecialchars($animal['price'] ?? '') ?></td>
-                            <?php $updatedAt = $animal['updated_at'] ?: ($animal['created_at'] ?? date(DATE_ATOM)); ?>
-                            <td><?= htmlspecialchars(date('d.m.Y', strtotime($updatedAt))) ?></td>
-                            <td class="table-actions">
-                                <a class="button subtle" href="<?= url('admin/adoptions', ['id' => (int)$animal['id']]) ?>">Bearbeiten</a>
-                                <form method="post" action="<?= url('admin/adoptions') ?>" onsubmit="return confirm('Tier wirklich löschen?');">
-                                    <input type="hidden" name="action" value="delete">
-                                    <input type="hidden" name="id" value="<?= (int)$animal['id'] ?>">
-                                    <button type="submit" class="button danger">Löschen</button>
-                                </form>
-                            </td>
+                            <th>Name</th>
+                            <th>Art</th>
+                            <th>Status</th>
+                            <th>Preis</th>
+                            <th>Aktualisiert</th>
+                            <th></th>
                         </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($adoptions as $animal): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($animal['name']) ?></td>
+                                <td><?= htmlspecialchars($animal['species']) ?></td>
+                                <td><span class="badge badge--<?= htmlspecialchars($animal['status']) ?>"><?= htmlspecialchars($statusLabels[$animal['status']] ?? $animal['status']) ?></span></td>
+                                <td><?= htmlspecialchars($animal['price'] ?? '') ?></td>
+                                <?php $updatedAt = $animal['updated_at'] ?: ($animal['created_at'] ?? date(DATE_ATOM)); ?>
+                                <td><?= htmlspecialchars(date('d.m.Y', strtotime($updatedAt))) ?></td>
+                                <td class="table-actions">
+                                    <a class="button subtle" href="<?= url('admin/adoptions', ['id' => (int)$animal['id']]) ?>">Bearbeiten</a>
+                                    <form method="post" action="<?= url('admin/adoptions') ?>" onsubmit="return confirm('Tier wirklich löschen?');">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="id" value="<?= (int)$animal['id'] ?>">
+                                        <button type="submit" class="button danger">Löschen</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
         <?php endif; ?>
     </div>
 </section>
@@ -132,52 +134,54 @@ $edit = $editAdoption ?? null;
     <?php if (empty($inquiries)): ?>
         <p>Es liegen noch keine Anfragen vor.</p>
     <?php else: ?>
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>Datum</th>
-                    <th>Tier</th>
-                    <th>Interessent</th>
-                    <th>Status</th>
-                    <th>Nachricht</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($inquiries as $inquiry): ?>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
                     <tr>
-                        <td><?= htmlspecialchars(date('d.m.Y H:i', strtotime($inquiry['created_at']))) ?></td>
-                        <td><?= htmlspecialchars($inquiry['adoption_name']) ?></td>
-                        <td>
-                            <strong><?= htmlspecialchars($inquiry['interested_name']) ?></strong><br>
-                            <a href="mailto:<?= htmlspecialchars($inquiry['interested_email']) ?>?subject=Rückmeldung%20zu%20<?= urlencode($inquiry['adoption_name']) ?>"><?= htmlspecialchars($inquiry['interested_email']) ?></a>
-                        </td>
-                        <td>
-                            <form method="post" action="<?= url('admin/adoptions') ?>" class="inline-form">
-                                <input type="hidden" name="action" value="inquiry-status">
-                                <input type="hidden" name="inquiry_id" value="<?= (int)$inquiry['id'] ?>">
-                                <select name="status">
-                                    <?php foreach ($inquiryLabels as $value => $label): ?>
-                                        <option value="<?= htmlspecialchars($value) ?>" <?= $inquiry['status'] === $value ? 'selected' : '' ?>><?= htmlspecialchars($label) ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <button type="submit" class="button subtle">Aktualisieren</button>
-                            </form>
-                        </td>
-                        <td>
-                            <?php if (!empty($inquiry['message'])): ?>
-                                <details>
-                                    <summary>Details anzeigen</summary>
-                                    <pre><?= htmlspecialchars($inquiry['message']) ?></pre>
-                                </details>
-                            <?php endif; ?>
-                        </td>
-                        <td class="table-actions">
-                            <a class="button" href="mailto:<?= htmlspecialchars($inquiry['interested_email']) ?>?subject=Rückmeldung%20zu%20<?= urlencode($inquiry['adoption_name']) ?>">Antworten</a>
-                        </td>
+                        <th>Datum</th>
+                        <th>Tier</th>
+                        <th>Interessent</th>
+                        <th>Status</th>
+                        <th>Nachricht</th>
+                        <th></th>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?php foreach ($inquiries as $inquiry): ?>
+                        <tr>
+                            <td><?= htmlspecialchars(date('d.m.Y H:i', strtotime($inquiry['created_at']))) ?></td>
+                            <td><?= htmlspecialchars($inquiry['adoption_name']) ?></td>
+                            <td>
+                                <strong><?= htmlspecialchars($inquiry['interested_name']) ?></strong><br>
+                                <a href="mailto:<?= htmlspecialchars($inquiry['interested_email']) ?>?subject=Rückmeldung%20zu%20<?= urlencode($inquiry['adoption_name']) ?>"><?= htmlspecialchars($inquiry['interested_email']) ?></a>
+                            </td>
+                            <td>
+                                <form method="post" action="<?= url('admin/adoptions') ?>" class="inline-form">
+                                    <input type="hidden" name="action" value="inquiry-status">
+                                    <input type="hidden" name="inquiry_id" value="<?= (int)$inquiry['id'] ?>">
+                                    <select name="status">
+                                        <?php foreach ($inquiryLabels as $value => $label): ?>
+                                            <option value="<?= htmlspecialchars($value) ?>" <?= $inquiry['status'] === $value ? 'selected' : '' ?>><?= htmlspecialchars($label) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <button type="submit" class="button subtle">Aktualisieren</button>
+                                </form>
+                            </td>
+                            <td>
+                                <?php if (!empty($inquiry['message'])): ?>
+                                    <details>
+                                        <summary>Details anzeigen</summary>
+                                        <pre><?= htmlspecialchars($inquiry['message']) ?></pre>
+                                    </details>
+                                <?php endif; ?>
+                            </td>
+                            <td class="table-actions">
+                                <a class="button" href="mailto:<?= htmlspecialchars($inquiry['interested_email']) ?>?subject=Rückmeldung%20zu%20<?= urlencode($inquiry['adoption_name']) ?>">Antworten</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
     <?php endif; ?>
 </section>

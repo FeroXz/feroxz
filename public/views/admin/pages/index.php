@@ -80,20 +80,22 @@ if (!function_exists('renderParentOptions')) {
     <?php if (empty($pageTree)): ?>
         <p>Noch keine Seiten angelegt.</p>
     <?php else: ?>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Seite</th>
-                    <th>Slug</th>
-                    <th>Menüstatus</th>
-                    <th>Menüpflege</th>
-                    <th>Aktionen</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php renderPageTreeRows($pageTree, $parentOptions); ?>
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Seite</th>
+                        <th>Slug</th>
+                        <th>Menüstatus</th>
+                        <th>Menüpflege</th>
+                        <th>Aktionen</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php renderPageTreeRows($pageTree, $parentOptions); ?>
+                </tbody>
+            </table>
+        </div>
     <?php endif; ?>
 </section>
 

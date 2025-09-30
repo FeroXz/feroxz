@@ -54,5 +54,51 @@
     buttons.forEach((button) => {
       button.addEventListener('click', toggleMode);
     });
+
+    const navToggles = Array.from(document.querySelectorAll('.nav-toggle'));
+    const collapseIfDesktop = () => {
+      if (window.innerWidth <= 960) {
+        return;
+      }
+      navToggles.forEach((toggle) => {
+        const targetId = toggle.getAttribute('data-target');
+        if (!targetId) {
+          return;
+        }
+        const target = document.getElementById(targetId);
+        if (!target) {
+          return;
+        }
+        toggle.setAttribute('aria-expanded', 'false');
+        target.classList.remove('is-open');
+      });
+    };
+
+    navToggles.forEach((toggle) => {
+      const targetId = toggle.getAttribute('data-target');
+      if (!targetId) {
+        return;
+      }
+      const target = document.getElementById(targetId);
+      if (!target) {
+        return;
+      }
+      toggle.addEventListener('click', () => {
+        const isOpen = target.classList.toggle('is-open');
+        toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      });
+      target.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', () => {
+          if (window.innerWidth > 960) {
+            return;
+          }
+          target.classList.remove('is-open');
+          toggle.setAttribute('aria-expanded', 'false');
+        });
+      });
+    });
+
+    collapseIfDesktop();
+    window.addEventListener('resize', collapseIfDesktop);
   });
 })();

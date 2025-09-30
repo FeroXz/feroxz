@@ -31,6 +31,14 @@ if (!empty($currentUser['username'])) {
             <a class="logo" href="<?= url('home') ?>"><?= htmlspecialchars($siteTitle) ?></a>
             <span class="tagline"><?= htmlspecialchars($siteTagline) ?></span>
         </div>
+        <button type="button" class="nav-toggle" data-target="site-primary-nav" aria-expanded="false" aria-controls="site-primary-nav">
+            <span class="sr-only">Hauptmenü umschalten</span>
+            <span class="nav-toggle__icon" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+            </span>
+        </button>
         <?php if (!function_exists('renderPageMenuItems')): ?>
             <?php
             function renderPageMenuItems(array $items): void
@@ -49,38 +57,40 @@ if (!empty($currentUser['username'])) {
             }
             ?>
         <?php endif; ?>
-        <nav class="main-nav">
-            <ul class="main-nav__root">
-                <li><a href="<?= url('home') ?>">Start</a></li>
-                <li><a href="<?= url('animals') ?>">Tiere</a></li>
-                <li><a href="<?= url('adoption') ?>">Tierabgabe</a></li>
-                <li><a href="<?= url('gallery') ?>">Galerie</a></li>
-                <li><a href="<?= url('genetics') ?>">Genetik</a></li>
-                <?php renderPageMenuItems($pages); ?>
+        <div class="header-collapsible" id="site-primary-nav">
+            <nav class="main-nav">
+                <ul class="main-nav__root">
+                    <li><a href="<?= url('home') ?>">Start</a></li>
+                    <li><a href="<?= url('animals') ?>">Tiere</a></li>
+                    <li><a href="<?= url('adoption') ?>">Tierabgabe</a></li>
+                    <li><a href="<?= url('gallery') ?>">Galerie</a></li>
+                    <li><a href="<?= url('genetics') ?>">Genetik</a></li>
+                    <?php renderPageMenuItems($pages); ?>
+                    <?php if (!empty($currentUser)): ?>
+                        <li><a href="<?= url('account/animals') ?>">Meine Tiere</a></li>
+                    <?php endif; ?>
+                </ul>
+            </nav>
+            <div class="header-actions">
+                <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">🌙 Dark Mode</button>
                 <?php if (!empty($currentUser)): ?>
-                    <li><a href="<?= url('account/animals') ?>">Meine Tiere</a></li>
+                    <details class="user-menu">
+                        <summary>
+                            <span class="avatar" aria-hidden="true"><?= htmlspecialchars($userInitial) ?></span>
+                            <span class="user-name"><?= htmlspecialchars($currentUser['username']) ?></span>
+                        </summary>
+                        <div class="user-menu__panel">
+                            <a href="<?= url('account/animals') ?>">Meine Tiere</a>
+                            <?php if (userHasPermission($currentUser, 'animals') || ($currentUser['role'] ?? '') === 'admin'): ?>
+                                <a href="<?= url('admin') ?>">Adminbereich</a>
+                            <?php endif; ?>
+                            <a href="<?= url('logout') ?>">Logout</a>
+                        </div>
+                    </details>
+                <?php else: ?>
+                    <a class="button subtle" href="<?= url('login') ?>">Login</a>
                 <?php endif; ?>
-            </ul>
-        </nav>
-        <div class="header-actions">
-            <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">🌙 Dark Mode</button>
-            <?php if (!empty($currentUser)): ?>
-                <details class="user-menu">
-                    <summary>
-                        <span class="avatar" aria-hidden="true"><?= htmlspecialchars($userInitial) ?></span>
-                        <span class="user-name"><?= htmlspecialchars($currentUser['username']) ?></span>
-                    </summary>
-                    <div class="user-menu__panel">
-                        <a href="<?= url('account/animals') ?>">Meine Tiere</a>
-                        <?php if (userHasPermission($currentUser, 'animals') || ($currentUser['role'] ?? '') === 'admin'): ?>
-                            <a href="<?= url('admin') ?>">Adminbereich</a>
-                        <?php endif; ?>
-                        <a href="<?= url('logout') ?>">Logout</a>
-                    </div>
-                </details>
-            <?php else: ?>
-                <a class="button subtle" href="<?= url('login') ?>">Login</a>
-            <?php endif; ?>
+            </div>
         </div>
     </div>
 </header>
@@ -99,6 +109,7 @@ if (!empty($currentUser['username'])) {
         <?php if (filter_var($contactEmail, FILTER_VALIDATE_EMAIL)): ?>
             <p><a href="mailto:<?= htmlspecialchars($contactEmail) ?>">Kontakt: <?= htmlspecialchars($contactEmail) ?></a></p>
         <?php endif; ?>
+        <p class="footer-version">Feroxz CMS Version <?= htmlspecialchars(FEROXZ_VERSION) ?></p>
     </div>
 </footer>
 </body>

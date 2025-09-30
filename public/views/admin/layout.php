@@ -28,24 +28,34 @@ if (!empty($currentUser['username'])) {
             <a href="<?= url('admin') ?>"><?= htmlspecialchars($siteTitle) ?> Admin</a>
             <span class="tagline">Kontrollzentrum</span>
         </div>
-        <nav class="admin-nav">
-            <?php foreach ($navItems as $item): ?>
-                <a href="<?= url($item['route']) ?>" class="<?= $adminRoute === $item['route'] ? 'active' : '' ?>"><?= htmlspecialchars($item['label']) ?></a>
-            <?php endforeach; ?>
-        </nav>
-        <div class="admin-actions">
-            <a class="button subtle" href="<?= url('home') ?>" target="_blank" rel="noopener">Website öffnen</a>
-            <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">🌙 Dark Mode</button>
-            <details class="user-menu">
-                <summary>
-                    <span class="avatar" aria-hidden="true"><?= htmlspecialchars($adminInitial) ?></span>
-                    <span class="user-name"><?= htmlspecialchars($currentUser['username'] ?? 'Admin') ?></span>
-                </summary>
-                <div class="user-menu__panel">
-                    <a href="<?= url('account/animals') ?>">Meine Tiere</a>
-                    <a href="<?= url('logout') ?>">Logout</a>
-                </div>
-            </details>
+        <button type="button" class="nav-toggle" data-target="admin-primary-nav" aria-expanded="false" aria-controls="admin-primary-nav">
+            <span class="sr-only">Admin-Navigation umschalten</span>
+            <span class="nav-toggle__icon" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+            </span>
+        </button>
+        <div class="header-collapsible" id="admin-primary-nav">
+            <nav class="admin-nav">
+                <?php foreach ($navItems as $item): ?>
+                    <a href="<?= url($item['route']) ?>" class="<?= $adminRoute === $item['route'] ? 'active' : '' ?>"><?= htmlspecialchars($item['label']) ?></a>
+                <?php endforeach; ?>
+            </nav>
+            <div class="admin-actions">
+                <a class="button subtle" href="<?= url('home') ?>" target="_blank" rel="noopener">Website öffnen</a>
+                <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">🌙 Dark Mode</button>
+                <details class="user-menu">
+                    <summary>
+                        <span class="avatar" aria-hidden="true"><?= htmlspecialchars($adminInitial) ?></span>
+                        <span class="user-name"><?= htmlspecialchars($currentUser['username'] ?? 'Admin') ?></span>
+                    </summary>
+                    <div class="user-menu__panel">
+                        <a href="<?= url('account/animals') ?>">Meine Tiere</a>
+                        <a href="<?= url('logout') ?>">Logout</a>
+                    </div>
+                </details>
+            </div>
         </div>
     </div>
 </header>

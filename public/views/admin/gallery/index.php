@@ -1,7 +1,8 @@
 <section class="card">
     <h2>Galerie</h2>
-    <table class="table">
-        <thead>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
             <tr>
                 <th>Titel</th>
                 <th>Bild</th>
@@ -25,8 +26,9 @@
                     </td>
                 </tr>
             <?php endforeach; ?>
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
 </section>
 
 <section class="card">

@@ -28,20 +28,30 @@ $currentRoute = $_GET['route'] ?? '';
             <a class="logo" href="<?= url('home') ?>"><?= htmlspecialchars($siteTitle) ?></a>
             <span class="tagline">Persönliche Tierverwaltung</span>
         </div>
-        <nav class="account-nav">
-            <a href="<?= url('account/animals') ?>" class="<?= $currentRoute === 'account/animals' ? 'active' : '' ?>">Meine Tiere</a>
-            <?php if (userHasPermission($currentUser, 'animals') || ($currentUser['role'] ?? '') === 'admin'): ?>
-                <a href="<?= url('admin') ?>" class="<?= str_starts_with($currentRoute, 'admin') ? 'active' : '' ?>">Adminbereich</a>
-            <?php endif; ?>
-            <a href="<?= url('logout') ?>">Logout</a>
-        </nav>
-        <div class="account-actions">
-            <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">🌙 Dark Mode</button>
-            <div class="account-user">
-                <span class="avatar" aria-hidden="true"><?= htmlspecialchars($initial) ?></span>
-                <div class="user-meta">
-                    <strong><?= htmlspecialchars($currentUser['username'] ?? 'User') ?></strong>
-                    <small><?= htmlspecialchars(($currentUser['role'] ?? 'user') === 'admin' ? 'Administrator' : 'Benutzer') ?></small>
+        <button type="button" class="nav-toggle" data-target="account-primary-nav" aria-expanded="false" aria-controls="account-primary-nav">
+            <span class="sr-only">Account-Navigation umschalten</span>
+            <span class="nav-toggle__icon" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+            </span>
+        </button>
+        <div class="header-collapsible" id="account-primary-nav">
+            <nav class="account-nav">
+                <a href="<?= url('account/animals') ?>" class="<?= $currentRoute === 'account/animals' ? 'active' : '' ?>">Meine Tiere</a>
+                <?php if (userHasPermission($currentUser, 'animals') || ($currentUser['role'] ?? '') === 'admin'): ?>
+                    <a href="<?= url('admin') ?>" class="<?= str_starts_with($currentRoute, 'admin') ? 'active' : '' ?>">Adminbereich</a>
+                <?php endif; ?>
+                <a href="<?= url('logout') ?>">Logout</a>
+            </nav>
+            <div class="account-actions">
+                <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">🌙 Dark Mode</button>
+                <div class="account-user">
+                    <span class="avatar" aria-hidden="true"><?= htmlspecialchars($initial) ?></span>
+                    <div class="user-meta">
+                        <strong><?= htmlspecialchars($currentUser['username'] ?? 'User') ?></strong>
+                        <small><?= htmlspecialchars(($currentUser['role'] ?? 'user') === 'admin' ? 'Administrator' : 'Benutzer') ?></small>
+                    </div>
                 </div>
             </div>
         </div>

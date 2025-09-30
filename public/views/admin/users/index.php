@@ -1,7 +1,8 @@
 <section class="card">
     <h2>Benutzerverwaltung</h2>
-    <table class="table">
-        <thead>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
             <tr>
                 <th>Benutzername</th>
                 <th>Rolle</th>
@@ -42,8 +43,9 @@
                     </td>
                 </tr>
             <?php endforeach; ?>
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
 </section>
 
 <section class="card">
