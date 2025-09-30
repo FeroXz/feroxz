@@ -1,0 +1,30 @@
+<?php include __DIR__ . '/../partials/header.php'; ?>
+<h1>Einstellungen</h1>
+<?php include __DIR__ . '/nav.php'; ?>
+<?php if ($flashSuccess): ?>
+    <div class="alert alert-success"><?= htmlspecialchars($flashSuccess) ?></div>
+<?php endif; ?>
+<div class="card">
+    <form method="post">
+        <label>Seitentitel
+            <input type="text" name="site_title" value="<?= htmlspecialchars($settings['site_title'] ?? '') ?>">
+        </label>
+        <label>Untertitel
+            <input type="text" name="site_tagline" value="<?= htmlspecialchars($settings['site_tagline'] ?? '') ?>">
+        </label>
+        <label>Hero-Einleitung
+            <textarea name="hero_intro"><?= htmlspecialchars($settings['hero_intro'] ?? '') ?></textarea>
+        </label>
+        <label>Abgabe Intro
+            <textarea name="adoption_intro"><?= htmlspecialchars($settings['adoption_intro'] ?? '') ?></textarea>
+        </label>
+        <label>Footer Text
+            <textarea name="footer_text"><?= htmlspecialchars($settings['footer_text'] ?? '') ?></textarea>
+        </label>
+        <label>Kontakt E-Mail
+            <input type="email" name="contact_email" value="<?= htmlspecialchars($settings['contact_email'] ?? '') ?>">
+        </label>
+        <button type="submit">Speichern</button>
+    </form>
+</div>
+<?php include __DIR__ . '/../partials/footer.php'; ?>
