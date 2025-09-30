@@ -14,6 +14,7 @@ function get_database_connection(): PDO
     $pdo = new PDO('sqlite:' . DATA_PATH);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    $pdo->exec('PRAGMA foreign_keys = ON');
     return $pdo;
 }
 
@@ -76,5 +77,63 @@ function initialize_database(PDO $pdo): void
         message TEXT NOT NULL,
         created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY(listing_id) REFERENCES adoption_listings(id)
+    )');
+
+    $pdo->exec('CREATE TABLE IF NOT EXISTS pages (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        slug TEXT NOT NULL UNIQUE,
+        content TEXT NOT NULL,
+        is_published INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )');
+
+    $pdo->exec('CREATE TABLE IF NOT EXISTS news_posts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        slug TEXT NOT NULL UNIQUE,
+        excerpt TEXT,
+        content TEXT NOT NULL,
+        is_published INTEGER NOT NULL DEFAULT 0,
+        published_at TEXT,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )');
+
+    $pdo->exec('CREATE TABLE IF NOT EXISTS breeding_plans (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        season TEXT,
+        notes TEXT,
+        expected_genetics TEXT,
+        incubation_notes TEXT,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )');
+
+    $pdo->exec('CREATE TABLE IF NOT EXISTS breeding_plan_parents (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        plan_id INTEGER NOT NULL,
+        parent_type TEXT NOT NULL,
+        animal_id INTEGER,
+        name TEXT,
+        sex TEXT,
+        species TEXT,
+        genetics TEXT,
+        notes TEXT,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(plan_id) REFERENCES breeding_plans(id) ON DELETE CASCADE,
+        FOREIGN KEY(animal_id) REFERENCES animals(id)
+    )');
+
+    $pdo->exec('CREATE TABLE IF NOT EXISTS care_articles (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        slug TEXT NOT NULL UNIQUE,
+        summary TEXT,
+        content TEXT NOT NULL,
+        is_published INTEGER NOT NULL DEFAULT 1,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     )');
 }

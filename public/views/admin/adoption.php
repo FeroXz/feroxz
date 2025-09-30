@@ -51,14 +51,14 @@
             <label>Art
                 <input type="text" name="species" value="<?= htmlspecialchars($editListing['species'] ?? '') ?>">
             </label>
-            <label>Genetik
-                <textarea name="genetics"><?= htmlspecialchars($editListing['genetics'] ?? '') ?></textarea>
-            </label>
             <label>Preis
                 <input type="text" name="price" value="<?= htmlspecialchars($editListing['price'] ?? '') ?>">
             </label>
+            <label>Genetik
+                <textarea name="genetics" class="rich-text"><?= htmlspecialchars($editListing['genetics'] ?? '') ?></textarea>
+            </label>
             <label>Beschreibung
-                <textarea name="description"><?= htmlspecialchars($editListing['description'] ?? '') ?></textarea>
+                <textarea name="description" class="rich-text"><?= htmlspecialchars($editListing['description'] ?? '') ?></textarea>
             </label>
             <label>Status
                 <select name="status">

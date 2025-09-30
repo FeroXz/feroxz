@@ -13,13 +13,13 @@
             <input type="text" name="site_tagline" value="<?= htmlspecialchars($settings['site_tagline'] ?? '') ?>">
         </label>
         <label>Hero-Einleitung
-            <textarea name="hero_intro"><?= htmlspecialchars($settings['hero_intro'] ?? '') ?></textarea>
+            <textarea name="hero_intro" class="rich-text"><?= htmlspecialchars($settings['hero_intro'] ?? '') ?></textarea>
         </label>
         <label>Abgabe Intro
-            <textarea name="adoption_intro"><?= htmlspecialchars($settings['adoption_intro'] ?? '') ?></textarea>
+            <textarea name="adoption_intro" class="rich-text"><?= htmlspecialchars($settings['adoption_intro'] ?? '') ?></textarea>
         </label>
         <label>Footer Text
-            <textarea name="footer_text"><?= htmlspecialchars($settings['footer_text'] ?? '') ?></textarea>
+            <textarea name="footer_text" class="rich-text"><?= htmlspecialchars($settings['footer_text'] ?? '') ?></textarea>
         </label>
         <label>Kontakt E-Mail
             <input type="email" name="contact_email" value="<?= htmlspecialchars($settings['contact_email'] ?? '') ?>">

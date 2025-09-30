@@ -56,16 +56,16 @@
                 <input type="text" name="age" value="<?= htmlspecialchars($editAnimal['age'] ?? '') ?>">
             </label>
             <label>Genetik
-                <textarea name="genetics"><?= htmlspecialchars($editAnimal['genetics'] ?? '') ?></textarea>
+                <textarea name="genetics" class="rich-text"><?= htmlspecialchars($editAnimal['genetics'] ?? '') ?></textarea>
             </label>
             <label>Herkunft
                 <input type="text" name="origin" value="<?= htmlspecialchars($editAnimal['origin'] ?? '') ?>">
             </label>
             <label>Besonderheiten
-                <textarea name="special_notes"><?= htmlspecialchars($editAnimal['special_notes'] ?? '') ?></textarea>
+                <textarea name="special_notes" class="rich-text"><?= htmlspecialchars($editAnimal['special_notes'] ?? '') ?></textarea>
             </label>
             <label>Beschreibung
-                <textarea name="description"><?= htmlspecialchars($editAnimal['description'] ?? '') ?></textarea>
+                <textarea name="description" class="rich-text"><?= htmlspecialchars($editAnimal['description'] ?? '') ?></textarea>
             </label>
             <label>Bild
                 <input type="file" name="image" accept="image/*">

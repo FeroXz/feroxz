@@ -2,7 +2,7 @@
 <section class="hero">
     <div>
         <h1><?= htmlspecialchars($settings['site_title'] ?? APP_NAME) ?></h1>
-        <p><?= nl2br(htmlspecialchars($settings['hero_intro'] ?? '')) ?></p>
+        <div class="rich-text-content"><?= render_rich_text($settings['hero_intro'] ?? '') ?></div>
     </div>
     <div>
         <span class="badge">Pflegeleitfaden</span>
@@ -30,7 +30,7 @@
                     <p><?= htmlspecialchars($animal['genetics']) ?></p>
                 <?php endif; ?>
                 <?php if (!empty($animal['special_notes'])): ?>
-                    <p><?= nl2br(htmlspecialchars($animal['special_notes'])) ?></p>
+                    <div class="rich-text-content"><?= render_rich_text($animal['special_notes']) ?></div>
                 <?php endif; ?>
             </article>
         <?php endforeach; ?>
@@ -40,7 +40,7 @@
 
 <section style="margin-top:3rem;">
     <h2>Tiervermittlung</h2>
-    <p><?= nl2br(htmlspecialchars($settings['adoption_intro'] ?? '')) ?></p>
+    <div class="rich-text-content"><?= render_rich_text($settings['adoption_intro'] ?? '') ?></div>
     <div class="grid cards">
         <?php foreach ($listings as $listing): ?>
             <article class="card">
@@ -59,7 +59,7 @@
                     <p><strong>Preis:</strong> <?= htmlspecialchars($listing['price']) ?></p>
                 <?php endif; ?>
                 <?php if (!empty($listing['description'])): ?>
-                    <p><?= nl2br(htmlspecialchars($listing['description'])) ?></p>
+                    <div class="rich-text-content"><?= render_rich_text($listing['description']) ?></div>
                 <?php endif; ?>
                 <?php if (!empty($settings['contact_email'])): ?>
                     <a class="btn" href="mailto:<?= htmlspecialchars($settings['contact_email']) ?>?subject=Anfrage%20<?= urlencode($listing['title']) ?>">Direkt anfragen</a>
@@ -68,4 +68,47 @@
         <?php endforeach; ?>
     </div>
 </section>
+<?php if (!empty($latestNews)): ?>
+<section style="margin-top:3rem;">
+    <h2>Neuigkeiten</h2>
+    <div class="grid cards">
+        <?php foreach ($latestNews as $post): ?>
+            <article class="card">
+                <h3><?= htmlspecialchars($post['title']) ?></h3>
+                <?php if (!empty($post['published_at'])): ?>
+                    <p class="text-muted"><?= date('d.m.Y', strtotime($post['published_at'])) ?></p>
+                <?php endif; ?>
+                <?php if (!empty($post['excerpt'])): ?>
+                    <p><?= nl2br(htmlspecialchars($post['excerpt'])) ?></p>
+                <?php endif; ?>
+                <a class="btn btn-secondary" href="<?= BASE_URL ?>/index.php?route=news&amp;slug=<?= urlencode($post['slug']) ?>">Details</a>
+            </article>
+        <?php endforeach; ?>
+    </div>
+    <div style="margin-top:1rem;">
+        <a class="btn" href="<?= BASE_URL ?>/index.php?route=news">Alle Meldungen anzeigen</a>
+    </div>
+</section>
+<?php endif; ?>
+
+<?php if (!empty($careHighlights)): ?>
+<section style="margin-top:3rem;">
+    <h2>Pflegewissen</h2>
+    <div class="grid cards">
+        <?php foreach ($careHighlights as $article): ?>
+            <article class="card">
+                <h3><?= htmlspecialchars($article['title']) ?></h3>
+                <?php if (!empty($article['summary'])): ?>
+                    <p><?= nl2br(htmlspecialchars($article['summary'])) ?></p>
+                <?php endif; ?>
+                <a class="btn btn-secondary" href="<?= BASE_URL ?>/index.php?route=care-article&amp;slug=<?= urlencode($article['slug']) ?>">Leitfaden öffnen</a>
+            </article>
+        <?php endforeach; ?>
+    </div>
+    <div style="margin-top:1rem;">
+        <a class="btn" href="<?= BASE_URL ?>/index.php?route=care-guide">Zur Wissenssammlung</a>
+    </div>
+</section>
+<?php endif; ?>
+
 <?php include __DIR__ . '/partials/footer.php'; ?>

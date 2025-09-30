@@ -19,11 +19,18 @@
             <div class="nav-links">
                 <a href="<?= BASE_URL ?>/index.php" class="<?= ($currentRoute === 'home') ? 'active' : '' ?>">Start</a>
                 <a href="<?= BASE_URL ?>/index.php?route=animals" class="<?= ($currentRoute === 'animals') ? 'active' : '' ?>">Tierübersicht</a>
-                <?php if (current_user()): ?>
-                    <a href="<?= BASE_URL ?>/index.php?route=my-animals" class="<?= ($currentRoute === 'my-animals') ? 'active' : '' ?>">Meine Tiere</a>
-                <?php endif; ?>
+                <a href="<?= BASE_URL ?>/index.php?route=news" class="<?= ($currentRoute === 'news') ? 'active' : '' ?>">Neuigkeiten</a>
+                <a href="<?= BASE_URL ?>/index.php?route=care-guide" class="<?= ($currentRoute === 'care-guide' || $currentRoute === 'care-article') ? 'active' : '' ?>">Pflegeleitfaden</a>
+                <?php foreach (($navCareArticles ?? []) as $careNav): ?>
+                    <a href="<?= BASE_URL ?>/index.php?route=care-article&amp;slug=<?= urlencode($careNav['slug']) ?>" class="<?= ($currentRoute === 'care-article' && ($activeCareSlug ?? '') === $careNav['slug']) ? 'active' : '' ?>"><?= htmlspecialchars($careNav['title']) ?></a>
+                <?php endforeach; ?>
+                <?php foreach (($navPages ?? []) as $navPage): ?>
+                    <a href="<?= BASE_URL ?>/index.php?route=page&amp;slug=<?= urlencode($navPage['slug']) ?>" class="<?= ($currentRoute === 'page' && ($activePageSlug ?? '') === $navPage['slug']) ? 'active' : '' ?>"><?= htmlspecialchars($navPage['title']) ?></a>
+                <?php endforeach; ?>
                 <a href="<?= BASE_URL ?>/index.php?route=adoption" class="<?= ($currentRoute === 'adoption') ? 'active' : '' ?>">Tierabgabe</a>
                 <?php if (current_user()): ?>
+                    <a href="<?= BASE_URL ?>/index.php?route=my-animals" class="<?= ($currentRoute === 'my-animals') ? 'active' : '' ?>">Meine Tiere</a>
+                    <a href="<?= BASE_URL ?>/index.php?route=breeding" class="<?= ($currentRoute === 'breeding') ? 'active' : '' ?>">Zuchtplanung</a>
                     <a href="<?= BASE_URL ?>/index.php?route=admin/dashboard" class="<?= str_starts_with($currentRoute, 'admin/') ? 'active' : '' ?>">Admin</a>
                     <a href="<?= BASE_URL ?>/index.php?route=logout">Logout</a>
                 <?php else: ?>

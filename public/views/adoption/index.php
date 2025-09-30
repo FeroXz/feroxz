@@ -1,6 +1,6 @@
 <?php include __DIR__ . '/../partials/header.php'; ?>
 <h1>Tierabgabe</h1>
-<p><?= nl2br(htmlspecialchars($settings['adoption_intro'] ?? '')) ?></p>
+<div class="rich-text-content"><?= render_rich_text($settings['adoption_intro'] ?? '') ?></div>
 <?php if ($flashSuccess): ?>
     <div class="alert alert-success"><?= htmlspecialchars($flashSuccess) ?></div>
 <?php endif; ?>
@@ -25,7 +25,7 @@
                 <p><strong>Preis:</strong> <?= htmlspecialchars($listing['price']) ?></p>
             <?php endif; ?>
             <?php if (!empty($listing['description'])): ?>
-                <p><?= nl2br(htmlspecialchars($listing['description'])) ?></p>
+                <div class="rich-text-content"><?= render_rich_text($listing['description']) ?></div>
             <?php endif; ?>
             <form method="post" class="card" style="background:rgba(148,163,184,0.08);margin-top:1rem;">
                 <input type="hidden" name="listing_id" value="<?= (int)$listing['id'] ?>">

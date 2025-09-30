@@ -23,7 +23,7 @@
                     <p><strong>Herkunft:</strong> <?= htmlspecialchars($animal['origin']) ?></p>
                 <?php endif; ?>
                 <?php if (!empty($animal['special_notes'])): ?>
-                    <p><?= nl2br(htmlspecialchars($animal['special_notes'])) ?></p>
+                    <div class="rich-text-content"><?= render_rich_text($animal['special_notes']) ?></div>
                 <?php endif; ?>
             </article>
         <?php endforeach; ?>
