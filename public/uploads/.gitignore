@@ -1,0 +1,3 @@
+# Keep uploads directory in version control but ignore files.
+*
+!.gitignore
