@@ -1,11 +1,11 @@
 <?php include __DIR__ . '/../partials/header.php'; ?>
 <h1>Tierabgabe</h1>
-<p><?= nl2br(htmlspecialchars($settings['adoption_intro'] ?? '')) ?></p>
+<div class="rich-text-content"><?= render_rich_text($settings['adoption_intro'] ?? '') ?></div>
 <?php if ($flashSuccess): ?>
-    <div class="alert alert-success"><?= htmlspecialchars($flashSuccess) ?></div>
+    <div class="alert alert-success" role="status" aria-live="polite"><?= htmlspecialchars($flashSuccess) ?></div>
 <?php endif; ?>
 <?php if ($flashError): ?>
-    <div class="alert alert-error"><?= htmlspecialchars($flashError) ?></div>
+    <div class="alert alert-error" role="alert" aria-live="assertive"><?= htmlspecialchars($flashError) ?></div>
 <?php endif; ?>
 <div class="grid cards" style="margin-top:2rem;">
     <?php foreach ($listings as $listing): ?>
@@ -25,7 +25,7 @@
                 <p><strong>Preis:</strong> <?= htmlspecialchars($listing['price']) ?></p>
             <?php endif; ?>
             <?php if (!empty($listing['description'])): ?>
-                <p><?= nl2br(htmlspecialchars($listing['description'])) ?></p>
+                <div class="rich-text-content"><?= render_rich_text($listing['description']) ?></div>
             <?php endif; ?>
             <form method="post" class="card" style="background:rgba(148,163,184,0.08);margin-top:1rem;">
                 <input type="hidden" name="listing_id" value="<?= (int)$listing['id'] ?>">
@@ -39,7 +39,7 @@
                     <input type="email" name="email" required>
                 </label>
                 <label>Nachricht
-                    <textarea name="message" required placeholder="Beschreibe deine Haltung, Erfahrung und Fragen."></textarea>
+                    <textarea name="message" required placeholder="Beschreiben Sie Ihre Haltung, Erfahrung und konkreten Fragen."></textarea>
                 </label>
                 <button type="submit">Anfrage senden</button>
             </form>

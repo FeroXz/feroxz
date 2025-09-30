@@ -2,7 +2,7 @@
 <h1>Tierabgabe verwalten</h1>
 <?php include __DIR__ . '/nav.php'; ?>
 <?php if ($flashSuccess): ?>
-    <div class="alert alert-success"><?= htmlspecialchars($flashSuccess) ?></div>
+    <div class="alert alert-success" role="status" aria-live="polite"><?= htmlspecialchars($flashSuccess) ?></div>
 <?php endif; ?>
 <div class="grid" style="grid-template-columns:2fr 1fr;gap:2rem;align-items:start;">
     <div class="card">
@@ -51,14 +51,14 @@
             <label>Art
                 <input type="text" name="species" value="<?= htmlspecialchars($editListing['species'] ?? '') ?>">
             </label>
-            <label>Genetik
-                <textarea name="genetics"><?= htmlspecialchars($editListing['genetics'] ?? '') ?></textarea>
-            </label>
             <label>Preis
                 <input type="text" name="price" value="<?= htmlspecialchars($editListing['price'] ?? '') ?>">
             </label>
+            <label>Genetik
+                <textarea name="genetics" class="rich-text"><?= htmlspecialchars($editListing['genetics'] ?? '') ?></textarea>
+            </label>
             <label>Beschreibung
-                <textarea name="description"><?= htmlspecialchars($editListing['description'] ?? '') ?></textarea>
+                <textarea name="description" class="rich-text"><?= htmlspecialchars($editListing['description'] ?? '') ?></textarea>
             </label>
             <label>Status
                 <select name="status">

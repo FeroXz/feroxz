@@ -3,7 +3,7 @@
     <div class="card">
         <h2>Login</h2>
         <?php if ($error = flash('error')): ?>
-            <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
+            <div class="alert alert-error" role="alert" aria-live="assertive"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
         <form method="post" action="<?= BASE_URL ?>/index.php?route=login">
             <label>Benutzername

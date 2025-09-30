@@ -146,6 +146,220 @@ main {
   letter-spacing: 0.08em;
 }
 
+.badge-pattern {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(148, 163, 184, 0.25) 100%);
+  color: var(--text);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+}
+
+.animal-marker {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.85rem;
+  margin-left: 0.35rem;
+  color: var(--accent);
+}
+
+.pair-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.parent-block {
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.7);
+  display: grid;
+  gap: 1rem;
+}
+
+.parent-block legend {
+  font-weight: 600;
+  padding: 0 0.4rem;
+}
+
+.parent-block__group[hidden] {
+  display: none !important;
+}
+
+.gene-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.gene-selector__intro p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.gene-selector__parents {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.gene-parent {
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
+  background: rgba(15, 23, 42, 0.72);
+  padding: 1.5rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.gene-parent h2 {
+  margin: 0;
+}
+
+.gene-parent__input {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.gene-parent__input input {
+  flex: 1;
+}
+
+.gene-parent__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  min-height: 2rem;
+}
+
+.gene-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(34, 211, 238, 0.15);
+  font-size: 0.85rem;
+}
+
+.gene-tag__remove {
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 1rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.gene-parent__suggestions {
+  display: grid;
+  gap: 0.35rem;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 0.6rem;
+  max-height: 240px;
+  overflow-y: auto;
+  box-shadow: 0 18px 35px rgba(15, 118, 110, 0.2);
+}
+
+.gene-suggestion {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  background: transparent;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 10px;
+  cursor: pointer;
+  color: inherit;
+}
+
+.gene-suggestion strong {
+  font-size: 0.95rem;
+}
+
+.gene-suggestion span {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.gene-suggestion:hover,
+.gene-suggestion:focus {
+  background: rgba(14, 165, 233, 0.2);
+}
+
+.gene-suggestion--empty {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.gene-reference {
+  margin-top: 2.5rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.gene-reference__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.gene-reference__states {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.gene-reference__states div {
+  background: rgba(15, 23, 42, 0.68);
+  border-radius: 12px;
+  padding: 0.6rem 0.8rem;
+}
+
+.gene-reference__states dt {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.gene-reference__states dd {
+  margin: 0.2rem 0 0;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-left: 0.5rem;
+}
+
+.tag-visual {
+  background: rgba(74, 222, 128, 0.18);
+  color: var(--success);
+}
+
+.tag-carrier {
+  background: rgba(250, 204, 21, 0.18);
+  color: #facc15;
+}
+
+.tag-normal {
+  background: rgba(148, 163, 184, 0.18);
+  color: var(--text-muted);
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -218,6 +432,10 @@ button:hover,
   color: var(--text);
 }
 
+.btn-secondary:hover {
+  color: var(--text);
+}
+
 .alert {
   padding: 1rem 1.25rem;
   border-radius: 16px;
@@ -261,6 +479,131 @@ button:hover,
 .admin-nav a.active {
   background: rgba(34, 211, 238, 0.25);
   color: var(--accent);
+}
+
+.rich-text-wrapper {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.rich-text-toolbar {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.rich-text-btn {
+  background: rgba(148, 163, 184, 0.18);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  color: var(--text);
+  padding: 0.35rem 0.6rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.rich-text-btn:hover {
+  background: rgba(34, 211, 238, 0.2);
+  color: var(--accent);
+}
+
+.rich-text-editor {
+  min-height: 160px;
+  padding: 0.75rem 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(15, 23, 42, 0.65);
+  line-height: 1.6;
+  color: var(--text);
+  overflow-y: auto;
+}
+
+.rich-text-editor:focus {
+  outline: 2px solid rgba(34, 211, 238, 0.35);
+}
+
+.rich-text-content {
+  display: grid;
+  gap: 0.75rem;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+.rich-text-content p {
+  margin: 0;
+}
+
+.rich-text-content ul,
+.rich-text-content ol {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.rich-text-content table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.rich-text-content table th,
+.rich-text-content table td {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.stack {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.plan-entry {
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 18px;
+  padding: 1.5rem;
+  background: rgba(15, 23, 42, 0.55);
+  display: grid;
+  gap: 1rem;
+}
+
+.plan-entry__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.plan-entry__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.plan-entry__section {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.plan-parents {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.plan-parents li {
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 14px;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.45);
+  display: grid;
+  gap: 0.35rem;
+}
+
+.plan-parent__title {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: center;
 }
 
 @media (max-width: 768px) {

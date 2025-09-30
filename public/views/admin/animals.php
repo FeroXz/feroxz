@@ -2,7 +2,10 @@
 <h1>Tiere verwalten</h1>
 <?php include __DIR__ . '/nav.php'; ?>
 <?php if ($flashSuccess): ?>
-    <div class="alert alert-success"><?= htmlspecialchars($flashSuccess) ?></div>
+    <div class="alert alert-success" role="status" aria-live="polite"><?= htmlspecialchars($flashSuccess) ?></div>
+<?php endif; ?>
+<?php if (!empty($flashError)): ?>
+    <div class="alert alert-error" role="alert" aria-live="assertive"><?= htmlspecialchars($flashError) ?></div>
 <?php endif; ?>
 <div class="grid" style="grid-template-columns:2fr 1fr;gap:2rem;align-items:start;">
     <div class="card">
@@ -20,7 +23,12 @@
             <tbody>
                 <?php foreach ($animals as $animal): ?>
                     <tr>
-                        <td><?= htmlspecialchars($animal['name']) ?></td>
+                        <td>
+                            <?= htmlspecialchars($animal['name']) ?>
+                            <?php if (!empty($animal['is_piebald'])): ?>
+                                <span class="animal-marker" title="Geschecktes Tier" aria-label="Geschecktes Tier">⬟</span>
+                            <?php endif; ?>
+                        </td>
                         <td><?= htmlspecialchars($animal['species']) ?></td>
                         <td><?= htmlspecialchars($animal['owner_name'] ?? '–') ?></td>
                         <td>
@@ -28,7 +36,10 @@
                                 <span class="badge">Privat</span>
                             <?php endif; ?>
                             <?php if ($animal['is_showcased']): ?>
-                                <span class="badge">Showcase</span>
+                                <span class="badge">Highlight</span>
+                            <?php endif; ?>
+                            <?php if (!empty($animal['is_piebald'])): ?>
+                                <span class="badge badge-pattern">Gescheckt</span>
                             <?php endif; ?>
                         </td>
                         <td>
@@ -56,16 +67,16 @@
                 <input type="text" name="age" value="<?= htmlspecialchars($editAnimal['age'] ?? '') ?>">
             </label>
             <label>Genetik
-                <textarea name="genetics"><?= htmlspecialchars($editAnimal['genetics'] ?? '') ?></textarea>
+                <textarea name="genetics" class="rich-text"><?= htmlspecialchars($editAnimal['genetics'] ?? '') ?></textarea>
             </label>
             <label>Herkunft
                 <input type="text" name="origin" value="<?= htmlspecialchars($editAnimal['origin'] ?? '') ?>">
             </label>
             <label>Besonderheiten
-                <textarea name="special_notes"><?= htmlspecialchars($editAnimal['special_notes'] ?? '') ?></textarea>
+                <textarea name="special_notes" class="rich-text"><?= htmlspecialchars($editAnimal['special_notes'] ?? '') ?></textarea>
             </label>
             <label>Beschreibung
-                <textarea name="description"><?= htmlspecialchars($editAnimal['description'] ?? '') ?></textarea>
+                <textarea name="description" class="rich-text"><?= htmlspecialchars($editAnimal['description'] ?? '') ?></textarea>
             </label>
             <label>Bild
                 <input type="file" name="image" accept="image/*">
@@ -87,6 +98,9 @@
             </label>
             <label style="display:flex;align-items:center;gap:0.5rem;">
                 <input type="checkbox" name="is_showcased" value="1" <?= !empty($editAnimal['is_showcased']) ? 'checked' : '' ?>> In Highlights anzeigen
+            </label>
+            <label style="display:flex;align-items:center;gap:0.5rem;">
+                <input type="checkbox" name="is_piebald" value="1" <?= !empty($editAnimal['is_piebald']) ? 'checked' : '' ?>> Als gescheckt markieren
             </label>
             <button type="submit">Speichern</button>
         </form>

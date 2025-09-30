@@ -14,6 +14,30 @@
         <h3>Neue Anfragen</h3>
         <p><?= count($inquiries) ?> Nachrichten</p>
     </div>
+    <div class="card">
+        <h3>Seiten</h3>
+        <p><?= count($pages) ?> Einträge</p>
+    </div>
+    <div class="card">
+        <h3>News</h3>
+        <p><?= count($newsPosts) ?> Beiträge</p>
+    </div>
+    <div class="card">
+        <h3>Zuchtpläne</h3>
+        <p><?= count($breedingPlans) ?> Projekte</p>
+    </div>
+    <div class="card">
+        <h3>Pflegeartikel</h3>
+        <p><?= count($careArticles) ?> Artikel</p>
+    </div>
+    <div class="card">
+        <h3>Genetische Arten</h3>
+        <p><?= isset($geneticSpecies) ? count($geneticSpecies) : 0 ?> Datensätze</p>
+    </div>
+    <div class="card">
+        <h3>Gene</h3>
+        <p><?= isset($geneticGenes) ? count($geneticGenes) : 0 ?> Einträge</p>
+    </div>
 </div>
 
 <section style="margin-top:2rem;">

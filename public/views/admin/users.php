@@ -2,7 +2,7 @@
 <h1>Benutzerverwaltung</h1>
 <?php include __DIR__ . '/nav.php'; ?>
 <?php if ($flashSuccess): ?>
-    <div class="alert alert-success"><?= htmlspecialchars($flashSuccess) ?></div>
+    <div class="alert alert-success" role="status" aria-live="polite"><?= htmlspecialchars($flashSuccess) ?></div>
 <?php endif; ?>
 <div class="grid" style="grid-template-columns:2fr 1fr;gap:2rem;align-items:start;">
     <div class="card">
