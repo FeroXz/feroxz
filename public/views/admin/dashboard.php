@@ -1,4 +1,5 @@
 <?php include __DIR__ . '/../partials/header.php'; ?>
+<section class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
 <h1>Admin-Dashboard</h1>
 <?php include __DIR__ . '/nav.php'; ?>
 <div class="grid cards">
@@ -13,6 +14,30 @@
     <div class="card">
         <h3>Neue Anfragen</h3>
         <p><?= count($inquiries) ?> Nachrichten</p>
+    </div>
+    <div class="card">
+        <h3>Seiten</h3>
+        <p><?= count($pages) ?> Einträge</p>
+    </div>
+    <div class="card">
+        <h3>News</h3>
+        <p><?= count($newsPosts) ?> Beiträge</p>
+    </div>
+    <div class="card">
+        <h3>Zuchtpläne</h3>
+        <p><?= count($breedingPlans) ?> Projekte</p>
+    </div>
+    <div class="card">
+        <h3>Pflegeartikel</h3>
+        <p><?= count($careArticles) ?> Artikel</p>
+    </div>
+    <div class="card">
+        <h3>Genetische Arten</h3>
+        <p><?= isset($geneticSpecies) ? count($geneticSpecies) : 0 ?> Datensätze</p>
+    </div>
+    <div class="card">
+        <h3>Gene</h3>
+        <p><?= isset($geneticGenes) ? count($geneticGenes) : 0 ?> Einträge</p>
     </div>
 </div>
 
@@ -44,5 +69,6 @@
             </table>
         <?php endif; ?>
     </div>
+</section>
 </section>
 <?php include __DIR__ . '/../partials/footer.php'; ?>
