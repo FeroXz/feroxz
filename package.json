@@ -1,0 +1,23 @@
+{
+  "name": "feroxz",
+  "version": "1.0.0",
+  "description": "FeroxZ Reptilien-CMS mit Node.js 18 Server",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "NODE_ENV=development nodemon server.js",
+    "lint": "node --check assets/js/app.js"
+  },
+  "dependencies": {
+    "compression": "^1.7.4",
+    "express": "^4.19.2",
+    "helmet": "^7.0.0",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

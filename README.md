@@ -1,86 +1,41 @@
-# FeroxZ – PHP Reptile CMS
+# FeroxZ – Reptilien-CMS mit Node.js 18 Backend
 
-FeroxZ ist ein leichtgewichtiges, auf PHP 8.3 und SQLite basierendes CMS für Reptilienhalter. Es vereint Tierverwaltung, Tierabgabe, private Tierakten sowie ein Admin-Backend mit granularen Berechtigungen. Alle Inhalte werden persistiert in einer lokalen SQLite-Datenbank gespeichert, Medien landen im Verzeichnis `uploads/`.
+FeroxZ läuft jetzt als **Node.js 18 Anwendung** und kombiniert eine clientseitige Single-Page-App mit einem Express-Backend. Das Backend liefert den Initialzustand, speichert sämtliche Änderungen auf dem Dateisystem und stellt API-Endpunkte für Exporte und Resets bereit. Dadurch lassen sich alle Funktionen unverändert weiter nutzen und gleichzeitig komfortabel auf Plattformen wie GitHub (über Actions oder Deployments) hosten.
 
-## Kernfunktionen
+## Funktionsüberblick
 
-- 🦎 **Tierverwaltung** mit Art, Genetik, Herkunft, Besonderheiten, Bildern, Showcase-Flag und optionalem Besitzer.
-- 🔒 **„Meine Tiere“** – angemeldete Benutzer sehen ausschließlich ihre privaten Tiere in einem separaten Bereich.
-- 📨 **Tierabgabe-Workflow** mit öffentlichen Inseraten, Kontaktformular und Nachrichteneingang für Administrator*innen.
-- ⚙️ **Einstellungen** für Seitentitel, Untertitel, Hero-/Abgabe-Text, Kontaktadresse und Footer (inkl. Versionshinweis).
-- 👥 **Benutzer- & Rechteverwaltung**: Admins können weitere Accounts mit eingeschränkten Rechten (Tiere, Adoption, Einstellungen) anlegen.
-- 📈 **Dashboard** mit Kennzahlen zu Bestand, Abgabeinträgen und neuen Anfragen.
-- 💾 **Persistente Speicherung** per SQLite – keine zusätzliche Server-Software notwendig.
+- 🦎 **Tierverwaltung** mit Bildern, Status, Eigenschaften und Beschreibungen.
+- 📢 **Tierabgabe-Inserate** inklusive Verknüpfung mit vorhandenen Tieren.
+- 📰 **Neuigkeiten & Seiten** mit integriertem Rich-Text-Editor (contenteditable Toolbar).
+- 📚 **Pflegeleitfäden** für jede Art mit strukturierten Abschnitten und Quellenangaben.
+- 🧬 **Genetikrechner** im MorphMarket-Stil, inkl. Visual-, Het- und Possible-Het-Auswertung sowie Heterodon/Pogona-Gendatenbank.
+- 🐍 **Zuchtplanung** mit eigenen oder virtuellen Elterntieren und Projektnotizen.
+- 🧾 **Export/Import** sämtlicher Daten als JSON, ideal für Versionsverwaltung in Git.
 
-## Systemvoraussetzungen
+## Nutzung
 
-| Komponente | Anforderung |
-| ---------- | ----------- |
-| PHP        | ≥ 8.3 mit PDO-SQLite, session, fileinfo |
-| Webserver  | Apache, Nginx oder kompatibel (z. B. shared hosting) |
-| Dateirechte | Schreibrechte für `storage/` und `uploads/` |
+1. Repository klonen oder als Template verwenden.
+2. Abhängigkeiten installieren: `npm install` (Node.js ≥ 18 erforderlich).
+3. Entwicklung starten: `npm run dev` (mit automatischem Reload) oder Produktionsserver: `npm start`.
+4. Die Anwendung ist unter `http://localhost:3000` erreichbar. Der **Admin-Bereich** (Passwort: `admin`) funktioniert wie gewohnt; Änderungen werden lokal im Browser und serverseitig unter `data/state.json` gespeichert.
+5. Für Deployments können statische Assets weiterhin über GitHub Pages bereitgestellt werden – der Node-Server liefert zusätzlich API-Endpunkte (`/api/state`, `/api/state/reset`) und den initialen Zustand (`/state.js`).
 
-## Installation
+## Technologie
 
-1. **Dateien hochladen** – den Inhalt dieses Repositories auf den Webspace kopieren (z. B. via FTP oder Git-Deploy).
-2. **Verzeichnisse beschreibbar machen**:
-   ```bash
-   chmod -R 775 storage uploads
-   ```
-3. **Aufruf im Browser** – `index.php` unter `public/` dient als Front-Controller. Richte den Dokumentenstamm deines Webservers auf `public/` aus.
-4. **Erstanmeldung** – Standard-Zugangsdaten: Benutzername `admin`, Passwort `12345678`. Nach dem Login können weitere Benutzer erstellt und Passwörter geändert werden.
+- Node.js 18, Express, Helmet, Compression für das Backend mit Datei-Persistenz.
+- Tailwind CDN für Utility-Klassen ohne Build-Step.
+- Eigene CSS-Ergänzungen für Glasdesign, Karten und Komponenten.
+- Vanilla JavaScript (ES Modules) für State-Management, Routing und Genetiklogik.
 
-> Hinweis: Beim ersten Start wird automatisch eine SQLite-Datenbank unter `storage/database.sqlite` angelegt sowie ein Admin-Benutzer erzeugt.
+## Deployment
 
-## Ordnerstruktur
-
-```
-feroxz/
-├── app/                 # PHP-Logik, Datenbank, Helper
-├── public/
-│   ├── assets/          # Stylesheet
-│   ├── index.php        # Front-Controller
-│   └── views/           # Öffentliche und Admin-Templates
-├── storage/             # SQLite-Datenbank (wird zur Laufzeit angelegt)
-├── uploads/             # Hochgeladene Medien (per .gitignore ausgenommen)
-└── README.md
-```
-
-## Adminbereich & Workflows
-
-- **Dashboard** – Überblick über Tiere, Abgabeinträge und eingegangene Nachrichten.
-- **Tiere** – CRUD für Tiere inkl. Upload und Zuordnung zu Benutzer*innen.
-- **Tierabgabe** – Inserate verwalten, Tiere aus dem Bestand übernehmen, Preis/Status pflegen.
-- **Anfragen** – Einsicht in alle Adoption-Anfragen, direkte Antwort via `mailto:`.
-- **Einstellungen** – Seitentexte und Kontaktadresse aktualisieren.
-- **Benutzer** – Nur für Admins sichtbar. Neue Benutzer mit selektiven Rechten anlegen.
-
-## Styling
-
-Das Theme nutzt Glas-/Neon-Akzente inspiriert von tropischen Terrarien. Anpassungen erfolgen im Stylesheet `public/assets/style.css`.
-
-## Entwicklung (lokal)
-
-Ein PHP-Entwicklungsserver reicht aus:
-
-```bash
-cd public
-php -S localhost:8000
-```
-
-Danach im Browser `http://localhost:8000/index.php` öffnen.
+- **Node-Hosting (empfohlen):** Über einen Node.js 18 fähigen Dienst (`npm start`). Der Zustand wird automatisch als JSON-Datei persistiert.
+- **Statischer Export:** `index.html`, `assets/` und `data/state.json` können auch ohne Node-Server ausgeliefert werden. Der Initialzustand muss dann manuell gepflegt werden.
 
 ## Tests
 
-Syntax-Check der PHP-Dateien:
+- Syntax-Prüfung der Haupt-JavaScript-Datei: `npm run lint`
 
-```bash
-find public app -name "*.php" -print0 | xargs -0 -n1 php -l
-```
+## Lizenz
 
-## Standard-Login
-
-- Benutzername: `admin`
-- Passwort: `12345678`
-
-Bitte ändere das Passwort nach der ersten Anmeldung über die Benutzerverwaltung.
+MIT – nutze FeroxZ als Grundlage für eigene statische Reptilienportale oder passe den Funktionsumfang an deine Projekte an.

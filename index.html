@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FeroxZ – Reptilien CMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <link
+      rel="icon"
+      type="image/png"
+      id="favicon-link"
+      href="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f40d.svg"
+    />
+  </head>
+  <body class="bg-slate-950 text-slate-100 font-[\'Fira Sans\']">
+    <div id="app" class="min-h-screen flex flex-col">
+      <header class="relative isolate">
+        <div class="absolute inset-0 -z-10 overflow-hidden">
+          <div class="gradient-orb"></div>
+        </div>
+        <div class="backdrop-blur-xl bg-slate-950/60 border-b border-white/10">
+          <div class="max-w-7xl mx-auto px-6 py-6 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div class="flex items-center gap-5">
+              <div
+                id="site-logo-wrapper"
+                class="hidden h-16 w-16 rounded-2xl border border-white/10 bg-white/10 p-1 shadow-lg shadow-cyan-500/20"
+              >
+                <img id="site-logo" alt="FeroxZ Logo" class="h-full w-full object-contain" />
+              </div>
+              <div>
+                <p class="text-sm uppercase tracking-[0.4em] text-cyan-200/80" data-copy="brandLabel">FeroxZ</p>
+                <h1 class="text-3xl md:text-4xl font-semibold leading-tight" id="site-title">
+                  Reptilienmanagement für Anspruchsvolle
+                </h1>
+                <p class="text-slate-200/80 mt-2" id="site-tagline">
+                  Verwalte Tiere, Pflegewissen und Genetik zentral in einer statischen App.
+                </p>
+              </div>
+            </div>
+            <nav class="flex flex-wrap gap-3" aria-label="Hauptnavigation">
+              <button class="nav-chip" data-view="home">Start</button>
+              <button class="nav-chip" data-view="animals">Tiere</button>
+              <button class="nav-chip" data-view="adoption">Tierabgabe</button>
+              <button class="nav-chip" data-view="news">Neuigkeiten</button>
+              <button class="nav-chip" data-view="care">Pflegeleitfäden</button>
+              <button class="nav-chip" data-view="genetics">Genetikrechner</button>
+              <button class="nav-chip" data-view="breeding">Zuchtplanung</button>
+              <button class="nav-chip" data-view="pages">Wiki</button>
+              <button class="nav-chip" data-view="admin">Admin</button>
+            </nav>
+          </div>
+        </div>
+      </header>
+      <main class="flex-1">
+        <section id="home" class="view-section hidden">
+          <div class="section-shell">
+            <div class="grid gap-8 lg:grid-cols-3">
+              <article class="glass-card lg:col-span-2">
+                <header class="flex items-center justify-between gap-3">
+                  <div>
+                    <h2 class="section-title" data-copy="homeHighlightsTitle">Aktuelle Highlights</h2>
+                    <p class="section-subtitle" data-copy="homeHighlightsSubtitle">
+                      Direkter Blick auf Tiere, Projekte und Meldungen
+                    </p>
+                  </div>
+                  <button class="btn-secondary" data-action="refresh-home">Aktualisieren</button>
+                </header>
+                <div id="home-highlights" class="mt-6 grid gap-6"></div>
+              </article>
+              <aside class="glass-card">
+                <h2 class="section-title" data-copy="homeDashboardTitle">Dashboard</h2>
+                <dl id="home-dashboard" class="mt-4 grid gap-4"></dl>
+              </aside>
+            </div>
+            <section class="glass-card">
+              <h2 class="section-title" data-copy="homeCareTitle">Letzte Pflegeartikel</h2>
+              <div id="home-care" class="mt-4 grid gap-6"></div>
+            </section>
+          </div>
+        </section>
+        <section id="animals" class="view-section hidden">
+          <div class="section-shell">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <h2 class="section-title" data-copy="animalsTitle">Bestand</h2>
+                <p class="section-subtitle" data-copy="animalsSubtitle">
+                  Verfügbare und private Tiere mit Genetikprofilen
+                </p>
+              </div>
+              <button class="btn-primary" data-action="open-add-animal">Tier anlegen</button>
+            </div>
+            <div class="mt-8 grid gap-6 xl:grid-cols-3" id="animal-grid"></div>
+          </div>
+        </section>
+        <section id="adoption" class="view-section hidden">
+          <div class="section-shell">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <h2 class="section-title" data-copy="adoptionTitle">Tierabgabe</h2>
+                <p class="section-subtitle" data-copy="adoptionSubtitle">
+                  Inserate, die öffentlich sichtbar sind
+                </p>
+              </div>
+              <button class="btn-primary" data-action="open-add-listing">Inserat erstellen</button>
+            </div>
+            <div class="mt-8 grid gap-6 lg:grid-cols-2" id="adoption-grid"></div>
+          </div>
+        </section>
+        <section id="news" class="view-section hidden">
+          <div class="section-shell">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <h2 class="section-title" data-copy="newsTitle">Neuigkeiten</h2>
+                <p class="section-subtitle" data-copy="newsSubtitle">Mitteilungen aus Bestand und Projekten</p>
+              </div>
+              <button class="btn-primary" data-action="open-add-news">Beitrag schreiben</button>
+            </div>
+            <div class="mt-8 grid gap-6" id="news-list"></div>
+          </div>
+        </section>
+        <section id="care" class="view-section hidden">
+          <div class="section-shell">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <h2 class="section-title" data-copy="careTitle">Pflegeleitfäden</h2>
+                <p class="section-subtitle" data-copy="careSubtitle">Artprofile mit Umwelt, Ernährung und Genetik</p>
+              </div>
+              <button class="btn-primary" data-action="open-add-care">Leitfaden erstellen</button>
+            </div>
+            <div class="mt-8 grid gap-6" id="care-grid"></div>
+          </div>
+        </section>
+        <section id="genetics" class="view-section hidden">
+          <div class="section-shell">
+            <div class="glass-card">
+              <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+                <div class="lg:w-2/5 space-y-6">
+                  <div>
+                    <h2 class="section-title" data-copy="geneticsTitle">Genetikrechner</h2>
+                    <p class="section-subtitle" data-copy="geneticsSubtitle">
+                      Wähle eine Art und ergänze visuelle oder Trägergene. Wildtyp-Anteile werden automatisch ausgeblendet.
+                    </p>
+                  </div>
+                  <label class="block">
+                    <span class="input-label">Art auswählen</span>
+                    <select id="genetics-species" class="input-control"></select>
+                  </label>
+                  <div class="grid gap-6">
+                    <div>
+                      <div class="flex items-center justify-between">
+                        <span class="input-label">Elterntier 1</span>
+                        <button class="text-xs text-cyan-300 hover:text-cyan-200" data-action="clear-parent" data-parent="one">Zurücksetzen</button>
+                      </div>
+                      <div class="chip-input" data-parent="one">
+                        <input type="text" class="chip-field" placeholder="Gen eingeben …" autocomplete="off" />
+                        <div class="chip-suggestions"></div>
+                      </div>
+                      <div class="chip-stack" id="parent-one-chips"></div>
+                    </div>
+                    <div>
+                      <div class="flex items-center justify-between">
+                        <span class="input-label">Elterntier 2</span>
+                        <button class="text-xs text-cyan-300 hover:text-cyan-200" data-action="clear-parent" data-parent="two">Zurücksetzen</button>
+                      </div>
+                      <div class="chip-input" data-parent="two">
+                        <input type="text" class="chip-field" placeholder="Gen eingeben …" autocomplete="off" />
+                        <div class="chip-suggestions"></div>
+                      </div>
+                      <div class="chip-stack" id="parent-two-chips"></div>
+                    </div>
+                  </div>
+                  <button class="btn-primary w-full" data-action="calculate-genetics">Ergebnis berechnen</button>
+                  <p class="text-sm text-slate-300" id="genetics-hint"></p>
+                </div>
+                <div class="lg:w-3/5">
+                  <div class="glass-card p-6">
+                    <h3 class="text-lg font-semibold text-cyan-200" data-copy="geneticsResultTitle">Auswertung</h3>
+                    <div id="genetics-results" class="mt-4 space-y-4"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <section class="glass-card">
+              <div class="flex items-center justify-between gap-4">
+                <div>
+                  <h3 class="text-xl font-semibold" data-copy="geneticsManageTitle">Genpool verwalten</h3>
+                  <p class="text-sm text-slate-300" data-copy="geneticsManageSubtitle">
+                    Alle Gene lassen sich im Admin-Bereich pflegen. Hier siehst du eine Übersicht.
+                  </p>
+                </div>
+                <button class="btn-secondary" data-action="open-genelist">Gene anzeigen</button>
+              </div>
+              <div id="genetics-overview" class="mt-6 grid gap-4"></div>
+            </section>
+          </div>
+        </section>
+        <section id="breeding" class="view-section hidden">
+          <div class="section-shell">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <h2 class="section-title" data-copy="breedingTitle">Zuchtplanung</h2>
+                <p class="section-subtitle" data-copy="breedingSubtitle">Paarungen mit eigenen oder virtuellen Elterntieren</p>
+              </div>
+              <div class="flex gap-3 flex-wrap">
+                <button class="btn-primary" data-action="open-add-breeding">Projekt anlegen</button>
+                <button class="btn-secondary" data-action="open-add-parent">Elterntier anlegen</button>
+              </div>
+            </div>
+            <div class="mt-8 grid gap-6" id="breeding-list"></div>
+          </div>
+        </section>
+        <section id="pages" class="view-section hidden">
+          <div class="section-shell">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <h2 class="section-title" data-copy="pagesTitle">Wiki & Seiten</h2>
+                <p class="section-subtitle" data-copy="pagesSubtitle">Hierarchische Seitenstruktur für zusätzliche Inhalte</p>
+              </div>
+              <button class="btn-primary" data-action="open-add-page">Seite erstellen</button>
+            </div>
+            <div class="mt-8 space-y-6" id="page-tree"></div>
+          </div>
+        </section>
+        <section id="admin" class="view-section hidden">
+          <div class="section-shell">
+            <div class="glass-card" id="admin-login">
+              <h2 class="section-title">Administrator*innen-Login</h2>
+              <p class="section-subtitle">Dieses Headless-CMS speichert Daten im Browser. Ein Export ermöglicht GitHub-Publikation.</p>
+              <form class="mt-6 space-y-4" data-action="login">
+                <label class="block">
+                  <span class="input-label">Passwort</span>
+                  <input type="password" name="password" class="input-control" placeholder="Passwort" required />
+                </label>
+                <button type="submit" class="btn-primary w-full">Anmelden</button>
+              </form>
+            </div>
+            <div class="hidden" id="admin-panel">
+              <div class="glass-card">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                  <div>
+                    <h2 class="section-title">Inhalte verwalten</h2>
+                    <p class="section-subtitle">Alle Änderungen werden direkt in <code>localStorage</code> gespeichert.</p>
+                  </div>
+                  <div class="flex gap-3 flex-wrap">
+                    <button class="btn-secondary" data-action="export-data">Daten exportieren</button>
+                    <label class="btn-secondary cursor-pointer">
+                      JSON importieren
+                      <input type="file" class="hidden" accept="application/json" data-action="import-data" />
+                    </label>
+                    <button class="btn-danger" data-action="reset-data">Zurücksetzen</button>
+                    <button class="btn-secondary" data-action="logout">Abmelden</button>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-8 grid gap-6" id="admin-forms"></div>
+            </div>
+          </div>
+        </section>
+      </main>
+      <footer class="border-t border-white/10 bg-slate-950/80 backdrop-blur">
+        <div class="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <p class="text-sm text-slate-400" id="footer-copy">
+            © <span data-field="year"></span> FeroxZ. Statische CMS-Demonstration für GitHub Pages.
+          </p>
+          <p class="text-xs text-slate-500">Version <span id="version-tag">2024.09-static</span> · Gespeichert im Browser</p>
+        </div>
+      </footer>
+    </div>
+    <template id="editor-template">
+      <div class="editor" role="region" aria-label="Rich-Text-Editor">
+        <div class="editor-toolbar" role="toolbar">
+          <button type="button" data-command="bold" aria-label="Fett">Fett</button>
+          <button type="button" data-command="italic" aria-label="Kursiv">Kursiv</button>
+          <button type="button" data-command="underline" aria-label="Unterstrichen">Unterstr.</button>
+          <button type="button" data-command="strikeThrough" aria-label="Durchgestrichen">Durchgestr.</button>
+          <button type="button" data-command="formatBlock" data-value="p" aria-label="Standardabsatz">Absatz</button>
+          <button type="button" data-command="formatBlock" data-value="h2" aria-label="Überschrift 2">H2</button>
+          <button type="button" data-command="formatBlock" data-value="h3" aria-label="Überschrift 3">H3</button>
+          <button type="button" data-command="formatBlock" data-value="h4" aria-label="Überschrift 4">H4</button>
+          <button type="button" data-command="justifyLeft" aria-label="Links ausrichten">Links</button>
+          <button type="button" data-command="justifyCenter" aria-label="Zentrieren">Zentriert</button>
+          <button type="button" data-command="justifyRight" aria-label="Rechts ausrichten">Rechts</button>
+          <button type="button" data-command="insertOrderedList" aria-label="Nummerierte Liste">1.</button>
+          <button type="button" data-command="insertUnorderedList" aria-label="Aufzählung">•</button>
+          <button type="button" data-command="formatBlock" data-value="blockquote" aria-label="Zitat">Zitat</button>
+          <button type="button" data-command="createLink" aria-label="Link einfügen">Link</button>
+          <button type="button" data-command="unlink" aria-label="Link entfernen">Link&nbsp;löschen</button>
+          <button type="button" data-command="insertImage" aria-label="Bild einfügen">Bild</button>
+          <button type="button" data-command="insertHorizontalRule" aria-label="Trennlinie">Linie</button>
+          <button type="button" data-command="removeFormat" aria-label="Formatierung entfernen">Format&nbsp;löschen</button>
+        </div>
+        <div class="editor-surface" contenteditable="true"></div>
+      </div>
+    </template>
+    <div id="modal-root" class="fixed inset-0 z-50 hidden">
+      <div class="absolute inset-0 bg-slate-950/70"></div>
+      <div class="relative max-w-3xl mx-auto mt-24 bg-slate-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
+        <header class="flex items-center justify-between px-6 py-4 border-b border-white/10">
+          <h2 class="text-lg font-semibold" id="modal-title">Dialog</h2>
+          <button class="text-slate-300 hover:text-white" data-action="close-modal">✕</button>
+        </header>
+        <div id="modal-content" class="max-h-[70vh] overflow-y-auto p-6"></div>
+      </div>
+    </div>
+    <script src="/state.js"></script>
+    <script src="assets/js/app.js" type="module"></script>
+  </body>
+</html>

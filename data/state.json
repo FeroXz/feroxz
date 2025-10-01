@@ -1,0 +1,657 @@
+{
+  "settings": {
+    "title": "FeroxZ – Reptilien CMS",
+    "tagline": "Verwalte Tiere, Wissen und Genetik vollständig statisch auf GitHub Pages.",
+    "footerNote": "FeroxZ ist ein statisches Headless-CMS für Reptilienhaltung und Zucht.",
+    "logoUrl": "https://images.unsplash.com/photo-1610276198568-eb7b73b5550a?auto=format&fit=crop&w=160&q=80",
+    "logoAlt": "FeroxZ Signet",
+    "iconUrl": "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f40d.svg",
+    "heroHighlight": [
+      {
+        "type": "news",
+        "title": "Neue Care-Guides verfügbar",
+        "description": "Ausführliche Leitfäden für Pogona vitticeps sowie Heterodon nasicus inklusive Genetikübersichten.",
+        "link": {
+          "label": "Mehr erfahren",
+          "view": "care"
+        }
+      },
+      {
+        "type": "animal",
+        "title": "Projekt: Arctic Anaconda",
+        "description": "Unser 2024er Schwerpunkt liegt auf der Kombination aus Arctic, Anaconda und Sable bei Heterodon nasicus.",
+        "link": {
+          "label": "Zum Bestand",
+          "view": "animals"
+        }
+      },
+      {
+        "type": "breeding",
+        "title": "Brutplanung Heloderma",
+        "description": "Virtuelle Zuchtplanung mit Heloderma suspectum und Heloderma alvarezi Leitfäden im Wiki verfügbar.",
+        "link": {
+          "label": "Zuchtplanung",
+          "view": "breeding"
+        }
+      }
+    ],
+    "metrics": [
+      {
+        "id": "animals",
+        "label": "Tiere im Bestand"
+      },
+      {
+        "id": "adoption",
+        "label": "Inserate aktiv"
+      },
+      {
+        "id": "news",
+        "label": "Neueste Meldungen"
+      },
+      {
+        "id": "breeding",
+        "label": "Zuchtprojekte"
+      }
+    ],
+    "copy": {
+      "brandLabel": "FeroxZ",
+      "homeHighlightsTitle": "Aktuelle Highlights",
+      "homeHighlightsSubtitle": "Direkter Blick auf Tiere, Projekte und Meldungen",
+      "homeDashboardTitle": "Dashboard",
+      "homeCareTitle": "Letzte Pflegeartikel",
+      "animalsTitle": "Bestand",
+      "animalsSubtitle": "Verfügbare und private Tiere mit Genetikprofilen",
+      "adoptionTitle": "Tierabgabe",
+      "adoptionSubtitle": "Inserate, die öffentlich sichtbar sind",
+      "newsTitle": "Neuigkeiten",
+      "newsSubtitle": "Mitteilungen aus Bestand und Projekten",
+      "careTitle": "Pflegeleitfäden",
+      "careSubtitle": "Artprofile mit Umwelt, Ernährung und Genetik",
+      "geneticsTitle": "Genetikrechner",
+      "geneticsSubtitle": "Wähle eine Art und ergänze visuelle oder Trägergene. Wildtyp-Anteile werden automatisch ausgeblendet.",
+      "geneticsResultTitle": "Auswertung",
+      "geneticsManageTitle": "Genpool verwalten",
+      "geneticsManageSubtitle": "Alle Gene lassen sich im Admin-Bereich pflegen. Hier siehst du eine Übersicht.",
+      "geneticsEmptyError": "Bitte wähle mindestens ein visuelles oder Träger-Gen pro Elternteil aus.",
+      "geneticsHintMissing": "Keine Berechnung möglich – es fehlen Gene.",
+      "geneticsHintResult": "Auswertung für {species}. Ergebnisse zeigen nur visuelle Tiere, Superformen, Träger und mögliche Het-Kombinationen.",
+      "geneticsWildtypeInfo": "Alle ausgewählten Gene führen in dieser Kombination zu Wildtyp-Nachzucht. Wähle weitere Visuals oder Träger, um Projektergebnisse zu sehen.",
+      "breedingTitle": "Zuchtplanung",
+      "breedingSubtitle": "Paarungen mit eigenen oder virtuellen Elterntieren",
+      "pagesTitle": "Wiki & Seiten",
+      "pagesSubtitle": "Hierarchische Seitenstruktur für zusätzliche Inhalte"
+    }
+  },
+  "pages": [
+    {
+      "id": "pogona-wiki",
+      "title": "Pogona vitticeps – Artprofil",
+      "slug": "pogona-vitticeps",
+      "menu": true,
+      "parentId": null,
+      "body": "<p><strong>Pogona vitticeps</strong>, im deutschsprachigen Raum als Bartagame bekannt, gilt als eine der beliebtesten Terrarienarten. Diese Ausarbeitung bietet ein vollständiges Wissensfundament für verantwortungsbewusste Halterinnen und Halter.</p>\n      <h3>Lebensraum & Klima</h3>\n      <p>Die Art bewohnt das australische Outback. Tagsüber herrschen Temperaturen zwischen 32–40&nbsp;°C mit punktuell heißeren Sonnenplätzen. In der Nacht fällt die Temperatur deutlich ab (18–22&nbsp;°C). Ein großzügig strukturiertes Terrarium ab 150×80×80&nbsp;cm mit Kletter- und Sonnenplätzen ist obligatorisch.</p>\n      <h3>Technik & Beleuchtung</h3>\n      <p>Eine Kombination aus UV-B-Flutern (z.&nbsp;B. Bright Sun Desert), Halogen-Spotstrahlern und breitbandigen LED-Flächenleuchten schafft ein artgerechtes Lichtspektrum. UV-B sollte 12 Stunden verfügbar sein. Temperatursteuerungen mit Smart-Thermostaten vermeiden Überhitzung.</p>\n      <h3>Ernährung</h3>\n      <p>Der Speiseplan wechselt saisonal: 70&nbsp;% hochwertiges Grünfutter (Wildkräuter, Endivien, Blüten), 30&nbsp;% tierische Proteine (Schaben, Heimchen, Grillen). Jungtiere benötigen mehr Proteine; adulte Tiere sollten maximal drei Insektenmahlzeiten pro Woche erhalten.</p>\n      <h3>Verhalten & Handling</h3>\n      <p>Bartagamen sind dämmerungsaktiv, zeigen aber tagsüber Sonnenbäder. Regelmäßige Gewichtskontrolle, Kotuntersuchungen und Winterruhe (8–10 Wochen bei 15&nbsp;°C) gehören zum Pflegestandard. Stressarme Handhabung und regelmäßige Beschäftigungsangebote fördern das Wohlbefinden.</p>\n      <h3>Genetik</h3>\n      <p>Die bekannten Linien umfassen Hypo, Translucent, Witblits, Zero, Leatherback, Silkback, Dunner und Paradox. Viele Linien werden kombiniert, um besondere Farben oder Strukturen zu erzielen. Das FeroxZ-CMS bietet im Genetikrechner vorbereitete Profile, die jederzeit erweiterbar sind.</p>"
+    },
+    {
+      "id": "heloderma-wiki",
+      "title": "Heloderma – Giftkröten",
+      "slug": "heloderma",
+      "menu": true,
+      "parentId": null,
+      "body": "<p>Die Gattung <strong>Heloderma</strong> umfasst die giftführenden Krustenechsen, darunter Heloderma suspectum, H. horridum und H. alvarezi. In Europa unterliegen sie strengen gesetzlichen Vorgaben. Dieses Wiki dient als Wissensbasis für Theorie und virtuelle Projekte.</p>\n      <h3>Arten und Unterarten</h3>\n      <ul>\n        <li><strong>Heloderma suspectum</strong> – Gila-Krustenechse (nördliches Verbreitungsgebiet)</li>\n        <li><strong>Heloderma horridum</strong> – Mexikanische Krustenechse (mehrere Unterarten)</li>\n        <li><strong>Heloderma alvarezi</strong> – Chiapan-Krustenechse</li>\n      </ul>\n      <p>Für jede Art steht ein eigener Pflegeleitfaden im Bereich „Pflegeleitfäden“ zur Verfügung.</p>"
+    },
+    {
+      "id": "heloderma-suspectum",
+      "title": "Heloderma suspectum Leitfaden",
+      "slug": "heloderma-suspectum",
+      "menu": false,
+      "parentId": "heloderma-wiki",
+      "body": "<p>Der Leitfaden für <strong>Heloderma suspectum</strong> konzentriert sich auf klimatische Anforderungen, Gehegesicherheit und Verhaltenstraining. Eine großzügige Grundfläche (mindestens 240×120×120&nbsp;cm) sowie gesicherte Rückzugsplätze sind Pflicht.</p>"
+    },
+    {
+      "id": "heloderma-alvarezi",
+      "title": "Heloderma alvarezi Leitfaden",
+      "slug": "heloderma-alvarezi",
+      "menu": false,
+      "parentId": "heloderma-wiki",
+      "body": "<p><strong>Heloderma alvarezi</strong> zeigt eine stärker tropische Prägung. Eine Luftfeuchtigkeit von 60–75&nbsp;% und strukturierte, kletterintensive Anlagen helfen, die Aktivität artgerecht zu halten.</p>"
+    }
+  ],
+  "news": [
+    {
+      "id": "news-1",
+      "title": "Digitale Transformation abgeschlossen",
+      "body": "<p>Das FeroxZ-Projekt läuft nun als vollständig statisches Headless-CMS auf GitHub Pages. Alle Inhalte lassen sich über den integrierten Adminbereich pflegen und als JSON exportieren.</p>",
+      "date": "2024-09-18"
+    },
+    {
+      "id": "news-2",
+      "title": "Genetikdatenbank erweitert",
+      "body": "<p>Über 30 bestätigte Gene für Heterodon nasicus sowie die gängigen Linien von Pogona vitticeps wurden hinterlegt. Der Rechner berücksichtigt Visuals, Het-Träger und mögliche Het-Tiere.</p>",
+      "date": "2024-09-12"
+    }
+  ],
+  "animals": [
+    {
+      "id": "animal-1",
+      "name": "Cypress",
+      "species": "Heterodon nasicus",
+      "sex": "♀",
+      "hatchYear": 2021,
+      "weight": 178,
+      "status": "Showcase",
+      "traits": [
+        "Albino",
+        "Anaconda",
+        "Hypo"
+      ],
+      "genetics": [
+        "albino:visual",
+        "anaconda:visual",
+        "hypo:visual"
+      ],
+      "description": "Kontrastreiche Albino-Arctic-Anaconda-Dame mit ruhigem Temperament und sicherem Futterverhalten.",
+      "image": "https://images.unsplash.com/photo-1521170665346-3f21e2291d8b?auto=format&fit=crop&w=700&q=80"
+    },
+    {
+      "id": "animal-2",
+      "name": "Helios",
+      "species": "Pogona vitticeps",
+      "sex": "♂",
+      "hatchYear": 2020,
+      "weight": 520,
+      "status": "Privat",
+      "traits": [
+        "Hypo",
+        "Witblits"
+      ],
+      "genetics": [
+        "hypo:visual",
+        "witblits:visual"
+      ],
+      "description": "Hypo-Witblits-Bartagame mit intensiver Orangefärbung, Teil unserer Zuchtplanung 2025.",
+      "image": "https://images.unsplash.com/photo-1610484826967-09c572dfd469?auto=format&fit=crop&w=700&q=80"
+    },
+    {
+      "id": "animal-3",
+      "name": "Asteria",
+      "species": "Heterodon nasicus",
+      "sex": "♀",
+      "hatchYear": 2022,
+      "weight": 145,
+      "status": "Reserviert",
+      "traits": [
+        "Het Toffee Belly",
+        "Anaconda"
+      ],
+      "genetics": [
+        "toffee-belly:het",
+        "anaconda:visual"
+      ],
+      "description": "Elegante Het-Toffee Belly Anaconda mit möglichen Arctic-Anteilen, aktuell in der Aufzucht.",
+      "image": "https://images.unsplash.com/photo-1574634534894-89d7576c8259?auto=format&fit=crop&w=700&q=80"
+    }
+  ],
+  "adoptionListings": [
+    {
+      "id": "listing-1",
+      "title": "Hognose „Quartz“ – Anaconda het Toffee Belly",
+      "price": "320 €",
+      "availability": "Verfügbar",
+      "details": "<p>Quartz frisst zuverlässig auf Frostfutter, ist ruhig im Handling und eignet sich als Puzzlestück für Toffee-Linien. Übergabe deutschlandweit per Spedition möglich.</p>",
+      "linkedAnimalId": "animal-3"
+    }
+  ],
+  "inquiries": [],
+  "careGuides": [
+    {
+      "id": "care-heterodon",
+      "species": "Heterodon nasicus",
+      "summary": "Nordamerikanische Hakennasennattern mit saisonaler Klimaanpassung und spannenden Genkombinationen.",
+      "environment": "<p>Hakennasennattern bewohnen Prärien und Halbwüsten. Ein Becken ab 120×60×60&nbsp;cm mit grabfähigem Substrat und wechselnden Tiefzonen ist empfehlenswert. Tages-Temperatur: 26–30&nbsp;°C, Sonnenplatz 32–34&nbsp;°C, Nachtabsenkung 20&nbsp;°C.</p>",
+      "feeding": "<p>Fütterung im Zwei-Wochen-Rhythmus mit Frostmäusen oder -küken. Supplementierung mit Kalzium/Vitamin D3 bei juvenilen Tieren, adulte Tiere benötigen seltener Zusätze.</p>",
+      "enrichment": "<p>Struktur mit Korkröhren, Laub, Spotsteinen und wechselnden Duftspuren regt zum Explorieren an. Eine feuchte Rückzugbox unterstützt anstehende Häutungen.</p>",
+      "genetics": "<p>Gefragte Gene: Albino, Toffee Belly, Arctic, Sable, Anaconda, Lavender, Axanthic. Kombinationsprojekte wie „Yeti“ (Axanthic + Albino) sind hoch im Kurs.</p>",
+      "resources": [
+        "Hognose Society Husbandry Standards 2023",
+        "MorphMarket Encyclopedia – Western Hognose"
+      ]
+    },
+    {
+      "id": "care-pogona",
+      "species": "Pogona vitticeps",
+      "summary": "Australische Bartagamen benötigen intensive Beleuchtung, reichhaltige Pflanzenkost und strukturierte Terrarien.",
+      "environment": "<p>Großzügiges Terrarium mit Sand-Lehm-Gemisch, Sonnenplatz 45&nbsp;°C, Grundtemperatur 32&nbsp;°C, Nachtabsenkung 18&nbsp;°C. UV-B-Strahler (12 % oder vergleichbare Werte) täglich 10–12&nbsp;Stunden.</p>",
+      "feeding": "<p>70&nbsp;% pflanzliche Nahrung aus Wildkräutern, 30&nbsp;% Insekten. Ergänzung mit Calcium- und Vitaminpräparaten in Intervallen.</p>",
+      "enrichment": "<p>Plattformen, Äste, wechselnde Futterstationen sowie Freilaufstunden in gesichertem Bereich fördern Aktivität.</p>",
+      "genetics": "<p>Dominante Linien: Dunner, Leatherback, Silkback. Rezessive Linien: Hypo, Translucent, Zero, Witblits. Der Rechner hilft bei der Planung.</p>",
+      "resources": [
+        "BDG-Leitlinie Bartagamen 2022",
+        "Reptile Lighting Guide 2024"
+      ]
+    }
+  ],
+  "genetics": {
+    "species": [
+      {
+        "id": "heterodon-nasicus",
+        "name": "Heterodon nasicus",
+        "description": "Hakennasennattern aus Nordamerika mit diversen rezessiven und kodominanten Linien.",
+        "resources": [
+          "Hognose Genetics Compendium 2024",
+          "Western Hognose Collaborative Project"
+        ]
+      },
+      {
+        "id": "pogona-vitticeps",
+        "name": "Pogona vitticeps",
+        "description": "Australische Bartagamen mit etablierten Farb- und Strukturmutationen.",
+        "resources": [
+          "Bearded Dragon Genetic Atlas",
+          "European Pogona Working Group"
+        ]
+      }
+    ],
+    "genes": [
+      {
+        "id": "albino",
+        "speciesId": "heterodon-nasicus",
+        "name": "Albino",
+        "inheritance": "recessive",
+        "description": "Reduziert Melanin vollständig und erzeugt gelb-orange Tiere.",
+        "aliases": [
+          "TAlbino",
+          "Albino"
+        ],
+        "expression": {
+          "visual": "Albino",
+          "carrier": "Het Albino",
+          "possibleCarrier": "Mögliche Het Albino"
+        }
+      },
+      {
+        "id": "axanthic",
+        "speciesId": "heterodon-nasicus",
+        "name": "Axanthic",
+        "inheritance": "recessive",
+        "description": "Unterdrückt Gelb- und Rotpigmente, graue Tiere mit starker Kontrastierung.",
+        "aliases": [],
+        "expression": {
+          "visual": "Axanthic",
+          "carrier": "Het Axanthic",
+          "possibleCarrier": "Mögliche Het Axanthic"
+        }
+      },
+      {
+        "id": "anaconda",
+        "speciesId": "heterodon-nasicus",
+        "name": "Anaconda",
+        "inheritance": "incomplete-dominant",
+        "description": "Sorgt für reduzierte Musterung bis hin zur volldeckenden Superform.",
+        "aliases": [
+          "Conda"
+        ],
+        "expression": {
+          "visual": "Anaconda",
+          "carrier": "Anaconda",
+          "possibleCarrier": "Mögliche Anaconda",
+          "superForm": "Super Anaconda"
+        }
+      },
+      {
+        "id": "arctic",
+        "speciesId": "heterodon-nasicus",
+        "name": "Arctic",
+        "inheritance": "incomplete-dominant",
+        "description": "Kühlt die Farbpalette ab, Superform erzeugt „Stormtrooper“-Optik.",
+        "aliases": [],
+        "expression": {
+          "visual": "Arctic",
+          "carrier": "Arctic",
+          "possibleCarrier": "Mögliche Arctic",
+          "superForm": "Super Arctic"
+        }
+      },
+      {
+        "id": "toffee-belly",
+        "speciesId": "heterodon-nasicus",
+        "name": "Toffee Belly",
+        "inheritance": "recessive",
+        "description": "Schokoladefarbene Tiere mit caramelfarbenem Bauch.",
+        "aliases": [
+          "Swiss Chocolate"
+        ],
+        "expression": {
+          "visual": "Toffee Belly",
+          "carrier": "Het Toffee Belly",
+          "possibleCarrier": "Mögliche Het Toffee Belly"
+        }
+      },
+      {
+        "id": "toxic",
+        "speciesId": "heterodon-nasicus",
+        "name": "Toxic",
+        "inheritance": "recessive",
+        "description": "Kombination aus Toffee Belly und Albino, vollständig rezessiv fixiert.",
+        "aliases": [],
+        "expression": {
+          "visual": "Toxic",
+          "carrier": "Het Toxic",
+          "possibleCarrier": "Mögliche Het Toxic"
+        }
+      },
+      {
+        "id": "sable",
+        "speciesId": "heterodon-nasicus",
+        "name": "Sable",
+        "inheritance": "recessive",
+        "description": "Dunkelbraune Tiere, häufig in Kombination mit Anaconda.",
+        "aliases": [],
+        "expression": {
+          "visual": "Sable",
+          "carrier": "Het Sable",
+          "possibleCarrier": "Mögliche Het Sable"
+        }
+      },
+      {
+        "id": "hypo",
+        "speciesId": "heterodon-nasicus",
+        "name": "Hypo",
+        "inheritance": "recessive",
+        "description": "Reduzierte schwarze Schuppen, leuchtende Grundfarben.",
+        "aliases": [
+          "Hypomelanistic"
+        ],
+        "expression": {
+          "visual": "Hypo",
+          "carrier": "Het Hypo",
+          "possibleCarrier": "Mögliche Het Hypo"
+        }
+      },
+      {
+        "id": "lavender",
+        "speciesId": "heterodon-nasicus",
+        "name": "Lavender",
+        "inheritance": "recessive",
+        "description": "Fliedertöne mit rubinroten Augen, seltene Linie.",
+        "aliases": [],
+        "expression": {
+          "visual": "Lavender",
+          "carrier": "Het Lavender",
+          "possibleCarrier": "Mögliche Het Lavender"
+        }
+      },
+      {
+        "id": "yeti",
+        "speciesId": "heterodon-nasicus",
+        "name": "Yeti",
+        "inheritance": "compound",
+        "description": "Kombination aus Albino und Axanthic, daher nur über Doppelrezessive sichtbar.",
+        "aliases": [],
+        "expression": {
+          "visual": "Yeti",
+          "carrier": "Träger-Kombination",
+          "possibleCarrier": "Mögliche Trägerkombination"
+        }
+      },
+      {
+        "id": "motley",
+        "speciesId": "heterodon-nasicus",
+        "name": "Motley",
+        "inheritance": "incomplete-dominant",
+        "description": "Rückenstrich wird zu Sattelpunkten, Superform zeigt breite Bänder.",
+        "aliases": [],
+        "expression": {
+          "visual": "Motley",
+          "carrier": "Motley",
+          "possibleCarrier": "Mögliche Motley",
+          "superForm": "Super Motley"
+        }
+      },
+      {
+        "id": "extreme-red",
+        "speciesId": "heterodon-nasicus",
+        "name": "Extreme Red Albino",
+        "inheritance": "recessive",
+        "description": "Selektion der Albino-Linie mit starkem Rotanteil.",
+        "aliases": [
+          "Extreme Red"
+        ],
+        "expression": {
+          "visual": "Extreme Red Albino",
+          "carrier": "Het Extreme Red",
+          "possibleCarrier": "Mögliche Het Extreme Red"
+        }
+      },
+      {
+        "id": "sunburst",
+        "speciesId": "heterodon-nasicus",
+        "name": "Sunburst",
+        "inheritance": "recessive",
+        "description": "Kombinationslinie aus Albino und Toffee Belly.",
+        "aliases": [],
+        "expression": {
+          "visual": "Sunburst",
+          "carrier": "Het Sunburst",
+          "possibleCarrier": "Mögliche Het Sunburst"
+        }
+      },
+      {
+        "id": "stormtrooper",
+        "speciesId": "heterodon-nasicus",
+        "name": "Stormtrooper",
+        "inheritance": "polygenic",
+        "description": "Linienzucht aus Arctic-Superformen mit hoher Kontrastierung.",
+        "aliases": [],
+        "expression": {
+          "visual": "Stormtrooper",
+          "carrier": "Träger",
+          "possibleCarrier": "Mögliche Träger"
+        }
+      },
+      {
+        "id": "t-negative",
+        "speciesId": "heterodon-nasicus",
+        "name": "T- Albino",
+        "inheritance": "recessive",
+        "description": "Tyrosinase-negative Albino-Linie, sehr kontrastreich.",
+        "aliases": [
+          "T- Albino"
+        ],
+        "expression": {
+          "visual": "T- Albino",
+          "carrier": "Het T- Albino",
+          "possibleCarrier": "Mögliche Het T- Albino"
+        }
+      },
+      {
+        "id": "evans-hypo",
+        "speciesId": "heterodon-nasicus",
+        "name": "Evans Hypo",
+        "inheritance": "recessive",
+        "description": "Historische Hypolinie mit stabilen, hellen Farben.",
+        "aliases": [],
+        "expression": {
+          "visual": "Evans Hypo",
+          "carrier": "Het Evans Hypo",
+          "possibleCarrier": "Mögliche Het Evans Hypo"
+        }
+      },
+      {
+        "id": "arctic-superconda",
+        "speciesId": "heterodon-nasicus",
+        "name": "Arctic Superconda",
+        "inheritance": "compound",
+        "description": "Superform aus Arctic und Anaconda, nahezu musterlos.",
+        "aliases": [],
+        "expression": {
+          "visual": "Arctic Superconda",
+          "carrier": "Projektträger",
+          "possibleCarrier": "Mögliche Projektträger"
+        }
+      },
+      {
+        "id": "hypo-dragon",
+        "speciesId": "pogona-vitticeps",
+        "name": "Hypomelanistic",
+        "inheritance": "recessive",
+        "description": "Reduzierte Melanine, klare Augen und helle Krallen.",
+        "aliases": [
+          "Hypo"
+        ],
+        "expression": {
+          "visual": "Hypomelanistic",
+          "carrier": "Het Hypo",
+          "possibleCarrier": "Mögliche Het Hypo"
+        }
+      },
+      {
+        "id": "translucent",
+        "speciesId": "pogona-vitticeps",
+        "name": "Translucent",
+        "inheritance": "recessive",
+        "description": "Durchscheinende Schuppen und dunkle Augen bei Jungtieren.",
+        "aliases": [],
+        "expression": {
+          "visual": "Translucent",
+          "carrier": "Het Translucent",
+          "possibleCarrier": "Mögliche Het Translucent"
+        }
+      },
+      {
+        "id": "leatherback",
+        "speciesId": "pogona-vitticeps",
+        "name": "Leatherback",
+        "inheritance": "incomplete-dominant",
+        "description": "Reduzierte Stachelreihen, Superform „Silkback“ ohne Schuppen.",
+        "aliases": [],
+        "expression": {
+          "visual": "Leatherback",
+          "carrier": "Leatherback",
+          "possibleCarrier": "Mögliche Leatherback",
+          "superForm": "Silkback"
+        }
+      },
+      {
+        "id": "dunner",
+        "speciesId": "pogona-vitticeps",
+        "name": "Dunner",
+        "inheritance": "dominant",
+        "description": "Veränderte Schuppenwuchsrichtung, gesprenkeltes Muster.",
+        "aliases": [],
+        "expression": {
+          "visual": "Dunner",
+          "carrier": "Dunner",
+          "possibleCarrier": "Mögliche Dunner"
+        }
+      },
+      {
+        "id": "zero",
+        "speciesId": "pogona-vitticeps",
+        "name": "Zero",
+        "inheritance": "recessive",
+        "description": "Patternless-Mutation mit silbrigem Körper.",
+        "aliases": [],
+        "expression": {
+          "visual": "Zero",
+          "carrier": "Het Zero",
+          "possibleCarrier": "Mögliche Het Zero"
+        }
+      },
+      {
+        "id": "witblits",
+        "speciesId": "pogona-vitticeps",
+        "name": "Witblits",
+        "inheritance": "recessive",
+        "description": "Hellbeige Tiere ohne Muster, häufig kombiniert mit Hypo.",
+        "aliases": [],
+        "expression": {
+          "visual": "Witblits",
+          "carrier": "Het Witblits",
+          "possibleCarrier": "Mögliche Het Witblits"
+        }
+      },
+      {
+        "id": "paradox",
+        "speciesId": "pogona-vitticeps",
+        "name": "Paradox",
+        "inheritance": "polygenic",
+        "description": "Unvorhersehbare Farbflecken, meist durch gezielte Selektion.",
+        "aliases": [],
+        "expression": {
+          "visual": "Paradox",
+          "carrier": "Träger",
+          "possibleCarrier": "Mögliche Träger"
+        }
+      },
+      {
+        "id": "red-flame",
+        "speciesId": "pogona-vitticeps",
+        "name": "Red Flame",
+        "inheritance": "polygenic",
+        "description": "Linienzucht mit Fokus auf tiefrote Farbgebung.",
+        "aliases": [],
+        "expression": {
+          "visual": "Red Flame",
+          "carrier": "Träger",
+          "possibleCarrier": "Mögliche Träger"
+        }
+      },
+      {
+        "id": "sunburst-dragon",
+        "speciesId": "pogona-vitticeps",
+        "name": "Sunburst",
+        "inheritance": "polygenic",
+        "description": "Gelb-Orange-Linie mit hoher Farbdeckung.",
+        "aliases": [],
+        "expression": {
+          "visual": "Sunburst",
+          "carrier": "Träger",
+          "possibleCarrier": "Mögliche Träger"
+        }
+      }
+    ]
+  },
+  "breeding": {
+    "parents": [
+      {
+        "id": "parent-1",
+        "name": "Cypress",
+        "linkType": "animal",
+        "referenceId": "animal-1",
+        "sex": "♀",
+        "speciesId": "heterodon-nasicus",
+        "notes": "Bewährte Albino-Anaconda-Dame, frisst zuverlässig.",
+        "genetics": [
+          "albino:visual",
+          "anaconda:visual",
+          "arctic:carrier"
+        ]
+      },
+      {
+        "id": "parent-2",
+        "name": "Nimbus",
+        "linkType": "virtual",
+        "referenceId": null,
+        "sex": "♂",
+        "speciesId": "heterodon-nasicus",
+        "notes": "Virtueller Arctic het Toffee Belly, für 2025 geplant.",
+        "genetics": [
+          "arctic:carrier",
+          "toffee-belly:carrier"
+        ]
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan-1",
+        "title": "Arctic Superconda 2025",
+        "season": "2025",
+        "femaleId": "parent-1",
+        "maleId": "parent-2",
+        "goals": "Super Arctic Superconda Nachzucht mit möglich Toffee Belly.",
+        "notes": "Brutkasten 30,5&nbsp;°C, Inkubationszeit 55 Tage. Schlupfboxen vorbereiten.",
+        "hatchEstimate": "2025-08-01"
+      }
+    ]
+  }
+}
