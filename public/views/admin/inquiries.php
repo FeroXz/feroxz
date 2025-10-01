@@ -1,4 +1,5 @@
 <?php include __DIR__ . '/../partials/header.php'; ?>
+<section class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
 <h1>Anfragen</h1>
 <?php include __DIR__ . '/nav.php'; ?>
 <div class="card">
@@ -31,4 +32,5 @@
         </table>
     <?php endif; ?>
 </div>
+</section>
 <?php include __DIR__ . '/../partials/footer.php'; ?>
