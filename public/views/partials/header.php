@@ -26,7 +26,23 @@
                     <a href="<?= BASE_URL ?>/index.php?route=care-article&amp;slug=<?= urlencode($careNav['slug']) ?>" class="<?= ($currentRoute === 'care-article' && ($activeCareSlug ?? '') === $careNav['slug']) ? 'active' : '' ?>"><?= htmlspecialchars($careNav['title']) ?></a>
                 <?php endforeach; ?>
                 <?php foreach (($navPages ?? []) as $navPage): ?>
-                    <a href="<?= BASE_URL ?>/index.php?route=page&amp;slug=<?= urlencode($navPage['slug']) ?>" class="<?= ($currentRoute === 'page' && ($activePageSlug ?? '') === $navPage['slug']) ? 'active' : '' ?>"><?= htmlspecialchars($navPage['title']) ?></a>
+                    <?php
+                        $parentActive = ($currentRoute === 'page' && ($activePageSlug ?? '') === $navPage['slug']);
+                        $childActive = false;
+                        foreach ($navPage['children'] ?? [] as $childPage) {
+                            if ($currentRoute === 'page' && ($activePageSlug ?? '') === $childPage['slug']) {
+                                $childActive = true;
+                                break;
+                            }
+                        }
+                        $parentClasses = trim(($parentActive || $childActive) ? 'active' : '');
+                    ?>
+                    <a href="<?= BASE_URL ?>/index.php?route=page&amp;slug=<?= urlencode($navPage['slug']) ?>" class="<?= $parentClasses ?>"><?= htmlspecialchars($navPage['title']) ?></a>
+                    <?php if (!empty($navPage['children'])): ?>
+                        <?php foreach ($navPage['children'] as $childPage): ?>
+                            <a href="<?= BASE_URL ?>/index.php?route=page&amp;slug=<?= urlencode($childPage['slug']) ?>" class="nav-sub <?= ($currentRoute === 'page' && ($activePageSlug ?? '') === $childPage['slug']) ? 'active' : '' ?>"><?= htmlspecialchars($childPage['title']) ?></a>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 <?php endforeach; ?>
                 <a href="<?= BASE_URL ?>/index.php?route=adoption" class="<?= ($currentRoute === 'adoption') ? 'active' : '' ?>">Tierabgabe</a>
                 <?php if (current_user()): ?>

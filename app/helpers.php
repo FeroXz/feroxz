@@ -7,8 +7,8 @@ function view(string $template, array $data = []): void
 
     global $pdo;
     if (isset($pdo)) {
-        if (!isset($data['navPages']) && function_exists('get_published_pages')) {
-            $data['navPages'] = get_published_pages($pdo);
+        if (!isset($data['navPages']) && function_exists('get_navigation_pages')) {
+            $data['navPages'] = get_navigation_pages($pdo);
         }
         if (!isset($data['navCareArticles']) && function_exists('get_published_care_articles')) {
             $data['navCareArticles'] = get_published_care_articles($pdo);

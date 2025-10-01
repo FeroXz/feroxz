@@ -217,6 +217,8 @@ switch ($route) {
                 'slug' => trim($_POST['slug'] ?? ''),
                 'content' => $_POST['content'] ?? '',
                 'is_published' => isset($_POST['is_published']),
+                'show_in_menu' => isset($_POST['show_in_menu']),
+                'parent_id' => $_POST['parent_id'] ?? null,
             ];
             if ($data['title'] && $data['content']) {
                 if (!empty($_POST['id'])) {

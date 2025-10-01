@@ -98,9 +98,24 @@ function initialize_database(PDO $pdo): void
         slug TEXT NOT NULL UNIQUE,
         content TEXT NOT NULL,
         is_published INTEGER NOT NULL DEFAULT 0,
+        show_in_menu INTEGER NOT NULL DEFAULT 0,
+        parent_id INTEGER,
+        menu_order INTEGER NOT NULL DEFAULT 0,
         created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     )');
+
+    $pageColumns = $pdo->query('PRAGMA table_info(pages)')->fetchAll();
+    $pageColumnNames = array_column($pageColumns, 'name');
+    if (!in_array('show_in_menu', $pageColumnNames, true)) {
+        $pdo->exec('ALTER TABLE pages ADD COLUMN show_in_menu INTEGER NOT NULL DEFAULT 0');
+    }
+    if (!in_array('parent_id', $pageColumnNames, true)) {
+        $pdo->exec('ALTER TABLE pages ADD COLUMN parent_id INTEGER');
+    }
+    if (!in_array('menu_order', $pageColumnNames, true)) {
+        $pdo->exec('ALTER TABLE pages ADD COLUMN menu_order INTEGER NOT NULL DEFAULT 0');
+    }
 
     $pdo->exec('CREATE TABLE IF NOT EXISTS news_posts (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

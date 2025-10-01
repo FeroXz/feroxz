@@ -74,11 +74,33 @@ header {
   transition: background 0.2s ease, transform 0.2s ease;
 }
 
+.nav-links .nav-sub {
+  background: transparent;
+  border: 1px dashed var(--card-border);
+  color: var(--text-muted);
+  padding: 0.4rem 0.9rem;
+  margin-left: 1.5rem;
+  position: relative;
+}
+
+.nav-links .nav-sub::before {
+  content: '↳';
+  margin-right: 0.4rem;
+  color: var(--accent);
+}
+
 .nav-links a.active,
 .nav-links a:hover {
   background: var(--accent-strong);
   color: #04101f;
   transform: translateY(-2px);
+}
+
+.nav-links .nav-sub.active,
+.nav-links .nav-sub:hover {
+  background: rgba(56, 189, 248, 0.18);
+  border-color: rgba(56, 189, 248, 0.45);
+  color: #04101f;
 }
 
 main {
