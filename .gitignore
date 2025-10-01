@@ -6,3 +6,4 @@ uploads/*
 .env
 .idea/
 .vscode/
+node_modules/
