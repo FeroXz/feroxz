@@ -249,6 +249,7 @@ body {
 .editor-toolbar {
   display: flex;
   gap: 0.4rem;
+  flex-wrap: wrap;
   background-color: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 9999px;
@@ -265,6 +266,7 @@ body {
   color: rgba(226, 232, 240, 0.9);
   background: transparent;
   cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .editor-toolbar button:hover {

@@ -6,6 +6,10 @@ const defaultState = {
     title: 'FeroxZ – Reptilien CMS',
     tagline: 'Verwalte Tiere, Wissen und Genetik vollständig statisch auf GitHub Pages.',
     footerNote: 'FeroxZ ist ein statisches Headless-CMS für Reptilienhaltung und Zucht.',
+    logoUrl:
+      'https://images.unsplash.com/photo-1610276198568-eb7b73b5550a?auto=format&fit=crop&w=160&q=80',
+    logoAlt: 'FeroxZ Signet',
+    iconUrl: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f40d.svg',
     heroHighlight: [
       {
         type: 'news',
@@ -31,7 +35,37 @@ const defaultState = {
       { id: 'adoption', label: 'Inserate aktiv' },
       { id: 'news', label: 'Neueste Meldungen' },
       { id: 'breeding', label: 'Zuchtprojekte' }
-    ]
+    ],
+    copy: {
+      brandLabel: 'FeroxZ',
+      homeHighlightsTitle: 'Aktuelle Highlights',
+      homeHighlightsSubtitle: 'Direkter Blick auf Tiere, Projekte und Meldungen',
+      homeDashboardTitle: 'Dashboard',
+      homeCareTitle: 'Letzte Pflegeartikel',
+      animalsTitle: 'Bestand',
+      animalsSubtitle: 'Verfügbare und private Tiere mit Genetikprofilen',
+      adoptionTitle: 'Tierabgabe',
+      adoptionSubtitle: 'Inserate, die öffentlich sichtbar sind',
+      newsTitle: 'Neuigkeiten',
+      newsSubtitle: 'Mitteilungen aus Bestand und Projekten',
+      careTitle: 'Pflegeleitfäden',
+      careSubtitle: 'Artprofile mit Umwelt, Ernährung und Genetik',
+      geneticsTitle: 'Genetikrechner',
+      geneticsSubtitle: 'Wähle eine Art und ergänze visuelle oder Trägergene. Wildtyp-Anteile werden automatisch ausgeblendet.',
+      geneticsResultTitle: 'Auswertung',
+      geneticsManageTitle: 'Genpool verwalten',
+      geneticsManageSubtitle: 'Alle Gene lassen sich im Admin-Bereich pflegen. Hier siehst du eine Übersicht.',
+      geneticsEmptyError: 'Bitte wähle mindestens ein visuelles oder Träger-Gen pro Elternteil aus.',
+      geneticsHintMissing: 'Keine Berechnung möglich – es fehlen Gene.',
+      geneticsHintResult:
+        'Auswertung für {species}. Ergebnisse zeigen nur visuelle Tiere, Superformen, Träger und mögliche Het-Kombinationen.',
+      geneticsWildtypeInfo:
+        'Alle ausgewählten Gene führen in dieser Kombination zu Wildtyp-Nachzucht. Wähle weitere Visuals oder Träger, um Projektergebnisse zu sehen.',
+      breedingTitle: 'Zuchtplanung',
+      breedingSubtitle: 'Paarungen mit eigenen oder virtuellen Elterntieren',
+      pagesTitle: 'Wiki & Seiten',
+      pagesSubtitle: 'Hierarchische Seitenstruktur für zusätzliche Inhalte'
+    }
   },
   pages: [
     {
@@ -254,13 +288,31 @@ const defaultState = {
   }
 };
 const deepClone = (value) => JSON.parse(JSON.stringify(value));
+const isPlainObject = (value) => typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const mergeDeep = (target, source) => {
+  const output = deepClone(target);
+  if (!isPlainObject(source)) {
+    return output;
+  }
+  Object.entries(source).forEach(([key, value]) => {
+    if (Array.isArray(value)) {
+      output[key] = deepClone(value);
+    } else if (isPlainObject(value)) {
+      output[key] = mergeDeep(target[key] ?? {}, value);
+    } else {
+      output[key] = value;
+    }
+  });
+  return output;
+};
 
 const loadState = () => {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       const parsed = JSON.parse(stored);
-      return { ...deepClone(defaultState), ...parsed };
+      return mergeDeep(defaultState, parsed);
     }
   } catch (error) {
     console.error('Fehler beim Laden des gespeicherten Zustands', error);
@@ -305,6 +357,7 @@ const fractionFromProbability = (prob) => {
 
 const renderAll = () => {
   renderHeader();
+  applyCopy();
   renderHome();
   renderAnimals();
   renderAdoption();
@@ -317,16 +370,49 @@ const renderAll = () => {
 };
 
 const renderHeader = () => {
-  document.getElementById('site-title').textContent = state.settings.title;
-  document.getElementById('site-tagline').textContent = state.settings.tagline;
+  document.title = state.settings.title || 'FeroxZ – Reptilien CMS';
+  const titleEl = document.getElementById('site-title');
+  if (titleEl) titleEl.textContent = state.settings.title;
+  const taglineEl = document.getElementById('site-tagline');
+  if (taglineEl) taglineEl.textContent = state.settings.tagline ?? '';
+  const logoWrapper = document.getElementById('site-logo-wrapper');
+  const logoEl = document.getElementById('site-logo');
+  const { logoUrl, logoAlt, iconUrl, footerNote } = state.settings;
+  if (logoEl && logoWrapper) {
+    if (logoUrl) {
+      logoEl.src = logoUrl;
+      logoEl.alt = logoAlt || state.settings.title || 'FeroxZ';
+      logoWrapper.classList.remove('hidden');
+    } else {
+      logoEl.removeAttribute('src');
+      logoWrapper.classList.add('hidden');
+    }
+  }
   const yearEl = document.querySelector('[data-field="year"]');
   if (yearEl) yearEl.textContent = new Date().getFullYear();
   const footerCopy = document.getElementById('footer-copy');
   if (footerCopy) {
-    footerCopy.innerHTML = `© <span data-field="year">${new Date().getFullYear()}</span> FeroxZ. ${state.settings.footerNote}`;
+    const brand = state.settings.copy?.brandLabel ?? 'FeroxZ';
+    footerCopy.innerHTML = `© <span data-field="year">${new Date().getFullYear()}</span> ${brand}. ${footerNote ?? ''}`;
   }
   const versionTag = document.getElementById('version-tag');
   if (versionTag) versionTag.textContent = VERSION;
+  const faviconLink = document.getElementById('favicon-link');
+  if (faviconLink) {
+    const fallbackIcon = defaultState.settings.iconUrl;
+    faviconLink.href = iconUrl || logoUrl || fallbackIcon;
+  }
+};
+
+const applyCopy = () => {
+  const copy = state.settings.copy ?? {};
+  document.querySelectorAll('[data-copy]').forEach((node) => {
+    const key = node.dataset.copy;
+    const value = copy[key];
+    if (typeof value === 'string') {
+      node.innerHTML = value;
+    }
+  });
 };
 const renderHome = () => {
   const highlightContainer = document.getElementById('home-highlights');
@@ -671,8 +757,23 @@ const createEditor = (value = '') => {
   editor.querySelectorAll('button[data-command]').forEach((button) => {
     button.addEventListener('click', () => {
       const command = button.dataset.command;
-      const val = button.dataset.value ?? null;
       surface.focus();
+      if (command === 'createLink') {
+        const url = prompt('Link-Adresse (inkl. https://) eingeben:');
+        if (url) document.execCommand('createLink', false, url);
+        return;
+      }
+      if (command === 'insertImage') {
+        const imageUrl = prompt('Bild-URL (inkl. https://) einfügen:');
+        if (imageUrl) document.execCommand('insertImage', false, imageUrl);
+        return;
+      }
+      if (command === 'formatBlock') {
+        const formatValue = button.dataset.value ?? 'p';
+        document.execCommand('formatBlock', false, formatValue);
+        return;
+      }
+      const val = button.dataset.value ?? null;
       document.execCommand(command, false, val);
     });
   });
@@ -688,6 +789,15 @@ const buildInput = ({ label, name, value = '', type = 'text', placeholder = '', 
     element.dataset.name = name;
     wrapper.appendChild(element);
     return { element: wrapper, getValue: () => getValue() };
+  }
+  if (type === 'multiline') {
+    const textarea = document.createElement('textarea');
+    textarea.name = name;
+    textarea.className = 'input-control';
+    textarea.rows = 4;
+    textarea.value = value;
+    wrapper.appendChild(textarea);
+    return { element: wrapper, getValue: () => textarea.value };
   }
   if (type === 'select') {
     const select = document.createElement('select');
@@ -941,6 +1051,216 @@ const showPageForm = (page = null) => {
   });
   modal.open(page ? 'Seite bearbeiten' : 'Neue Seite', form);
 };
+
+const showBrandingForm = () => {
+  const form = document.createElement('form');
+  form.className = 'modal-form';
+  const titleField = buildInput({ label: 'Seitentitel', name: 'title', value: state.settings.title ?? '' });
+  const taglineField = buildInput({ label: 'Unterzeile (Tagline)', name: 'tagline', value: state.settings.tagline ?? '' });
+  const footerField = buildInput({
+    label: 'Fußzeile',
+    name: 'footerNote',
+    value: state.settings.footerNote ?? '',
+    type: 'textarea'
+  });
+  const logoUrlField = buildInput({
+    label: 'Logo-URL',
+    name: 'logoUrl',
+    value: state.settings.logoUrl ?? '',
+    type: 'url',
+    placeholder: 'https://…'
+  });
+  const logoAltField = buildInput({
+    label: 'Alternativtext für das Logo',
+    name: 'logoAlt',
+    value: state.settings.logoAlt ?? ''
+  });
+  const iconUrlField = buildInput({
+    label: 'Favicon/Icon-URL',
+    name: 'iconUrl',
+    value: state.settings.iconUrl ?? '',
+    type: 'url',
+    placeholder: 'https://…'
+  });
+  [titleField, taglineField, footerField, logoUrlField, logoAltField, iconUrlField].forEach((field) =>
+    form.appendChild(field.element)
+  );
+  form.appendChild(createHiddenSubmit('Speichern'));
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    state.settings.title = titleField.getValue();
+    state.settings.tagline = taglineField.getValue();
+    state.settings.footerNote = footerField.getValue();
+    state.settings.logoUrl = logoUrlField.getValue();
+    state.settings.logoAlt = logoAltField.getValue();
+    state.settings.iconUrl = iconUrlField.getValue();
+    persistState();
+    modal.close();
+    showToast('Branding aktualisiert.', 'success');
+  });
+  modal.open('Branding bearbeiten', form);
+};
+
+const showCopyForm = () => {
+  const form = document.createElement('form');
+  form.className = 'modal-form';
+  const intro = document.createElement('p');
+  intro.className = 'text-sm text-slate-300';
+  intro.innerHTML =
+    'Bearbeite die sichtbaren Überschriften und Beschreibungen. Verwende den Platzhalter <code>{species}</code> für den Artnamen im Genetik-Hinweis.';
+  form.appendChild(intro);
+  const copyConfig = [
+    { key: 'brandLabel', label: 'Header · Markenlabel' },
+    { key: 'homeHighlightsTitle', label: 'Startseite · Bereichstitel Highlights' },
+    { key: 'homeHighlightsSubtitle', label: 'Startseite · Untertitel Highlights', type: 'multiline' },
+    { key: 'homeDashboardTitle', label: 'Startseite · Dashboard-Titel' },
+    { key: 'homeCareTitle', label: 'Startseite · Bereichstitel Pflegeartikel' },
+    { key: 'animalsTitle', label: 'Tiere · Bereichstitel' },
+    { key: 'animalsSubtitle', label: 'Tiere · Untertitel', type: 'multiline' },
+    { key: 'adoptionTitle', label: 'Tierabgabe · Bereichstitel' },
+    { key: 'adoptionSubtitle', label: 'Tierabgabe · Untertitel', type: 'multiline' },
+    { key: 'newsTitle', label: 'Neuigkeiten · Bereichstitel' },
+    { key: 'newsSubtitle', label: 'Neuigkeiten · Untertitel', type: 'multiline' },
+    { key: 'careTitle', label: 'Pflegeleitfäden · Bereichstitel' },
+    { key: 'careSubtitle', label: 'Pflegeleitfäden · Untertitel', type: 'multiline' },
+    { key: 'geneticsTitle', label: 'Genetikrechner · Bereichstitel' },
+    { key: 'geneticsSubtitle', label: 'Genetikrechner · Untertitel', type: 'multiline' },
+    { key: 'geneticsResultTitle', label: 'Genetikrechner · Ergebnisüberschrift' },
+    { key: 'geneticsManageTitle', label: 'Genpool · Bereichstitel' },
+    { key: 'geneticsManageSubtitle', label: 'Genpool · Untertitel', type: 'multiline' },
+    { key: 'geneticsEmptyError', label: 'Genetikrechner · Hinweis ohne Auswahl', type: 'multiline' },
+    { key: 'geneticsHintMissing', label: 'Genetikrechner · Hinweistext leer', type: 'multiline' },
+    { key: 'geneticsHintResult', label: 'Genetikrechner · Hinweistext Ergebnis', type: 'multiline' },
+    { key: 'geneticsWildtypeInfo', label: 'Genetikrechner · Hinweis nur Wildtyp', type: 'multiline' },
+    { key: 'breedingTitle', label: 'Zuchtplanung · Bereichstitel' },
+    { key: 'breedingSubtitle', label: 'Zuchtplanung · Untertitel', type: 'multiline' },
+    { key: 'pagesTitle', label: 'Wiki · Bereichstitel' },
+    { key: 'pagesSubtitle', label: 'Wiki · Untertitel', type: 'multiline' }
+  ];
+  const fieldRefs = copyConfig.map((config) => {
+    const field = buildInput({
+      label: config.label,
+      name: config.key,
+      value: state.settings.copy?.[config.key] ?? '',
+      type: config.type ?? 'text'
+    });
+    form.appendChild(field.element);
+    return { key: config.key, getValue: field.getValue };
+  });
+  form.appendChild(createHiddenSubmit('Texte speichern'));
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const updated = { ...state.settings.copy };
+    fieldRefs.forEach((field) => {
+      updated[field.key] = field.getValue();
+    });
+    state.settings.copy = updated;
+    persistState();
+    modal.close();
+    showToast('Seitentexte aktualisiert.', 'success');
+  });
+  modal.open('Seitentexte bearbeiten', form);
+};
+
+const showHighlightForm = (index = null) => {
+  const hasExisting = Number.isInteger(index) && index >= 0 && index < state.settings.heroHighlight.length;
+  const existing = hasExisting ? state.settings.heroHighlight[index] : null;
+  const form = document.createElement('form');
+  form.className = 'modal-form';
+  const typeField = buildInput({ label: 'Badge/Typ', name: 'type', value: existing?.type ?? '' });
+  const titleField = buildInput({ label: 'Titel', name: 'title', value: existing?.title ?? '' });
+  const descField = buildInput({ label: 'Beschreibung', name: 'description', value: existing?.description ?? '', type: 'textarea' });
+  const buttonLabelField = buildInput({ label: 'Button-Text', name: 'buttonLabel', value: existing?.link?.label ?? '' });
+  const viewOptions = [
+    { value: 'home', label: 'Startseite' },
+    { value: 'animals', label: 'Tiere' },
+    { value: 'adoption', label: 'Tierabgabe' },
+    { value: 'news', label: 'Neuigkeiten' },
+    { value: 'care', label: 'Pflegeleitfäden' },
+    { value: 'genetics', label: 'Genetikrechner' },
+    { value: 'breeding', label: 'Zuchtplanung' },
+    { value: 'pages', label: 'Wiki & Seiten' },
+    { value: 'admin', label: 'Admin' }
+  ];
+  const viewField = buildInput({
+    label: 'Zielbereich',
+    name: 'view',
+    type: 'select',
+    value: existing?.link?.view ?? 'home',
+    options: viewOptions
+  });
+  [typeField, titleField, descField, buttonLabelField, viewField].forEach((field) => form.appendChild(field.element));
+  form.appendChild(createHiddenSubmit('Speichern'));
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const payload = {
+      type: typeField.getValue(),
+      title: titleField.getValue(),
+      description: descField.getValue(),
+      link: {
+        label: buttonLabelField.getValue(),
+        view: viewField.getValue()
+      }
+    };
+    if (!payload.title || !payload.link.label) {
+      return showToast('Titel und Button-Text sind Pflichtfelder.');
+    }
+    if (hasExisting) {
+      state.settings.heroHighlight.splice(index, 1, payload);
+    } else {
+      state.settings.heroHighlight.push(payload);
+    }
+    persistState();
+    modal.close();
+    showHighlightManager();
+    showToast('Highlight gespeichert.', 'success');
+  });
+  modal.open(existing ? 'Highlight bearbeiten' : 'Neues Highlight', form);
+};
+
+const showHighlightManager = () => {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'space-y-6';
+  const header = document.createElement('div');
+  header.className = 'flex items-center justify-between gap-4';
+  header.innerHTML = `
+    <h3 class="text-lg font-semibold">Startseiten-Highlights</h3>
+    <button class="btn-primary" data-action="add-highlight">Highlight hinzufügen</button>
+  `;
+  wrapper.appendChild(header);
+  if (!state.settings.heroHighlight.length) {
+    const empty = document.createElement('p');
+    empty.className = 'notice';
+    empty.textContent = 'Noch keine Highlights erfasst.';
+    wrapper.appendChild(empty);
+  } else {
+    const list = document.createElement('div');
+    list.className = 'space-y-4';
+    list.innerHTML = state.settings.heroHighlight
+      .map(
+        (item, idx) => `
+          <article class="glass-card space-y-3">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <span class="card-badge">${item.type || 'Highlight'}</span>
+                <h4 class="text-lg font-semibold mt-2">${item.title}</h4>
+                <div class="text-sm text-slate-300">${item.description}</div>
+                <p class="text-xs text-slate-500 mt-2">Ziel: ${item.link?.label ?? '—'} → ${item.link?.view ?? 'home'}</p>
+              </div>
+              <div class="flex flex-col gap-2">
+                <button class="btn-secondary" data-action="edit-highlight" data-index="${idx}">Bearbeiten</button>
+                <button class="btn-danger" data-action="delete-highlight" data-index="${idx}">Löschen</button>
+              </div>
+            </div>
+          </article>
+        `
+      )
+      .join('');
+    wrapper.appendChild(list);
+  }
+  modal.open('Highlights verwalten', wrapper);
+};
+
 const showGeneList = () => {
   const wrapper = document.createElement('div');
   wrapper.className = 'space-y-6';
@@ -1181,6 +1501,17 @@ const updateAdminForms = () => {
           )
           .join('')}
       </ul>
+    </section>
+    <section class="admin-section">
+      <h3>Branding &amp; Texte</h3>
+      <p class="text-sm text-slate-300 mt-2">
+        Passe Logo, Startseitenelemente, Seitentitel sowie Beschreibungen für Genetik und weitere Bereiche an.
+      </p>
+      <div class="flex flex-wrap gap-3 mt-4">
+        <button class="btn-primary" data-action="open-branding">Branding bearbeiten</button>
+        <button class="btn-secondary" data-action="open-copy">Seitentexte bearbeiten</button>
+        <button class="btn-secondary" data-action="open-highlights">Highlights verwalten</button>
+      </div>
     </section>
     <section class="admin-section">
       <h3>Inhaltsverwaltung</h3>
@@ -1440,13 +1771,16 @@ const calculateGenetics = () => {
   const hint = document.getElementById('genetics-hint');
   const speciesId = geneticsSelections.speciesId;
   const species = state.genetics.species.find((entry) => entry.id === speciesId);
+  const copy = state.settings.copy ?? {};
   const geneIds = new Set([
     ...geneticsSelections.parents.one.map((entry) => entry.geneId),
     ...geneticsSelections.parents.two.map((entry) => entry.geneId)
   ]);
   if (!geneIds.size) {
-    resultsContainer.innerHTML = '<p class="notice">Bitte wähle mindestens ein visuelles oder Träger-Gen pro Elternteil aus.</p>';
-    hint.textContent = 'Keine Berechnung möglich – es fehlen Gene.';
+    resultsContainer.innerHTML = `<p class="notice">${
+      copy.geneticsEmptyError ?? 'Bitte wähle mindestens ein visuelles oder Träger-Gen pro Elternteil aus.'
+    }</p>`;
+    hint.textContent = copy.geneticsHintMissing ?? 'Keine Berechnung möglich – es fehlen Gene.';
     return;
   }
   const cards = [];
@@ -1511,11 +1845,21 @@ const calculateGenetics = () => {
     `);
   });
   if (!cards.length) {
-    resultsContainer.innerHTML = '<p class="notice">Alle ausgewählten Gene führen in dieser Kombination zu Wildtyp-Nachzucht. Wähle weitere Visuals oder Träger, um Projektergebnisse zu sehen.</p>';
+    resultsContainer.innerHTML = `<p class="notice">${
+      copy.geneticsWildtypeInfo ??
+      'Alle ausgewählten Gene führen in dieser Kombination zu Wildtyp-Nachzucht. Wähle weitere Visuals oder Träger, um Projektergebnisse zu sehen.'
+    }</p>`;
   } else {
     resultsContainer.innerHTML = cards.join('');
   }
-  hint.textContent = species ? `Auswertung für ${species.name}. Ergebnisse zeigen nur visuelle Tiere, Superformen, Träger und mögliche Het-Kombinationen.` : '';
+  if (species) {
+    const template =
+      copy.geneticsHintResult ??
+      'Auswertung für {species}. Ergebnisse zeigen nur visuelle Tiere, Superformen, Träger und mögliche Het-Kombinationen.';
+    hint.textContent = template.replace('{species}', species.name);
+  } else {
+    hint.textContent = '';
+  }
 };
 const showGeneDetails = (geneId) => {
   const gene = state.genetics.genes.find((entry) => entry.id === geneId);
@@ -1632,7 +1976,7 @@ const initAdmin = () => {
       reader.onload = (loadEvent) => {
         try {
           const parsed = JSON.parse(loadEvent.target.result);
-          state = { ...deepClone(defaultState), ...parsed };
+          state = mergeDeep(defaultState, parsed);
           persistState();
           showToast('Import abgeschlossen.', 'success');
         } catch (error) {
@@ -1653,6 +1997,47 @@ const initActions = () => {
     switch (action) {
       case 'close-modal':
         modal.close();
+        break;
+      case 'open-branding':
+        if (!isAuthenticated) return showToast('Bitte zuerst anmelden.');
+        showBrandingForm();
+        break;
+      case 'open-copy':
+        if (!isAuthenticated) return showToast('Bitte zuerst anmelden.');
+        showCopyForm();
+        break;
+      case 'open-highlights':
+        if (!isAuthenticated) return showToast('Bitte zuerst anmelden.');
+        showHighlightManager();
+        break;
+      case 'add-highlight':
+        if (!isAuthenticated) return showToast('Bitte zuerst anmelden.');
+        showHighlightForm();
+        break;
+      case 'edit-highlight':
+        if (!isAuthenticated) return showToast('Bitte zuerst anmelden.');
+        {
+          const editIndex = Number(actionTarget.dataset.index);
+          if (Number.isInteger(editIndex)) {
+            showHighlightForm(editIndex);
+          }
+        }
+        break;
+      case 'delete-highlight':
+        if (!isAuthenticated) return showToast('Bitte zuerst anmelden.');
+        if (confirm('Highlight entfernen?')) {
+          const deleteIndex = Number(actionTarget.dataset.index);
+          if (
+            Number.isInteger(deleteIndex) &&
+            deleteIndex >= 0 &&
+            deleteIndex < state.settings.heroHighlight.length
+          ) {
+            state.settings.heroHighlight.splice(deleteIndex, 1);
+            persistState();
+            showHighlightManager();
+            showToast('Highlight entfernt.', 'success');
+          }
+        }
         break;
       case 'open-add-animal':
         if (!isAuthenticated) return showToast('Bitte zuerst anmelden.');
