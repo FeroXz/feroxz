@@ -1,4 +1,5 @@
 <?php include __DIR__ . '/../partials/header.php'; ?>
+<section class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
 <h1>Zuchtplanung</h1>
 <?php include __DIR__ . '/nav.php'; ?>
 <?php if ($flashSuccess): ?>
@@ -302,5 +303,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+</section>
 <?php include __DIR__ . '/../partials/footer.php'; ?>
 

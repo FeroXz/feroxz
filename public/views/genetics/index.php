@@ -1,6 +1,7 @@
 <?php include __DIR__ . '/../partials/header.php'; ?>
-<h1>Genetikrechner</h1>
-<p class="text-muted">Planen Sie Ihre Verpaarungen analog zu MorphMarket: Wählen Sie eine Art, hinterlegen Sie die Genetik beider Elternteile und erhalten Sie fundierte Wahrscheinlichkeiten für visuelle Nachzuchten sowie Trägertiere.</p>
+<section class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+<h1 class="text-3xl font-semibold text-white sm:text-4xl">Genetikrechner</h1>
+<p class="mt-2 text-sm text-slate-300">Planen Sie Ihre Verpaarungen analog zu MorphMarket: Wählen Sie eine Art, hinterlegen Sie die Genetik beider Elternteile und erhalten Sie fundierte Wahrscheinlichkeiten für visuelle Nachzuchten sowie Trägertiere.</p>
 
 <?php if (empty($speciesList)): ?>
     <div class="card">
@@ -213,4 +214,5 @@
     <?php endif; ?>
 <?php endif; ?>
 
+</section>
 <?php include __DIR__ . '/../partials/footer.php'; ?>

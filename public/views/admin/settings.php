@@ -1,4 +1,5 @@
 <?php include __DIR__ . '/../partials/header.php'; ?>
+<section class="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8">
 <h1>Einstellungen</h1>
 <?php include __DIR__ . '/nav.php'; ?>
 <?php if ($flashSuccess): ?>
@@ -27,4 +28,5 @@
         <button type="submit">Speichern</button>
     </form>
 </div>
+</section>
 <?php include __DIR__ . '/../partials/footer.php'; ?>
