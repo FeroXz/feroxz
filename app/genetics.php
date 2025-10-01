@@ -321,22 +321,32 @@ function calculate_gene_distribution(array $gene, string $parentOneState, string
     return $states;
 }
 
-function calculate_genetic_outcomes(array $genes, array $parentOneSelections, array $parentTwoSelections): array
+function calculate_genetic_outcomes(array $genes, array $parentOneSelections, array $parentTwoSelections): ?array
 {
     $geneResults = [];
-    $parentStates = [];
 
     foreach ($genes as $gene) {
         $geneId = (int)$gene['id'];
         $stateOne = sanitize_gene_state($parentOneSelections[$geneId] ?? null);
         $stateTwo = sanitize_gene_state($parentTwoSelections[$geneId] ?? null);
-        $parentStates[$geneId] = ['parent_one' => $stateOne, 'parent_two' => $stateTwo];
+
+        if ($stateOne === 'normal' && $stateTwo === 'normal') {
+            continue;
+        }
+
         $states = calculate_gene_distribution($gene, $stateOne, $stateTwo);
         $geneResults[$geneId] = [
             'gene' => $gene,
             'states' => $states,
-            'parent_states' => $parentStates[$geneId],
+            'parent_states' => [
+                'parent_one' => $stateOne,
+                'parent_two' => $stateTwo,
+            ],
         ];
+    }
+
+    if (empty($geneResults)) {
+        return null;
     }
 
     $combined = [
@@ -349,9 +359,8 @@ function calculate_genetic_outcomes(array $genes, array $parentOneSelections, ar
         ],
     ];
 
-    foreach ($genes as $gene) {
-        $geneId = (int)$gene['id'];
-        $geneStates = $geneResults[$geneId]['states'];
+    foreach ($geneResults as $geneId => $geneResult) {
+        $geneStates = $geneResult['states'];
         $nextCombined = [];
         foreach ($combined as $entry) {
             foreach ($geneStates as $stateInfo) {

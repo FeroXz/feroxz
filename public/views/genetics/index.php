@@ -211,6 +211,10 @@
                 <?php endforeach; ?>
             </div>
         </section>
+    <?php elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $selectedSpecies): ?>
+        <div class="card" style="margin-bottom:3rem;">
+            <p>Bitte wählen Sie mindestens ein Gen mit Träger- oder visueller Ausprägung aus, um eine Auswertung zu erhalten.</p>
+        </div>
     <?php endif; ?>
 <?php endif; ?>
 
