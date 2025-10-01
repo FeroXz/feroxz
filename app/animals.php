@@ -1,7 +1,7 @@
 <?php
 function create_animal(PDO $pdo, array $data): void
 {
-    $stmt = $pdo->prepare('INSERT INTO animals(name, species, age, genetics, origin, special_notes, description, image_path, owner_id, is_private, is_showcased) VALUES (:name, :species, :age, :genetics, :origin, :special_notes, :description, :image_path, :owner_id, :is_private, :is_showcased)');
+    $stmt = $pdo->prepare('INSERT INTO animals(name, species, age, genetics, origin, special_notes, description, image_path, owner_id, is_private, is_showcased, is_piebald) VALUES (:name, :species, :age, :genetics, :origin, :special_notes, :description, :image_path, :owner_id, :is_private, :is_showcased, :is_piebald)');
     $stmt->execute([
         'name' => $data['name'],
         'species' => $data['species'],
@@ -14,12 +14,13 @@ function create_animal(PDO $pdo, array $data): void
         'owner_id' => $data['owner_id'] ?: null,
         'is_private' => !empty($data['is_private']) ? 1 : 0,
         'is_showcased' => !empty($data['is_showcased']) ? 1 : 0,
+        'is_piebald' => !empty($data['is_piebald']) ? 1 : 0,
     ]);
 }
 
 function update_animal(PDO $pdo, int $id, array $data): void
 {
-    $stmt = $pdo->prepare('UPDATE animals SET name = :name, species = :species, age = :age, genetics = :genetics, origin = :origin, special_notes = :special_notes, description = :description, image_path = :image_path, owner_id = :owner_id, is_private = :is_private, is_showcased = :is_showcased WHERE id = :id');
+    $stmt = $pdo->prepare('UPDATE animals SET name = :name, species = :species, age = :age, genetics = :genetics, origin = :origin, special_notes = :special_notes, description = :description, image_path = :image_path, owner_id = :owner_id, is_private = :is_private, is_showcased = :is_showcased, is_piebald = :is_piebald WHERE id = :id');
     $stmt->execute([
         'name' => $data['name'],
         'species' => $data['species'],
@@ -32,6 +33,7 @@ function update_animal(PDO $pdo, int $id, array $data): void
         'owner_id' => $data['owner_id'] ?: null,
         'is_private' => !empty($data['is_private']) ? 1 : 0,
         'is_showcased' => !empty($data['is_showcased']) ? 1 : 0,
+        'is_piebald' => !empty($data['is_piebald']) ? 1 : 0,
         'id' => $id
     ]);
 }
