@@ -1,17 +1,31 @@
 <?php include __DIR__ . '/../partials/header.php'; ?>
-<section class="mx-auto w-full max-w-3xl px-4 sm:px-6 lg:px-8">
-    <article class="rounded-3xl border border-white/5 bg-night-900/70 p-8 shadow-lg shadow-black/30">
-        <h1 class="text-3xl font-semibold text-white sm:text-4xl"><?= htmlspecialchars($post['title']) ?></h1>
-        <?php if (!empty($post['published_at'])): ?>
-            <p class="mt-2 text-xs uppercase tracking-wide text-slate-400">Veröffentlicht am <?= date('d.m.Y H:i', strtotime($post['published_at'])) ?></p>
+<section class="section">
+    <div class="section__inner">
+        <?php if (!empty($pageMeta['breadcrumbs'])): ?>
+            <nav class="breadcrumb" aria-label="Brotkrumen">
+                <?php foreach ($pageMeta['breadcrumbs'] as $crumb): ?>
+                    <a href="<?= htmlspecialchars($crumb['url']) ?>"><?= htmlspecialchars($crumb['name']) ?></a>
+                    <span aria-hidden="true">/</span>
+                <?php endforeach; ?>
+                <span><?= htmlspecialchars($post['title']) ?></span>
+            </nav>
         <?php endif; ?>
-        <?php if (!empty($post['excerpt'])): ?>
-            <p class="mt-4 text-sm italic text-slate-200"><?= nl2br(htmlspecialchars($post['excerpt'])) ?></p>
-        <?php endif; ?>
-        <div class="rich-text-content prose prose-invert mt-6 max-w-none text-slate-100">
-            <?= render_rich_text($post['content']) ?>
-        </div>
-    </article>
+        <article class="article-shell">
+            <header>
+                <time datetime="<?= htmlspecialchars(date('Y-m-d', strtotime($post['published_at'] ?? 'now'))) ?>">Veröffentlicht am <?= date('d.m.Y', strtotime($post['published_at'] ?? 'now')) ?></time>
+                <h1><?= htmlspecialchars($post['title']) ?></h1>
+            </header>
+            <?php if (!empty($post['hero_image'])): ?>
+                <figure>
+                    <?= render_responsive_picture($post['hero_image'], $post['title'], [
+                        'sizes' => '(max-width: 768px) 100vw, 960px',
+                    ]) ?>
+                </figure>
+            <?php endif; ?>
+            <div class="content-prose">
+                <?= render_rich_text($post['content']) ?>
+            </div>
+        </article>
+    </div>
 </section>
 <?php include __DIR__ . '/../partials/footer.php'; ?>
-
