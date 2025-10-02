@@ -1,13 +1,11 @@
 
-node_modules/
-dist/
-*.log
+storage/*.sqlite
+storage/*.db
+uploads/*
+!uploads/.gitignore
 .DS_Store
-.cache/
-.vite/
-.env.local
-
-# Browser storage exports
-*.localstorage.json
-*.sessionstorage.json
+.env
+.idea/
+.vscode/
+node_modules/
 
