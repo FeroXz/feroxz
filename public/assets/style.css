@@ -34,12 +34,14 @@
 }
 
 *, *::before, *::after {
+
   box-sizing: border-box;
 }
 
 html, body {
   margin: 0;
   padding: 0;
+
   min-height: 100%;
   background: var(--bg-base);
 }
@@ -200,6 +202,7 @@ button {
 .site-nav__group > button {
   padding: 0.75rem 1rem;
   border-radius: var(--radius-md);
+
   color: var(--text);
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid transparent;
@@ -466,10 +469,12 @@ button {
 .metric-card__context {
   color: var(--text-soft);
   font-size: 0.95rem;
+
 }
 
 .section-header {
   display: grid;
+
   gap: 0.65rem;
   text-align: left;
 }
@@ -483,6 +488,7 @@ button {
   margin: 0;
   color: var(--text-soft);
   max-width: 60ch;
+
 }
 
 .card-grid,
@@ -490,6 +496,7 @@ button {
   display: grid;
   gap: 1.5rem;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+
 }
 
 .card,
@@ -506,9 +513,12 @@ button {
 .card,
 .listing-card {
   padding: clamp(1.5rem, 3vw, 2rem);
+
+
   display: grid;
   gap: 1rem;
 }
+
 
 .card--highlight {
   background: linear-gradient(145deg, rgba(59, 130, 246, 0.12) 0%, rgba(14, 116, 144, 0.18) 50%, rgba(5, 8, 20, 0.9) 100%);
@@ -544,11 +554,13 @@ button {
 
 .card__cta {
   margin-top: auto;
+
 }
 
 .listing-card__meta {
   display: flex;
   flex-wrap: wrap;
+
   gap: 0.5rem 1rem;
   font-size: 0.95rem;
   color: var(--text-soft);
@@ -870,13 +882,18 @@ textarea {
   gap: 1.5rem;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   align-items: flex-start;
+
 }
 
 .table-actions {
   display: flex;
+
   gap: 0.5rem;
+
   flex-wrap: wrap;
+  gap: 0.75rem;
 }
+
 
 form button,
 form .button,
@@ -971,6 +988,7 @@ form .btn {
   display: grid;
   gap: 1.25rem;
   position: relative;
+
 }
 
 .timeline::before {
@@ -981,6 +999,7 @@ form .btn {
   width: 2px;
   background: rgba(96, 165, 250, 0.35);
 }
+
 
 .timeline__item {
   position: relative;
@@ -1093,6 +1112,7 @@ pre {
   border: 1px solid rgba(96, 165, 250, 0.18);
   display: grid;
   gap: 0.4rem;
+
 }
 
 .stat-card__value {
@@ -1103,6 +1123,7 @@ pre {
 .status-pill {
   display: inline-flex;
   align-items: center;
+
   gap: 0.35rem;
   padding: 0.35rem 0.75rem;
   border-radius: 999px;
@@ -1199,5 +1220,6 @@ pre {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+
   }
 }
