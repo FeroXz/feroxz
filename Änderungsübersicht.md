@@ -16,7 +16,9 @@
 - Geschlechtsauswahl in allen Tierformularen mit tastaturbedienbaren Icon-Optionen.
 
 ## UX & IA
-- Vollflächiges Aurora-Layout mit neuem Header, Glas-Navigation und 100%-Viewport-Sektionen auf allen Geräten.
+
+- FlyonUI-inspirierte Glas-Oberfläche mit vollflächigen Panels, die jeden Viewport auf Mobile wie Desktop komplett ausnutzt.
+
 - Startseiten-Hero mit drei zentralen CTAs, Kennzahlen und Vertrauenssektion.
 - Vereinheitlichte Tier-, Vermittlungs- und Guide-Ansichten mit responsiven Bildern, Rich-Text-Blöcken und Barrierefreiheit.
 - Adminbereich mit optimierter Shell für Desktop und Mobile inklusive breiter Tabellen und Formular-Gitter.
