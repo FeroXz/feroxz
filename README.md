@@ -2,6 +2,12 @@
 
 FeroxZ ist ein leichtgewichtiges, auf PHP 8.3 und SQLite basierendes CMS für Reptilienhalter. Es vereint Tierverwaltung, Tierabgabe, private Tierakten sowie ein Admin-Backend mit granularen Berechtigungen. Alle Inhalte werden persistiert in einer lokalen SQLite-Datenbank gespeichert, Medien landen im Verzeichnis `uploads/`.
 
+## Version
+
+<!--VERSION-START-->
+2025.10.02-183055+bf15ba6
+<!--VERSION-END-->
+
 ## Kernfunktionen
 
 - 🦎 **Tierverwaltung** mit Art, Genetik, Herkunft, Besonderheiten, Bildern, Showcase-Flag und optionalem Besitzer.
@@ -84,3 +90,13 @@ find public app -name "*.php" -print0 | xargs -0 -n1 php -l
 - Passwort: `12345678`
 
 Bitte ändere das Passwort nach der ersten Anmeldung über die Benutzerverwaltung.
+
+## Automatisches Versioning
+
+Damit bei jedem Push die Versionsnummer in `README.md` und dem Footer aktualisiert wird, nutzt das Projekt ein Git-Pre-Push-Hook.
+
+```bash
+git config core.hooksPath scripts/git-hooks
+```
+
+Der Hook führt `php scripts/update-version.php` aus, erzeugt eine Build-Zeitstempel-Version (UTC + Git-Commit) und schreibt diese in die Datei `VERSION` sowie in den Versionsabschnitt dieses README. Die Konstante `APP_VERSION` lädt denselben Wert und blendet ihn im Footer ein.
