@@ -41,6 +41,7 @@ function initialize_database(PDO $pdo): void
         name TEXT NOT NULL,
         species TEXT NOT NULL,
         age TEXT,
+        sex TEXT,
         genetics TEXT,
         origin TEXT,
         special_notes TEXT,
@@ -55,14 +56,11 @@ function initialize_database(PDO $pdo): void
     )');
 
     $animalColumns = $pdo->query('PRAGMA table_info(animals)')->fetchAll();
-    $hasPiebald = false;
-    foreach ($animalColumns as $column) {
-        if (($column['name'] ?? '') === 'is_piebald') {
-            $hasPiebald = true;
-            break;
-        }
+    $animalColumnNames = array_column($animalColumns, 'name');
+    if (!in_array('sex', $animalColumnNames, true)) {
+        $pdo->exec('ALTER TABLE animals ADD COLUMN sex TEXT');
     }
-    if (!$hasPiebald) {
+    if (!in_array('is_piebald', $animalColumnNames, true)) {
         $pdo->exec('ALTER TABLE animals ADD COLUMN is_piebald INTEGER NOT NULL DEFAULT 0');
     }
 
@@ -75,11 +73,18 @@ function initialize_database(PDO $pdo): void
         price TEXT,
         description TEXT,
         image_path TEXT,
+        sex TEXT,
         status TEXT NOT NULL DEFAULT "available",
         contact_email TEXT,
         created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY(animal_id) REFERENCES animals(id)
     )');
+
+    $adoptionColumns = $pdo->query('PRAGMA table_info(adoption_listings)')->fetchAll();
+    $adoptionColumnNames = array_column($adoptionColumns, 'name');
+    if (!in_array('sex', $adoptionColumnNames, true)) {
+        $pdo->exec('ALTER TABLE adoption_listings ADD COLUMN sex TEXT');
+    }
 
     $pdo->exec('CREATE TABLE IF NOT EXISTS adoption_inquiries (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

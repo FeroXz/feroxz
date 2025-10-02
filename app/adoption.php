@@ -1,7 +1,7 @@
 <?php
 function create_listing(PDO $pdo, array $data): void
 {
-    $stmt = $pdo->prepare('INSERT INTO adoption_listings(animal_id, title, species, genetics, price, description, image_path, status, contact_email) VALUES (:animal_id, :title, :species, :genetics, :price, :description, :image_path, :status, :contact_email)');
+    $stmt = $pdo->prepare('INSERT INTO adoption_listings(animal_id, title, species, genetics, price, description, image_path, sex, status, contact_email) VALUES (:animal_id, :title, :species, :genetics, :price, :description, :image_path, :sex, :status, :contact_email)');
     $stmt->execute([
         'animal_id' => $data['animal_id'] ?: null,
         'title' => $data['title'],
@@ -10,6 +10,7 @@ function create_listing(PDO $pdo, array $data): void
         'price' => $data['price'] ?? null,
         'description' => $data['description'] ?? null,
         'image_path' => $data['image_path'] ?? null,
+        'sex' => $data['sex'] ?? 'unknown',
         'status' => $data['status'] ?? 'available',
         'contact_email' => $data['contact_email'] ?? null,
     ]);
@@ -17,7 +18,7 @@ function create_listing(PDO $pdo, array $data): void
 
 function update_listing(PDO $pdo, int $id, array $data): void
 {
-    $stmt = $pdo->prepare('UPDATE adoption_listings SET animal_id = :animal_id, title = :title, species = :species, genetics = :genetics, price = :price, description = :description, image_path = :image_path, status = :status, contact_email = :contact_email WHERE id = :id');
+    $stmt = $pdo->prepare('UPDATE adoption_listings SET animal_id = :animal_id, title = :title, species = :species, genetics = :genetics, price = :price, description = :description, image_path = :image_path, sex = :sex, status = :status, contact_email = :contact_email WHERE id = :id');
     $stmt->execute([
         'animal_id' => $data['animal_id'] ?: null,
         'title' => $data['title'],
@@ -26,6 +27,7 @@ function update_listing(PDO $pdo, int $id, array $data): void
         'price' => $data['price'] ?? null,
         'description' => $data['description'] ?? null,
         'image_path' => $data['image_path'] ?? null,
+        'sex' => $data['sex'] ?? 'unknown',
         'status' => $data['status'] ?? 'available',
         'contact_email' => $data['contact_email'] ?? null,
         'id' => $id,
