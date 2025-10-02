@@ -1,47 +1,56 @@
 <?php include __DIR__ . '/../partials/header.php'; ?>
-<section class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-    <header class="max-w-3xl">
-        <h1 class="text-3xl font-semibold text-white sm:text-4xl">Meine Tiere</h1>
-        <p class="mt-2 text-sm text-slate-300">Nur du kannst diese Tiere sehen. Bearbeitungen erfolgen im Adminbereich.</p>
-    </header>
-    <?php if (empty($animals)): ?>
-        <div class="mt-8 rounded-3xl border border-white/5 bg-night-900/70 p-8 text-center text-sm text-slate-300">
-            Es wurden bislang keine Tiere zugewiesen.
-        </div>
-    <?php else: ?>
-        <div class="mt-10 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-            <?php foreach ($animals as $animal): ?>
-                <article class="flex h-full flex-col rounded-3xl border border-white/5 bg-night-900/70 p-6 shadow-lg shadow-black/30 transition hover:border-brand-400/60 hover:shadow-glow">
-                    <?php if (!empty($animal['image_path'])): ?>
-                        <img src="<?= BASE_URL . '/' . htmlspecialchars($animal['image_path']) ?>" alt="<?= htmlspecialchars($animal['name']) ?>" class="mb-4 h-48 w-full rounded-2xl object-cover" loading="lazy">
-                    <?php endif; ?>
-                    <h3 class="text-xl font-semibold text-white">
-                        <?= htmlspecialchars($animal['name']) ?>
-                        <?php if (!empty($animal['is_piebald'])): ?>
-                            <span class="ml-2 inline-flex items-center justify-center rounded-full border border-brand-400 bg-brand-500/20 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-brand-100" title="Geschecktes Tier" aria-label="Geschecktes Tier">Gescheckt</span>
+<section class="section">
+    <div class="section__inner">
+        <header class="section-header">
+            <h1 class="section-header__title">Meine Tiere</h1>
+            <p class="section-header__description">Nur für dich sichtbar – verwalte Details im Adminbereich und halte Stammdaten aktuell.</p>
+        </header>
+        <?php if (empty($animals)): ?>
+            <div class="highlight-card">
+                <strong>Keine Tiere hinterlegt</strong>
+                <p>Aktuell sind dir keine Tiere zugeordnet. Ergänze Tiere im Adminbereich, um ihren Status zu verfolgen.</p>
+            </div>
+        <?php else: ?>
+            <div class="card-grid">
+                <?php foreach ($animals as $animal): ?>
+                    <article class="card card--neutral" id="animal-<?= (int)$animal['id'] ?>">
+                        <?php if (!empty($animal['image_path'])): ?>
+                            <div class="card__media">
+                                <?= render_responsive_picture($animal['image_path'], $animal['name'], [
+                                    'sizes' => '(max-width: 768px) 100vw, 360px',
+                                ]) ?>
+                            </div>
                         <?php endif; ?>
-                    </h3>
-                    <p class="text-sm text-slate-300"><?= htmlspecialchars($animal['species']) ?></p>
-                    <?php if (!empty($animal['age'])): ?>
-                        <p class="mt-2 text-sm text-slate-200"><strong>Alter:</strong> <?= htmlspecialchars($animal['age']) ?></p>
-                    <?php endif; ?>
-                    <?php if (!empty($animal['genetics'])): ?>
-                        <p class="mt-2 rounded-xl border border-brand-400/40 bg-brand-500/10 px-3 py-2 text-sm text-brand-100">
-                            <span class="font-semibold uppercase tracking-wide">Genetik:</span>
-                            <?= htmlspecialchars($animal['genetics']) ?>
-                        </p>
-                    <?php endif; ?>
-                    <?php if (!empty($animal['origin'])): ?>
-                        <p class="mt-2 text-sm text-slate-200"><strong>Herkunft:</strong> <?= htmlspecialchars($animal['origin']) ?></p>
-                    <?php endif; ?>
-                    <?php if (!empty($animal['special_notes'])): ?>
-                        <div class="rich-text-content prose prose-invert mt-3 max-w-none text-sm text-slate-200">
-                            <?= render_rich_text($animal['special_notes']) ?>
+                        <h2 class="card__title">
+                            <?= htmlspecialchars($animal['name']) ?>
+                            <?php if (!empty($animal['is_piebald'])): ?>
+                                <span class="badge" title="Geschecktes Tier" aria-label="Geschecktes Tier">Gescheckt</span>
+                            <?php endif; ?>
+                        </h2>
+                        <p class="card__subtitle"><?= htmlspecialchars($animal['species']) ?></p>
+                        <?php if ($badge = render_sex_badge($animal['sex'] ?? null, ['class' => 'badge-gender--inline'])): ?>
+                            <?= $badge ?>
+                        <?php endif; ?>
+                        <div class="card__meta">
+                            <?php if (!empty($animal['age'])): ?>
+                                <span>Alter: <?= htmlspecialchars($animal['age']) ?></span>
+                            <?php endif; ?>
+                            <?php if (!empty($animal['genetics'])): ?>
+                                <span>Genetik: <?= htmlspecialchars($animal['genetics']) ?></span>
+                            <?php endif; ?>
+                            <?php if (!empty($animal['origin'])): ?>
+                                <span>Herkunft: <?= htmlspecialchars($animal['origin']) ?></span>
+                            <?php endif; ?>
                         </div>
-                    <?php endif; ?>
-                </article>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
+                        <?php if (!empty($animal['special_notes'])): ?>
+                            <div class="rich-text-content">
+                                <?= render_rich_text($animal['special_notes']) ?>
+                            </div>
+                        <?php endif; ?>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </div>
 </section>
 <?php include __DIR__ . '/../partials/footer.php'; ?>

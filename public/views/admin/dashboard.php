@@ -1,6 +1,15 @@
 <?php include __DIR__ . '/../partials/header.php'; ?>
-<section class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-<h1>Admin-Dashboard</h1>
+<section class="admin-shell">
+<header class="admin-page-header">
+    <div>
+        <h1 class="admin-title">Admin-Dashboard</h1>
+        <p class="admin-subtitle">Behalte jedes Detail deines digitalen Terrariums im Blick – von aktiven Bartagamen bis zu den neuesten Anfragen.</p>
+    </div>
+    <div class="admin-meta">
+        <span class="badge">Pogona Pulse</span>
+        <span><?= count($animals) ?> Tiere aktiv</span>
+    </div>
+</header>
 <?php include __DIR__ . '/nav.php'; ?>
 <div class="grid cards">
     <div class="card">
@@ -40,14 +49,14 @@
         <p><?= isset($geneticGenes) ? count($geneticGenes) : 0 ?> Einträge</p>
     </div>
 </div>
-
-<section style="margin-top:2rem;">
+<section class="admin-section">
     <h2>Letzte Anfragen</h2>
     <div class="card">
         <?php if (empty($inquiries)): ?>
             Keine Anfragen vorhanden.
         <?php else: ?>
-            <table class="table">
+            <div class="table-responsive">
+                <table class="table">
                 <thead>
                     <tr>
                         <th>Datum</th>
@@ -66,7 +75,8 @@
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
-            </table>
+                </table>
+            </div>
         <?php endif; ?>
     </div>
 </section>

@@ -1,11 +1,12 @@
 <?php
 function create_animal(PDO $pdo, array $data): void
 {
-    $stmt = $pdo->prepare('INSERT INTO animals(name, species, age, genetics, origin, special_notes, description, image_path, owner_id, is_private, is_showcased, is_piebald) VALUES (:name, :species, :age, :genetics, :origin, :special_notes, :description, :image_path, :owner_id, :is_private, :is_showcased, :is_piebald)');
+    $stmt = $pdo->prepare('INSERT INTO animals(name, species, age, sex, genetics, origin, special_notes, description, image_path, owner_id, is_private, is_showcased, is_piebald) VALUES (:name, :species, :age, :sex, :genetics, :origin, :special_notes, :description, :image_path, :owner_id, :is_private, :is_showcased, :is_piebald)');
     $stmt->execute([
         'name' => $data['name'],
         'species' => $data['species'],
         'age' => $data['age'] ?? null,
+        'sex' => $data['sex'] ?? 'unknown',
         'genetics' => $data['genetics'] ?? null,
         'origin' => $data['origin'] ?? null,
         'special_notes' => $data['special_notes'] ?? null,
@@ -20,11 +21,12 @@ function create_animal(PDO $pdo, array $data): void
 
 function update_animal(PDO $pdo, int $id, array $data): void
 {
-    $stmt = $pdo->prepare('UPDATE animals SET name = :name, species = :species, age = :age, genetics = :genetics, origin = :origin, special_notes = :special_notes, description = :description, image_path = :image_path, owner_id = :owner_id, is_private = :is_private, is_showcased = :is_showcased, is_piebald = :is_piebald WHERE id = :id');
+    $stmt = $pdo->prepare('UPDATE animals SET name = :name, species = :species, age = :age, sex = :sex, genetics = :genetics, origin = :origin, special_notes = :special_notes, description = :description, image_path = :image_path, owner_id = :owner_id, is_private = :is_private, is_showcased = :is_showcased, is_piebald = :is_piebald WHERE id = :id');
     $stmt->execute([
         'name' => $data['name'],
         'species' => $data['species'],
         'age' => $data['age'] ?? null,
+        'sex' => $data['sex'] ?? 'unknown',
         'genetics' => $data['genetics'] ?? null,
         'origin' => $data['origin'] ?? null,
         'special_notes' => $data['special_notes'] ?? null,
