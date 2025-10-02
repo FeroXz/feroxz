@@ -1,17 +1,28 @@
 <?php include __DIR__ . '/../partials/header.php'; ?>
-<section class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-<h1>Neuigkeiten</h1>
+<section class="admin-shell">
+<header class="admin-page-header">
+    <div>
+        <h1 class="admin-title">Neuigkeiten</h1>
+        <p class="admin-subtitle">Veröffentliche Geschichten aus dem Pogona-Habitat mit einem klaren, interaktiven Redaktions-Workspace.</p>
+    </div>
+    <div class="admin-meta">
+        <span class="badge">Storyflow</span>
+        <span><?= count($newsPosts) ?> Beiträge</span>
+    </div>
+</header>
 <?php include __DIR__ . '/nav.php'; ?>
+<div class="admin-section">
 <?php if ($flashSuccess): ?>
     <div class="alert alert-success" role="status" aria-live="polite"><?= htmlspecialchars($flashSuccess) ?></div>
 <?php endif; ?>
 <?php if ($flashError): ?>
     <div class="alert alert-error" role="alert" aria-live="assertive"><?= htmlspecialchars($flashError) ?></div>
 <?php endif; ?>
-<div class="grid" style="grid-template-columns:2fr 1fr;gap:2rem;align-items:start;">
+<div class="admin-layout">
     <div class="card">
         <h2>Veröffentlichte Beiträge</h2>
-        <table class="table">
+        <div class="table-responsive">
+            <table class="table">
             <thead>
                 <tr>
                     <th>Titel</th>
@@ -39,7 +50,8 @@
                     </tr>
                 <?php endforeach; ?>
             </tbody>
-        </table>
+            </table>
+        </div>
     </div>
     <div class="card">
         <h2><?= $editPost ? 'Beitrag bearbeiten' : 'Neuer Beitrag' ?></h2>
@@ -62,12 +74,14 @@
             <label>Veröffentlicht am
                 <input type="datetime-local" name="published_at" value="<?= !empty($editPost['published_at']) ? date('Y-m-d\TH:i', strtotime($editPost['published_at'])) : '' ?>">
             </label>
-            <label style="display:flex;align-items:center;gap:0.5rem;">
-                <input type="checkbox" name="is_published" value="1" <?= !empty($editPost['is_published']) ? 'checked' : '' ?>> Sofort veröffentlichen
+            <label class="form-switch">
+                <input type="checkbox" name="is_published" value="1" <?= !empty($editPost['is_published']) ? 'checked' : '' ?>>
+                <span>Sofort veröffentlichen</span>
             </label>
             <button type="submit">Speichern</button>
         </form>
     </div>
+</div>
 </div>
 </section>
 <?php include __DIR__ . '/../partials/footer.php'; ?>
