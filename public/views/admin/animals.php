@@ -1,17 +1,28 @@
 <?php include __DIR__ . '/../partials/header.php'; ?>
-<section class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-<h1>Tiere verwalten</h1>
+<section class="admin-shell">
+<header class="admin-page-header">
+    <div>
+        <h1 class="admin-title">Tiere verwalten</h1>
+        <p class="admin-subtitle">Kuratiere den warmen Lebensraum deiner Bartagamen – vom Portfolio bis zu den feinsten Genetik-Notizen.</p>
+    </div>
+    <div class="admin-meta">
+        <span class="badge">Habitat-Übersicht</span>
+        <span><?= count($animals) ?> Tiere gelistet</span>
+    </div>
+</header>
 <?php include __DIR__ . '/nav.php'; ?>
+<div class="admin-section">
 <?php if ($flashSuccess): ?>
     <div class="alert alert-success" role="status" aria-live="polite"><?= htmlspecialchars($flashSuccess) ?></div>
 <?php endif; ?>
 <?php if (!empty($flashError)): ?>
     <div class="alert alert-error" role="alert" aria-live="assertive"><?= htmlspecialchars($flashError) ?></div>
 <?php endif; ?>
-<div class="grid" style="grid-template-columns:2fr 1fr;gap:2rem;align-items:start;">
+<div class="admin-layout">
     <div class="card">
         <h2>Bestand</h2>
-        <table class="table">
+        <div class="table-responsive">
+            <table class="table">
             <thead>
                 <tr>
                     <th>Name</th>
@@ -50,7 +61,8 @@
                     </tr>
                 <?php endforeach; ?>
             </tbody>
-        </table>
+            </table>
+        </div>
     </div>
     <div class="card">
         <h2><?= $editAnimal ? 'Tier bearbeiten' : 'Neues Tier' ?></h2>
@@ -94,18 +106,22 @@
                     <?php endforeach; ?>
                 </select>
             </label>
-            <label style="display:flex;align-items:center;gap:0.5rem;">
-                <input type="checkbox" name="is_private" value="1" <?= !empty($editAnimal['is_private']) ? 'checked' : '' ?>> Privat
+            <label class="form-switch">
+                <input type="checkbox" name="is_private" value="1" <?= !empty($editAnimal['is_private']) ? 'checked' : '' ?>>
+                <span>Privat</span>
             </label>
-            <label style="display:flex;align-items:center;gap:0.5rem;">
-                <input type="checkbox" name="is_showcased" value="1" <?= !empty($editAnimal['is_showcased']) ? 'checked' : '' ?>> In Highlights anzeigen
+            <label class="form-switch">
+                <input type="checkbox" name="is_showcased" value="1" <?= !empty($editAnimal['is_showcased']) ? 'checked' : '' ?>>
+                <span>In Highlights anzeigen</span>
             </label>
-            <label style="display:flex;align-items:center;gap:0.5rem;">
-                <input type="checkbox" name="is_piebald" value="1" <?= !empty($editAnimal['is_piebald']) ? 'checked' : '' ?>> Als gescheckt markieren
+            <label class="form-switch">
+                <input type="checkbox" name="is_piebald" value="1" <?= !empty($editAnimal['is_piebald']) ? 'checked' : '' ?>>
+                <span>Als gescheckt markieren</span>
             </label>
             <button type="submit">Speichern</button>
         </form>
     </div>
+</div>
 </div>
 </section>
 <?php include __DIR__ . '/../partials/footer.php'; ?>

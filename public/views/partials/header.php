@@ -11,18 +11,18 @@
                 extend: {
                     colors: {
                         night: {
-                            900: '#020617',
-                            800: '#0f172a',
-                            700: '#1e293b',
+                            900: '#120c09',
+                            800: '#1f1510',
+                            700: '#2d1c15',
                         },
                         brand: {
-                            400: '#22d3ee',
-                            500: '#06b6d4',
-                            600: '#0891b2',
+                            400: '#f4b97f',
+                            500: '#f1914d',
+                            600: '#d46a26',
                         },
                     },
                     boxShadow: {
-                        glow: '0 25px 65px rgba(15, 118, 110, 0.35)',
+                        glow: '0 25px 65px rgba(242, 140, 71, 0.35)',
                     },
                     fontFamily: {
                         sans: ['Inter', 'system-ui', 'ui-sans-serif', 'Segoe UI', 'sans-serif'],
@@ -33,7 +33,7 @@
     </script>
     <link rel="stylesheet" href="<?= asset('style.css') ?>">
 </head>
-<body class="min-h-screen bg-gradient-to-br from-night-900 via-night-800 to-slate-900 font-sans text-slate-100">
+<body class="min-h-screen bg-gradient-to-br from-night-900 via-night-800 to-[#3d2517] font-sans text-slate-100">
 <header class="sticky top-0 z-50 border-b border-white/5 bg-night-900/80 backdrop-blur">
     <div class="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
         <a href="<?= BASE_URL ?>/index.php" class="flex items-center gap-3">

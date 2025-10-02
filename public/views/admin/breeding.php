@@ -1,7 +1,17 @@
 <?php include __DIR__ . '/../partials/header.php'; ?>
-<section class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-<h1>Zuchtplanung</h1>
+<section class="admin-shell">
+<header class="admin-page-header">
+    <div>
+        <h1 class="admin-title">Zuchtplanung</h1>
+        <p class="admin-subtitle">Gestalte kommende Generationen deiner Pogona vitticeps mit klarer, temperaturstabiler Übersicht – von Plänen bis Verpaarungen.</p>
+    </div>
+    <div class="admin-meta">
+        <span class="badge">Zuchtlinie</span>
+        <span><?= count($breedingPlans) ?> aktive Pläne</span>
+    </div>
+</header>
 <?php include __DIR__ . '/nav.php'; ?>
+<div class="admin-section">
 <?php if ($flashSuccess): ?>
     <div class="alert alert-success" role="status" aria-live="polite"><?= htmlspecialchars($flashSuccess) ?></div>
 <?php endif; ?>
@@ -20,7 +30,7 @@
         }
     }
 ?>
-<div class="grid" style="grid-template-columns:2fr 1fr;gap:2rem;align-items:start;">
+<div class="admin-layout">
     <div class="card">
         <h2>Aktive Pläne</h2>
         <?php if (empty($breedingPlans)): ?>
@@ -118,7 +128,7 @@
             <button type="submit">Zuchtplan speichern</button>
         </form>
         <?php if (!empty($breedingPlans)): ?>
-            <hr style="margin:2rem 0;opacity:0.3;">
+            <hr class="admin-divider">
             <h3>Elterntier hinzufügen</h3>
             <form method="post">
                 <input type="hidden" name="form" value="parent">
@@ -171,7 +181,7 @@
             </label>
                 <button type="submit">Elternteil speichern</button>
             </form>
-            <hr style="margin:2rem 0;opacity:0.3;">
+            <hr class="admin-divider">
             <h3>Verpaarung anlegen</h3>
             <form method="post" data-breeding-pair-form>
                 <input type="hidden" name="form" value="pair">
@@ -281,6 +291,7 @@
                 <button type="submit">Verpaarung speichern</button>
             </form>
         <?php endif; ?>
+</div>
 </div>
 </div>
 <script>
