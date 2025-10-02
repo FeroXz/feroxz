@@ -5,9 +5,10 @@
 <?php if ($flashSuccess): ?>
     <div class="alert alert-success" role="status" aria-live="polite"><?= htmlspecialchars($flashSuccess) ?></div>
 <?php endif; ?>
-<div class="grid" style="grid-template-columns:2fr 1fr;gap:2rem;align-items:start;">
+<div class="admin-layout">
     <div class="card">
-        <table class="table">
+        <div class="table-responsive">
+            <table class="table">
             <thead>
                 <tr>
                     <th>Benutzername</th>
@@ -35,7 +36,8 @@
                     </tr>
                 <?php endforeach; ?>
             </tbody>
-        </table>
+            </table>
+        </div>
     </div>
     <div class="card">
         <h2><?= $editUser ? 'Benutzer bearbeiten' : 'Benutzer anlegen' ?></h2>

@@ -2,11 +2,12 @@
 <section class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
 <h1>Anfragen</h1>
 <?php include __DIR__ . '/nav.php'; ?>
-<div class="card">
-    <?php if (empty($inquiries)): ?>
-        Keine Nachrichten vorhanden.
-    <?php else: ?>
-        <table class="table">
+    <div class="card">
+        <?php if (empty($inquiries)): ?>
+            Keine Nachrichten vorhanden.
+        <?php else: ?>
+        <div class="table-responsive">
+            <table class="table">
             <thead>
                 <tr>
                     <th>Datum</th>
@@ -29,8 +30,9 @@
                     </tr>
                 <?php endforeach; ?>
             </tbody>
-        </table>
+            </table>
+        </div>
     <?php endif; ?>
-</div>
+    </div>
 </section>
 <?php include __DIR__ . '/../partials/footer.php'; ?>

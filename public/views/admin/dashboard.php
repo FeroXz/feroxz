@@ -47,7 +47,8 @@
         <?php if (empty($inquiries)): ?>
             Keine Anfragen vorhanden.
         <?php else: ?>
-            <table class="table">
+            <div class="table-responsive">
+                <table class="table">
                 <thead>
                     <tr>
                         <th>Datum</th>
@@ -66,7 +67,8 @@
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
-            </table>
+                </table>
+            </div>
         <?php endif; ?>
     </div>
 </section>

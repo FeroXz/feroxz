@@ -44,6 +44,57 @@ main p {
   gap: 1.5rem;
 }
 
+.admin-layout {
+  display: grid;
+  gap: clamp(1.25rem, 3vw, 2rem);
+  align-items: start;
+}
+
+@media (min-width: 960px) {
+  .admin-layout {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  }
+}
+
+.admin-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.admin-nav a {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 700px) {
+  .admin-nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0.75rem;
+    margin-left: -1rem;
+    margin-right: -1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .admin-nav::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-responsive .table {
+  min-width: 640px;
+}
+
 .grid.cards {
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
@@ -307,6 +358,8 @@ input[type="checkbox"] {
 .rich-text-toolbar {
   display: flex;
   gap: 0.35rem;
+  flex-wrap: wrap;
+  row-gap: 0.25rem;
   padding: 0.5rem;
   background: rgba(148, 163, 184, 0.15);
   border-bottom: 1px solid var(--border);

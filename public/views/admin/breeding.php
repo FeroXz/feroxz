@@ -20,7 +20,7 @@
         }
     }
 ?>
-<div class="grid" style="grid-template-columns:2fr 1fr;gap:2rem;align-items:start;">
+<div class="admin-layout">
     <div class="card">
         <h2>Aktive Pläne</h2>
         <?php if (empty($breedingPlans)): ?>

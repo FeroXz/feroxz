@@ -23,10 +23,11 @@
         'parent_id' => $hasPagePost ? ($_POST['parent_id'] ?? '') : (($editPage['parent_id'] ?? '') !== '' ? (string)$editPage['parent_id'] : ''),
     ];
 ?>
-<div class="grid" style="grid-template-columns:2fr 1fr;gap:2rem;align-items:start;">
+<div class="admin-layout">
     <div class="card">
         <h2>Bestehende Seiten</h2>
-        <table class="table">
+        <div class="table-responsive">
+            <table class="table">
             <thead>
                 <tr>
                     <th>Titel</th>
@@ -64,7 +65,8 @@
                     </tr>
                 <?php endforeach; ?>
             </tbody>
-        </table>
+            </table>
+        </div>
     </div>
     <div class="card">
         <h2><?= $editPage ? 'Seite bearbeiten' : 'Neue Seite' ?></h2>
