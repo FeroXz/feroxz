@@ -1,8 +1,8 @@
 <?php
-    $linkBase = 'inline-flex items-center gap-1 rounded-full border border-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-200 transition hover:border-brand-400 hover:bg-brand-500/10 hover:text-brand-100';
-    $linkActive = 'inline-flex items-center gap-1 rounded-full border border-brand-400 bg-brand-500/20 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-brand-100 shadow-glow';
+    $linkBase = 'admin-chip';
+    $linkActive = 'admin-chip is-active';
 ?>
-<nav class="mt-6 flex flex-wrap gap-2">
+<nav class="admin-nav" aria-label="Admin-Navigation">
     <a href="<?= BASE_URL ?>/index.php?route=admin/dashboard" class="<?= $currentRoute === 'admin/dashboard' ? $linkActive : $linkBase ?>">Übersicht</a>
     <a href="<?= BASE_URL ?>/index.php?route=admin/animals" class="<?= $currentRoute === 'admin/animals' ? $linkActive : $linkBase ?>">Tiere</a>
     <?php if (is_authorized('can_manage_animals')): ?>
