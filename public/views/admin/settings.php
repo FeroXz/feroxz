@@ -1,7 +1,17 @@
 <?php include __DIR__ . '/../partials/header.php'; ?>
-<section class="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8">
-<h1>Einstellungen</h1>
+<section class="admin-shell">
+<header class="admin-page-header">
+    <div>
+        <h1 class="admin-title">Einstellungen</h1>
+        <p class="admin-subtitle">Forme die digitale Umgebung – von Terrarium-Branding bis Kontakt – mit wenigen, fokussierten Eingaben.</p>
+    </div>
+    <div class="admin-meta">
+        <span class="badge">Systemkern</span>
+        <span>Individuelle Konfiguration</span>
+    </div>
+</header>
 <?php include __DIR__ . '/nav.php'; ?>
+<div class="admin-section">
 <?php if ($flashSuccess): ?>
     <div class="alert alert-success" role="status" aria-live="polite"><?= htmlspecialchars($flashSuccess) ?></div>
 <?php endif; ?>
@@ -27,6 +37,7 @@
         </label>
         <button type="submit">Speichern</button>
     </form>
+</div>
 </div>
 </section>
 <?php include __DIR__ . '/../partials/footer.php'; ?>
