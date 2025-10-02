@@ -1,7 +1,17 @@
 <?php include __DIR__ . '/../partials/header.php'; ?>
-<section class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-<h1>Seiten verwalten</h1>
+<section class="admin-shell">
+<header class="admin-page-header">
+    <div>
+        <h1 class="admin-title">Seiten verwalten</h1>
+        <p class="admin-subtitle">Strukturiere Inhalte wie ein modularer Felsgarten – klar gegliedert und perfekt für neugierige Bartagamen-Fans.</p>
+    </div>
+    <div class="admin-meta">
+        <span class="badge">Informationsnetz</span>
+        <span><?= count($pages) ?> Seiten</span>
+    </div>
+</header>
 <?php include __DIR__ . '/nav.php'; ?>
+<div class="admin-section">
 <?php if ($flashSuccess): ?>
     <div class="alert alert-success" role="status" aria-live="polite"><?= htmlspecialchars($flashSuccess) ?></div>
 <?php endif; ?>
@@ -23,10 +33,11 @@
         'parent_id' => $hasPagePost ? ($_POST['parent_id'] ?? '') : (($editPage['parent_id'] ?? '') !== '' ? (string)$editPage['parent_id'] : ''),
     ];
 ?>
-<div class="grid" style="grid-template-columns:2fr 1fr;gap:2rem;align-items:start;">
+<div class="admin-layout">
     <div class="card">
         <h2>Bestehende Seiten</h2>
-        <table class="table">
+        <div class="table-responsive">
+            <table class="table">
             <thead>
                 <tr>
                     <th>Titel</th>
@@ -54,7 +65,7 @@
                             <?php if (!empty($pageItem['parent_id']) && isset($pageTitleLookup[$pageItem['parent_id']])): ?>
                                 <?= htmlspecialchars($pageTitleLookup[$pageItem['parent_id']]) ?>
                             <?php else: ?>
-                                <span style="color:var(--text-muted);">Hauptebene</span>
+                                <span class="text-muted">Hauptebene</span>
                             <?php endif; ?>
                         </td>
                         <td>
@@ -64,7 +75,8 @@
                     </tr>
                 <?php endforeach; ?>
             </tbody>
-        </table>
+            </table>
+        </div>
     </div>
     <div class="card">
         <h2><?= $editPage ? 'Seite bearbeiten' : 'Neue Seite' ?></h2>
@@ -81,11 +93,13 @@
             <label>Inhalt
                 <textarea name="content" class="rich-text" required><?= htmlspecialchars($formValues['content']) ?></textarea>
             </label>
-            <label style="display:flex;align-items:center;gap:0.5rem;">
-                <input type="checkbox" name="is_published" value="1" <?= !empty($formValues['is_published']) ? 'checked' : '' ?>> veröffentlichen
+            <label class="form-switch">
+                <input type="checkbox" name="is_published" value="1" <?= !empty($formValues['is_published']) ? 'checked' : '' ?>>
+                <span>veröffentlichen</span>
             </label>
-            <label style="display:flex;align-items:center;gap:0.5rem;">
-                <input type="checkbox" name="show_in_menu" value="1" <?= !empty($formValues['show_in_menu']) ? 'checked' : '' ?>> Im Hauptmenü anzeigen
+            <label class="form-switch">
+                <input type="checkbox" name="show_in_menu" value="1" <?= !empty($formValues['show_in_menu']) ? 'checked' : '' ?>>
+                <span>Im Hauptmenü anzeigen</span>
             </label>
             <label>Übergeordnete Seite
                 <select name="parent_id">
@@ -101,6 +115,7 @@
             <button type="submit">Speichern</button>
         </form>
     </div>
+</div>
 </div>
 </section>
 <?php include __DIR__ . '/../partials/footer.php'; ?>
