@@ -7,7 +7,9 @@
     <link rel="canonical" href="<?= htmlspecialchars($pageMeta['canonical'] ?? canonical_url()) ?>">
     <meta name="description" content="<?= htmlspecialchars($pageMeta['description'] ?? '') ?>">
     <meta name="keywords" content="<?= htmlspecialchars(PRIMARY_TOPIC) ?>">
+
     <meta name="theme-color" content="#e0e7ff">
+
     <meta property="og:site_name" content="<?= htmlspecialchars(SITE_NAME) ?>">
     <meta property="og:title" content="<?= htmlspecialchars($pageMeta['og_title'] ?? '') ?>">
     <meta property="og:description" content="<?= htmlspecialchars($pageMeta['og_description'] ?? '') ?>">
@@ -22,7 +24,9 @@
     <link rel="alternate" hreflang="de" href="<?= htmlspecialchars($pageMeta['canonical'] ?? canonical_url()) ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="<?= asset('style.css') ?>">
 </head>
 <body>

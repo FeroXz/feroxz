@@ -1,3 +1,4 @@
+
 <?php include __DIR__ . '/../partials/header.php'; ?>
 <section class="section">
     <div class="section__inner">
@@ -119,11 +120,13 @@
                             <p class="gene-parent__hint">Jeder Eintrag wird direkt übernommen – nicht hinzugefügte Gene bleiben Wildtyp.</p>
                             <div data-hidden-inputs></div>
                         </section>
+
                     </div>
                     <div class="gene-selector__actions">
                         <button type="submit" class="btn btn-primary">Berechnen</button>
                         <button type="button" class="btn btn-secondary" data-clear-all>Zurücksetzen</button>
                     </div>
+
                 </form>
                 <section class="gene-reference">
                     <h2>Verfügbare Gene</h2>

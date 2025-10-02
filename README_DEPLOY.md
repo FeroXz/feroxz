@@ -10,10 +10,12 @@
    ```bash
    npm install
    ```
+
 2. Configure Git hooks once per clone to auto-bump the version on every push:
    ```bash
    git config core.hooksPath scripts/git-hooks
    ```
+
 2. Generate responsive image derivatives (WebP/AVIF variants under `public/media/generated/`):
    ```bash
    npm run build:images

@@ -1,3 +1,4 @@
+
 # FeroxZ – PHP Reptile CMS
 
 FeroxZ ist ein leichtgewichtiges, auf PHP 8.3 und SQLite basierendes CMS für Reptilienhalter. Es vereint Tierverwaltung, Tierabgabe, private Tierakten sowie ein Admin-Backend mit granularen Berechtigungen. Alle Inhalte werden persistiert in einer lokalen SQLite-Datenbank gespeichert, Medien landen im Verzeichnis `uploads/`.
@@ -39,6 +40,7 @@ FeroxZ ist ein leichtgewichtiges, auf PHP 8.3 und SQLite basierendes CMS für R
 > Hinweis: Beim ersten Start wird automatisch eine SQLite-Datenbank unter `storage/database.sqlite` angelegt sowie ein Admin-Benutzer erzeugt.
 
 ## Ordnerstruktur
+
 
 ```
 feroxz/

@@ -16,7 +16,9 @@
 - Geschlechtsauswahl in allen Tierformularen mit tastaturbedienbaren Icon-Optionen.
 
 ## UX & IA
+
 - Supermodernes UI-Kit auf Basis heller Glasflächen, Aurora-Verläufen und FlyonUI-/Open-Source-Dashboard-Komponenten mit 100%-Viewport-Ausnutzung auf allen Geräten.
+
 - Startseiten-Hero mit drei zentralen CTAs, Kennzahlen und Vertrauenssektion.
 - Vereinheitlichte Tier-, Vermittlungs- und Guide-Ansichten mit responsiven Bildern, Rich-Text-Blöcken und Barrierefreiheit.
 - Adminbereich mit optimierter Shell für Desktop und Mobile inklusive breiter Tabellen und Formular-Gitter.
@@ -25,7 +27,9 @@
 - Health-Endpoint (`/index.php?route=healthz`) für Monitoring.
 - QA-Tooling über `npm run audit` (Lighthouse CI, HTML-Validator, Schema-Check) mit Reports-Verzeichnis.
 - CDN-Purge-Skript `scripts/purge-cache.sh` und Dokumentation in `README_DEPLOY.md`.
+
 - Automatisches Versioning über `scripts/git-hooks/pre-push` + `scripts/update-version.php` (schreibt `VERSION`, README und Footer).
+
 
 ## Neue Routen/Endpunkte
 - `/index.php?route=healthz`

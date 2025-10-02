@@ -11,6 +11,7 @@ const ORG_SAME_AS = [
     'https://www.facebook.com/...',
 ];
 
+
 if (!defined('APP_VERSION')) {
     $appVersion = 'dev-main';
     $versionFile = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'VERSION';
@@ -22,3 +23,4 @@ if (!defined('APP_VERSION')) {
     }
     define('APP_VERSION', $appVersion);
 }
+
