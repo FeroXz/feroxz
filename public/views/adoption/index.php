@@ -20,9 +20,12 @@
     <?php $inputClasses = 'mt-1 block w-full rounded-xl border border-white/10 bg-night-900/60 px-3 py-2 text-slate-100 shadow-inner shadow-black/40 focus:border-brand-400 focus:outline-none focus:ring focus:ring-brand-500/40'; ?>
     <div class="mt-10 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
         <?php foreach ($listings as $listing): ?>
-            <article class="flex h-full flex-col rounded-3xl border border-white/5 bg-night-900/70 p-6 shadow-lg shadow-black/30 transition hover:border-brand-400/60 hover:shadow-glow">
+            <article id="listing-<?= (int)$listing['id'] ?>" class="flex h-full flex-col rounded-3xl border border-white/5 bg-night-900/70 p-6 shadow-lg shadow-black/30 transition hover:border-brand-400/60 hover:shadow-glow">
                 <?php if (!empty($listing['image_path'])): ?>
-                    <img src="<?= BASE_URL . '/' . htmlspecialchars($listing['image_path']) ?>" alt="<?= htmlspecialchars($listing['title']) ?>" class="mb-4 h-48 w-full rounded-2xl object-cover" loading="lazy">
+                    <?= render_responsive_picture($listing['image_path'], $listing['title'], [
+                        'class' => 'mb-4 h-48 w-full rounded-2xl object-cover',
+                        'sizes' => '(max-width: 768px) 100vw, 320px',
+                    ]) ?>
                 <?php endif; ?>
                 <h3 class="text-xl font-semibold text-white"><?= htmlspecialchars($listing['title']) ?></h3>
                 <?php if (!empty($listing['species'])): ?>

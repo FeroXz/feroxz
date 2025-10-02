@@ -51,6 +51,42 @@
         });
     })();
 </script>
+<?php
+    $schemaBlocks = [
+        [
+            '@context' => 'https://schema.org',
+            '@type' => 'Organization',
+            'name' => ORG_NAME,
+            'url' => 'https://' . SITE_DOMAIN,
+            'logo' => ORG_LOGO_URL,
+            'email' => CONTACT_EMAIL,
+            'sameAs' => ORG_SAME_AS,
+        ],
+    ];
+
+    if (!empty($pageMeta['breadcrumbs'])) {
+        $schemaBlocks[] = [
+            '@context' => 'https://schema.org',
+            '@type' => 'BreadcrumbList',
+            'itemListElement' => array_map(static function ($crumb) {
+                return [
+                    '@type' => 'ListItem',
+                    'position' => $crumb['position'],
+                    'name' => $crumb['name'],
+                    'item' => $crumb['url'],
+                ];
+            }, $pageMeta['breadcrumbs']),
+        ];
+    }
+
+    if (!empty($pageMeta['schema'])) {
+        foreach ($pageMeta['schema'] as $schemaBlock) {
+            $schemaBlocks[] = $schemaBlock;
+        }
+    }
+
+    echo render_structured_data($schemaBlocks);
+?>
 <?php if (($currentRoute ?? '') === 'genetics'): ?>
     <script src="<?= asset('genetics.js') ?>"></script>
 <?php endif; ?>

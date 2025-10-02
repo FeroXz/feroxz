@@ -13,6 +13,15 @@ function view(string $template, array $data = []): void
         if (!isset($data['navCareArticles']) && function_exists('get_published_care_articles')) {
             $data['navCareArticles'] = get_published_care_articles($pdo);
         }
+        if (!isset($data['settings']) && function_exists('get_all_settings')) {
+            $data['settings'] = get_all_settings($pdo);
+        }
+    }
+
+    if (!isset($data['pageMeta'])) {
+        $data['pageMeta'] = build_page_meta([], $data['settings'] ?? []);
+    } else {
+        $data['pageMeta'] = build_page_meta($data['pageMeta'], $data['settings'] ?? []);
     }
 
     extract($data);
@@ -21,7 +30,9 @@ function view(string $template, array $data = []): void
 
 function asset(string $path): string
 {
-    return BASE_URL . '/assets/' . ltrim($path, '/');
+    $assetHost = getenv('ASSET_CDN_URL');
+    $prefix = $assetHost ? rtrim($assetHost, '/') : BASE_URL;
+    return $prefix . '/assets/' . ltrim($path, '/');
 }
 
 function redirect(string $route, array $params = []): void
@@ -76,6 +87,118 @@ function ensure_directory(string $dir): void
     if (!is_dir($dir)) {
         mkdir($dir, 0775, true);
     }
+}
+
+function canonical_url(string $path = ''): string
+{
+    $cleanPath = '/' . ltrim($path ?: parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/', '/');
+    return 'https://' . SITE_DOMAIN . $cleanPath;
+}
+
+function absolute_url(string $path = ''): string
+{
+    $cleanPath = '/' . ltrim($path, '/');
+    return 'https://' . SITE_DOMAIN . $cleanPath;
+}
+
+function build_page_meta(array $overrides = [], array $settings = []): array
+{
+    $path = $overrides['path'] ?? (parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/');
+    $path = '/' . ltrim($path, '/');
+    $title = trim($overrides['title'] ?? ($settings['site_title'] ?? SITE_NAME));
+    $description = trim($overrides['description'] ?? ($settings['site_tagline'] ?? ($settings['hero_intro'] ?? PRIMARY_TOPIC)));
+    $ogImage = $overrides['og_image'] ?? ($settings['hero_image'] ?? ORG_LOGO_URL);
+    $type = $overrides['type'] ?? 'website';
+
+    $fullTitle = $title === SITE_NAME ? $title : $title . ' | ' . SITE_NAME;
+
+    return array_merge([
+        'title' => $title,
+        'full_title' => $fullTitle,
+        'description' => $description,
+        'path' => $path,
+        'canonical' => canonical_url($path),
+        'og_title' => $overrides['og_title'] ?? $title,
+        'og_description' => $overrides['og_description'] ?? $description,
+        'og_type' => $type,
+        'og_image' => $ogImage,
+        'lang' => PRIMARY_LANGUAGE,
+        'breadcrumbs' => $overrides['breadcrumbs'] ?? [],
+        'schema' => $overrides['schema'] ?? [],
+    ], $overrides);
+}
+
+function build_breadcrumbs(array $items): array
+{
+    $position = 1;
+    $trail = [];
+    foreach ($items as $item) {
+        $trail[] = [
+            'name' => $item['name'],
+            'url' => $item['url'] ?? canonical_url($item['path'] ?? ''),
+            'position' => $position++,
+        ];
+    }
+    return $trail;
+}
+
+function render_structured_data(array $blocks): string
+{
+    if (empty($blocks)) {
+        return '';
+    }
+
+    $scripts = array_map(function ($block) {
+        return '<script type="application/ld+json">' . json_encode($block, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . '</script>';
+    }, $blocks);
+
+    return implode("\n", $scripts);
+}
+
+function render_responsive_picture(?string $path, string $alt, array $options = []): string
+{
+    if (empty($path)) {
+        return '';
+    }
+
+    $breakpoints = $options['breakpoints'] ?? [480, 768, 1024, 1600];
+    $sizes = $options['sizes'] ?? '100vw';
+    $class = $options['class'] ?? '';
+    $loading = $options['loading'] ?? 'lazy';
+    $decoding = $options['decoding'] ?? 'async';
+
+    $normalized = ltrim($path, '/');
+    $base = preg_replace('/\.[^.]+$/', '', $normalized);
+    $directory = trim(dirname($base), './');
+    $filename = basename($base);
+    $prefix = 'media/generated' . ($directory ? '/' . $directory : '');
+
+    $buildSrcset = static function (string $format) use ($prefix, $filename, $breakpoints): string {
+        $parts = [];
+        foreach ($breakpoints as $width) {
+            $url = '/' . trim($prefix . '/' . $filename . '_' . $width . '.' . $format, '/');
+            $parts[] = $url . ' ' . $width . 'w';
+        }
+        return implode(', ', $parts);
+    };
+
+    $avifSrcset = $buildSrcset('avif');
+    $webpSrcset = $buildSrcset('webp');
+    $fallback = '/' . $normalized;
+
+    return sprintf(
+        '<picture><source type="image/avif" srcset="%s" sizes="%s"><source type="image/webp" srcset="%s" sizes="%s"><img src="%s" alt="%s" loading="%s" decoding="%s" sizes="%s" class="%s"></picture>',
+        htmlspecialchars($avifSrcset, ENT_QUOTES),
+        htmlspecialchars($sizes, ENT_QUOTES),
+        htmlspecialchars($webpSrcset, ENT_QUOTES),
+        htmlspecialchars($sizes, ENT_QUOTES),
+        htmlspecialchars($fallback, ENT_QUOTES),
+        htmlspecialchars($alt, ENT_QUOTES),
+        htmlspecialchars($loading, ENT_QUOTES),
+        htmlspecialchars($decoding, ENT_QUOTES),
+        htmlspecialchars($sizes, ENT_QUOTES),
+        htmlspecialchars($class, ENT_QUOTES)
+    );
 }
 
 function handle_upload(array $file): ?string

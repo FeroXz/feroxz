@@ -27,16 +27,71 @@ switch ($route) {
     case 'home':
         $settings = get_all_settings($pdo);
         $animals = get_showcased_animals($pdo);
-        $listings = get_public_listings($pdo);
+        $listingsPreview = array_slice(get_public_listings($pdo), 0, 4);
         $latestNews = get_latest_published_news($pdo, 3);
         $careHighlights = array_slice(get_published_care_articles($pdo), 0, 3);
-        view('home', compact('settings', 'animals', 'listings', 'latestNews', 'careHighlights'));
+        $featureGeneticsTeaser = filter_var(getenv('FEATURE_GENETICS_TEASER') ?? '1', FILTER_VALIDATE_BOOLEAN);
+        $pageMeta = [
+            'title' => 'Startseite',
+            'description' => trim(strip_tags($settings['hero_intro'] ?? $settings['site_tagline'] ?? '')),
+            'breadcrumbs' => build_breadcrumbs([
+                ['name' => 'Start', 'url' => canonical_url('/')],
+            ]),
+            'og_image' => $settings['hero_image'] ?? ORG_LOGO_URL,
+            'schema' => [
+                [
+                    '@context' => 'https://schema.org',
+                    '@type' => 'WebPage',
+                    'name' => SITE_NAME . ' – Startseite',
+                    'url' => canonical_url('/'),
+                    'inLanguage' => PRIMARY_LANGUAGE,
+                    'about' => PRIMARY_TOPIC,
+                    'description' => trim(strip_tags($settings['hero_intro'] ?? $settings['site_tagline'] ?? '')),
+                ],
+            ],
+        ];
+        view('home', [
+            'settings' => $settings,
+            'animals' => $animals,
+            'listings' => $listingsPreview,
+            'latestNews' => $latestNews,
+            'careHighlights' => $careHighlights,
+            'featureGeneticsTeaser' => $featureGeneticsTeaser,
+            'pageMeta' => $pageMeta,
+        ]);
         break;
+
+    case 'healthz':
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'ok',
+            'time' => date(DATE_ATOM),
+            'db' => $pdo ? 'connected' : 'unavailable',
+        ], JSON_UNESCAPED_SLASHES);
+        exit;
 
     case 'animals':
         $settings = get_all_settings($pdo);
         $animals = get_public_animals($pdo);
-        view('animals/index', compact('settings', 'animals'));
+        $pageMeta = [
+            'title' => 'Tierübersicht',
+            'description' => 'Überblick über verfügbare und vergangene Tiere inkl. Morphs und Besonderheiten.',
+            'breadcrumbs' => build_breadcrumbs([
+                ['name' => 'Start', 'url' => canonical_url('/')],
+                ['name' => 'Tierübersicht'],
+            ]),
+            'schema' => [
+                [
+                    '@context' => 'https://schema.org',
+                    '@type' => 'CollectionPage',
+                    'name' => 'Tierübersicht',
+                    'inLanguage' => PRIMARY_LANGUAGE,
+                    'url' => canonical_url('/index.php?route=animals'),
+                    'about' => PRIMARY_TOPIC,
+                ],
+            ],
+        ];
+        view('animals/index', compact('settings', 'animals', 'pageMeta'));
         break;
 
     case 'my-animals':
@@ -77,7 +132,59 @@ switch ($route) {
         }
         $flashSuccess = flash('success');
         $flashError = flash('error');
-        view('adoption/index', compact('settings', 'listings', 'flashSuccess', 'flashError'));
+        $productSchemas = array_map(static function ($listing) {
+            $priceRaw = $listing['price'] ?? '';
+            $priceNumeric = null;
+            if ($priceRaw !== null && $priceRaw !== '') {
+                $normalized = preg_replace('/[^0-9,\.]/', '', (string)$priceRaw);
+                if ($normalized !== '') {
+                    $priceNumeric = number_format((float)str_replace(',', '.', $normalized), 2, '.', '');
+                }
+            }
+
+            $imagePath = !empty($listing['image_path']) ? absolute_url($listing['image_path']) : ORG_LOGO_URL;
+            $nameParts = array_filter([
+                $listing['species'] ?? null,
+                $listing['title'] ?? null,
+            ]);
+            return [
+                '@context' => 'https://schema.org',
+                '@type' => 'Product',
+                'name' => implode(' – ', $nameParts),
+                'description' => trim(strip_tags($listing['description'] ?? '')),
+                'image' => [$imagePath],
+                'category' => 'Pets',
+                'brand' => ORG_NAME,
+                'offers' => [
+                    '@type' => 'Offer',
+                    'price' => $priceNumeric ?? '0.00',
+                    'priceCurrency' => 'EUR',
+                    'availability' => ($listing['status'] ?? '') === 'available' ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+                    'url' => canonical_url('/index.php?route=adoption#listing-' . $listing['id']),
+                ],
+            ];
+        }, $listings);
+        $ogImage = !empty($productSchemas) ? ($productSchemas[0]['image'][0] ?? ORG_LOGO_URL) : ($settings['hero_image'] ?? ORG_LOGO_URL);
+        $pageMeta = [
+            'title' => 'Tierabgabe & Vermittlung',
+            'description' => trim(strip_tags($settings['adoption_intro'] ?? '')) ?: 'Transparente Abgabebedingungen und verfügbare Tiere inklusive Gesundheitsstatus.',
+            'breadcrumbs' => build_breadcrumbs([
+                ['name' => 'Start', 'url' => canonical_url('/')],
+                ['name' => 'Tierabgabe'],
+            ]),
+            'og_image' => $ogImage,
+            'schema' => array_merge([
+                [
+                    '@context' => 'https://schema.org',
+                    '@type' => 'CollectionPage',
+                    'name' => 'Tiervermittlung',
+                    'url' => canonical_url('/index.php?route=adoption'),
+                    'inLanguage' => PRIMARY_LANGUAGE,
+                    'description' => trim(strip_tags($settings['adoption_intro'] ?? '')),
+                ],
+            ], $productSchemas),
+        ];
+        view('adoption/index', compact('settings', 'listings', 'flashSuccess', 'flashError', 'pageMeta'));
         break;
 
     case 'page':
@@ -89,10 +196,30 @@ switch ($route) {
             break;
         }
         $settings = get_all_settings($pdo);
+        $summary = trim($page['summary'] ?? mb_substr(strip_tags($page['content'] ?? ''), 0, 160));
+        $pageMeta = [
+            'title' => $page['title'],
+            'description' => $summary,
+            'breadcrumbs' => build_breadcrumbs([
+                ['name' => 'Start', 'url' => canonical_url('/')],
+                ['name' => $page['title']],
+            ]),
+            'schema' => [
+                [
+                    '@context' => 'https://schema.org',
+                    '@type' => 'WebPage',
+                    'name' => $page['title'],
+                    'url' => canonical_url('/index.php?route=page&slug=' . urlencode($page['slug'])),
+                    'description' => $summary,
+                    'inLanguage' => PRIMARY_LANGUAGE,
+                ],
+            ],
+        ];
         view('pages/show', [
             'settings' => $settings,
             'page' => $page,
             'activePageSlug' => $page['slug'],
+            'pageMeta' => $pageMeta,
         ]);
         break;
 
@@ -106,20 +233,89 @@ switch ($route) {
                 view('errors/404', ['settings' => $settings]);
                 break;
             }
+            $summary = trim($post['excerpt'] ?? mb_substr(strip_tags($post['content'] ?? ''), 0, 160));
+            $pageMeta = [
+                'title' => $post['title'],
+                'description' => $summary,
+                'breadcrumbs' => build_breadcrumbs([
+                    ['name' => 'Start', 'url' => canonical_url('/')],
+                    ['name' => 'Neuigkeiten', 'url' => canonical_url('/index.php?route=news')],
+                    ['name' => $post['title']],
+                ]),
+                'type' => 'article',
+                'og_type' => 'article',
+                'schema' => [
+                    [
+                        '@context' => 'https://schema.org',
+                        '@type' => 'Article',
+                        'headline' => $post['title'],
+                        'inLanguage' => PRIMARY_LANGUAGE,
+                        'author' => ['@type' => 'Organization', 'name' => ORG_NAME],
+                        'datePublished' => $post['published_at'] ?: $post['created_at'],
+                        'dateModified' => $post['updated_at'] ?? $post['published_at'] ?? $post['created_at'],
+                        'image' => [ORG_LOGO_URL],
+                        'mainEntityOfPage' => canonical_url('/index.php?route=news&slug=' . urlencode($post['slug'])),
+                        'description' => $summary,
+                    ],
+                ],
+            ];
             view('news/show', [
                 'settings' => $settings,
                 'post' => $post,
+                'pageMeta' => $pageMeta,
             ]);
         } else {
             $newsPosts = get_published_news($pdo);
-            view('news/index', compact('settings', 'newsPosts'));
+            $pageMeta = [
+                'title' => 'Neuigkeiten',
+                'description' => 'Aktuelle Meldungen, Pflege-Updates und Veranstaltungshinweise rund um unsere Bartagamen.',
+                'breadcrumbs' => build_breadcrumbs([
+                    ['name' => 'Start', 'url' => canonical_url('/')],
+                    ['name' => 'Neuigkeiten'],
+                ]),
+                'schema' => [
+                    [
+                        '@context' => 'https://schema.org',
+                        '@type' => 'Blog',
+                        'name' => 'FeroxZ Neuigkeiten',
+                        'url' => canonical_url('/index.php?route=news'),
+                        'inLanguage' => PRIMARY_LANGUAGE,
+                    ],
+                ],
+            ];
+            view('news/index', compact('settings', 'newsPosts', 'pageMeta'));
         }
         break;
 
     case 'care-guide':
         $settings = get_all_settings($pdo);
         $careArticles = get_published_care_articles($pdo);
-        view('care/index', compact('settings', 'careArticles'));
+        $itemListElements = [];
+        foreach (array_values($careArticles) as $index => $article) {
+            $itemListElements[] = [
+                '@type' => 'ListItem',
+                'position' => $index + 1,
+                'name' => $article['title'],
+                'url' => canonical_url('/index.php?route=care-article&slug=' . urlencode($article['slug'])),
+            ];
+        }
+        $pageMeta = [
+            'title' => 'Pflegeleitfaden Bartagame',
+            'description' => 'Komplette Pflegeanleitungen für Bartagamen inklusive Habitat, UV, Ernährung und Gesundheit.',
+            'breadcrumbs' => build_breadcrumbs([
+                ['name' => 'Start', 'url' => canonical_url('/')],
+                ['name' => 'Pflegeleitfaden'],
+            ]),
+            'schema' => [
+                [
+                    '@context' => 'https://schema.org',
+                    '@type' => 'ItemList',
+                    'name' => 'Pflegeleitfäden Bartagame',
+                    'itemListElement' => $itemListElements,
+                ],
+            ],
+        ];
+        view('care/index', compact('settings', 'careArticles', 'pageMeta'));
         break;
 
     case 'care-article':
@@ -131,10 +327,37 @@ switch ($route) {
             break;
         }
         $settings = get_all_settings($pdo);
+        $summary = trim($article['summary'] ?? mb_substr(strip_tags($article['content'] ?? ''), 0, 160));
+        $pageMeta = [
+            'title' => $article['title'],
+            'description' => $summary,
+            'breadcrumbs' => build_breadcrumbs([
+                ['name' => 'Start', 'url' => canonical_url('/')],
+                ['name' => 'Pflegeleitfaden', 'url' => canonical_url('/index.php?route=care-guide')],
+                ['name' => $article['title']],
+            ]),
+            'type' => 'article',
+            'og_type' => 'article',
+            'schema' => [
+                [
+                    '@context' => 'https://schema.org',
+                    '@type' => 'Article',
+                    'headline' => $article['title'],
+                    'inLanguage' => PRIMARY_LANGUAGE,
+                    'author' => ['@type' => 'Organization', 'name' => ORG_NAME],
+                    'datePublished' => $article['published_at'] ?: $article['created_at'],
+                    'dateModified' => $article['updated_at'] ?? $article['published_at'] ?? $article['created_at'],
+                    'image' => [ORG_LOGO_URL],
+                    'mainEntityOfPage' => canonical_url('/index.php?route=care-article&slug=' . urlencode($article['slug'])),
+                    'description' => $summary,
+                ],
+            ],
+        ];
         view('care/show', [
             'settings' => $settings,
             'article' => $article,
             'activeCareSlug' => $article['slug'],
+            'pageMeta' => $pageMeta,
         ]);
         break;
 
@@ -156,6 +379,25 @@ switch ($route) {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && $selectedSpecies && !empty($genes)) {
             $results = calculate_genetic_outcomes($genes, $parentSelections['parent1'], $parentSelections['parent2']);
         }
+        $pageMeta = [
+            'title' => 'Genetik Rechner',
+            'description' => 'Interaktiver Rechner für Bartagamen-Genetik zur Planung verantwortungsvoller Verpaarungen.',
+            'breadcrumbs' => build_breadcrumbs([
+                ['name' => 'Start', 'url' => canonical_url('/')],
+                ['name' => 'Genetik-Rechner'],
+            ]),
+            'schema' => [
+                [
+                    '@context' => 'https://schema.org',
+                    '@type' => 'SoftwareApplication',
+                    'name' => 'FeroxZ Genetik Rechner',
+                    'applicationCategory' => 'EducationApplication',
+                    'operatingSystem' => 'Web',
+                    'url' => canonical_url('/index.php?route=genetics'),
+                    'offers' => ['@type' => 'Offer', 'price' => '0', 'priceCurrency' => 'EUR'],
+                ],
+            ],
+        ];
         view('genetics/index', [
             'settings' => $settings,
             'speciesList' => $speciesList,
@@ -164,6 +406,7 @@ switch ($route) {
             'genes' => $genes,
             'parentSelections' => $parentSelections,
             'results' => $results,
+            'pageMeta' => $pageMeta,
         ]);
         break;
 

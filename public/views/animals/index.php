@@ -6,9 +6,12 @@
     </header>
     <div class="mt-10 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
         <?php foreach ($animals as $animal): ?>
-            <article class="flex h-full flex-col rounded-3xl border border-white/5 bg-night-900/70 p-6 shadow-lg shadow-black/30 transition hover:border-brand-400/60 hover:shadow-glow">
+            <article id="animal-<?= (int)$animal['id'] ?>" class="flex h-full flex-col rounded-3xl border border-white/5 bg-night-900/70 p-6 shadow-lg shadow-black/30 transition hover:border-brand-400/60 hover:shadow-glow">
                 <?php if (!empty($animal['image_path'])): ?>
-                    <img src="<?= BASE_URL . '/' . htmlspecialchars($animal['image_path']) ?>" alt="<?= htmlspecialchars($animal['name']) ?>" class="mb-4 h-48 w-full rounded-2xl object-cover" loading="lazy">
+                    <?= render_responsive_picture($animal['image_path'], $animal['name'] . ' – ' . $animal['species'], [
+                        'class' => 'mb-4 h-48 w-full rounded-2xl object-cover',
+                        'sizes' => '(max-width: 768px) 100vw, 320px',
+                    ]) ?>
                 <?php endif; ?>
                 <h3 class="text-xl font-semibold text-white">
                     <?= htmlspecialchars($animal['name']) ?>

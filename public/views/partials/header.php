@@ -1,9 +1,25 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="<?= htmlspecialchars($pageMeta['lang'] ?? 'de') ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($settings['site_title'] ?? APP_NAME) ?></title>
+    <title><?= htmlspecialchars($pageMeta['full_title'] ?? ($settings['site_title'] ?? SITE_NAME)) ?></title>
+    <link rel="canonical" href="<?= htmlspecialchars($pageMeta['canonical'] ?? canonical_url()) ?>">
+    <meta name="description" content="<?= htmlspecialchars($pageMeta['description'] ?? '') ?>">
+    <meta name="keywords" content="<?= htmlspecialchars(PRIMARY_TOPIC) ?>">
+    <meta name="theme-color" content="#0c0f12">
+    <meta property="og:site_name" content="<?= htmlspecialchars(SITE_NAME) ?>">
+    <meta property="og:title" content="<?= htmlspecialchars($pageMeta['og_title'] ?? '') ?>">
+    <meta property="og:description" content="<?= htmlspecialchars($pageMeta['og_description'] ?? '') ?>">
+    <meta property="og:url" content="<?= htmlspecialchars($pageMeta['canonical'] ?? canonical_url()) ?>">
+    <meta property="og:type" content="<?= htmlspecialchars($pageMeta['og_type'] ?? 'website') ?>">
+    <meta property="og:image" content="<?= htmlspecialchars($pageMeta['og_image'] ?? ORG_LOGO_URL) ?>">
+    <meta property="og:image:alt" content="<?= htmlspecialchars($pageMeta['og_image_alt'] ?? SITE_NAME) ?>">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<?= htmlspecialchars($pageMeta['og_title'] ?? '') ?>">
+    <meta name="twitter:description" content="<?= htmlspecialchars($pageMeta['og_description'] ?? '') ?>">
+    <meta name="twitter:image" content="<?= htmlspecialchars($pageMeta['og_image'] ?? ORG_LOGO_URL) ?>">
+    <link rel="alternate" hreflang="de" href="<?= htmlspecialchars($pageMeta['canonical'] ?? canonical_url()) ?>">
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
     <script>
         tailwind.config = {
@@ -34,6 +50,7 @@
     <link rel="stylesheet" href="<?= asset('style.css') ?>">
 </head>
 <body class="min-h-screen bg-gradient-to-br from-night-900 via-night-800 to-[#3d2517] font-sans text-slate-100">
+<a class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:bg-brand-500/90 focus:px-4 focus:py-2 focus:text-night-900 skip-link" href="#main">Zum Inhalt springen</a>
 <header class="sticky top-0 z-50 border-b border-white/5 bg-night-900/80 backdrop-blur">
     <div class="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
         <a href="<?= BASE_URL ?>/index.php" class="flex items-center gap-3">
@@ -181,4 +198,23 @@
         </nav>
     </div>
 </header>
-<main class="flex-1 pb-16 pt-12">
+<main id="main" role="main" class="flex-1 pb-16 pt-12">
+    <?php if (!empty($pageMeta['breadcrumbs'])): ?>
+        <nav aria-label="Brotkrumen" class="mx-auto mb-8 w-full max-w-7xl px-4 text-sm text-slate-300 sm:px-6 lg:px-8">
+            <ol class="flex flex-wrap items-center gap-2">
+                <?php $crumbCount = count($pageMeta['breadcrumbs']); ?>
+                <?php foreach ($pageMeta['breadcrumbs'] as $index => $crumb): ?>
+                    <li class="flex items-center gap-2">
+                        <?php if (!empty($crumb['url']) && $index < $crumbCount - 1): ?>
+                            <a href="<?= htmlspecialchars($crumb['url']) ?>" class="text-slate-300 hover:text-brand-200">
+                                <?= htmlspecialchars($crumb['name']) ?>
+                            </a>
+                            <span aria-hidden="true" class="text-slate-500">/</span>
+                        <?php else: ?>
+                            <span class="text-brand-200" aria-current="page"><?= htmlspecialchars($crumb['name']) ?></span>
+                        <?php endif; ?>
+                    </li>
+                <?php endforeach; ?>
+            </ol>
+        </nav>
+    <?php endif; ?>

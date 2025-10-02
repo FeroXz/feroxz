@@ -1085,3 +1085,18 @@ input[type="checkbox"] {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+:focus-visible {
+  outline: 2px solid rgba(241, 145, 77, 0.9);
+  outline-offset: 3px;
+}
+
+.skip-link {
+  clip: rect(1px, 1px, 1px, 1px);
+  clip-path: inset(50%);
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
