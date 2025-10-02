@@ -1,3 +1,4 @@
+
 <?php include __DIR__ . '/partials/header.php'; ?>
 <section class="section section--hero">
     <div class="section__inner">

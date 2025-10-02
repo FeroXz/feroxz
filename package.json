@@ -1,4 +1,4 @@
-{
+
   "name": "feroxz-site",
   "version": "1.0.0",
   "private": true,
@@ -13,5 +13,6 @@
     "@lhci/cli": "^0.11.0",
     "html-validator-cli": "^7.1.1",
     "node-fetch": "^3.3.2"
+
   }
 }

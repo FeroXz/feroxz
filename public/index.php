@@ -1,4 +1,5 @@
 <?php
+
 session_start();
 require_once __DIR__ . '/../app/bootstrap.php';
 
@@ -972,4 +973,5 @@ switch ($route) {
     default:
         http_response_code(404);
         view('errors/404', ['settings' => get_all_settings($pdo)]);
+
 }
