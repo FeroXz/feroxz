@@ -1,7 +1,17 @@
 <?php include __DIR__ . '/../partials/header.php'; ?>
-<section class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-<h1>Zuchtplanung</h1>
+<section class="admin-shell">
+<header class="admin-page-header">
+    <div>
+        <h1 class="admin-title">Zuchtplanung</h1>
+        <p class="admin-subtitle">Gestalte kommende Generationen deiner Pogona vitticeps mit klarer, temperaturstabiler Übersicht – von Plänen bis Verpaarungen.</p>
+    </div>
+    <div class="admin-meta">
+        <span class="badge">Zuchtlinie</span>
+        <span><?= count($breedingPlans) ?> aktive Pläne</span>
+    </div>
+</header>
 <?php include __DIR__ . '/nav.php'; ?>
+<div class="admin-section">
 <?php if ($flashSuccess): ?>
     <div class="alert alert-success" role="status" aria-live="polite"><?= htmlspecialchars($flashSuccess) ?></div>
 <?php endif; ?>
@@ -20,7 +30,7 @@
         }
     }
 ?>
-<div class="grid" style="grid-template-columns:2fr 1fr;gap:2rem;align-items:start;">
+<div class="admin-layout">
     <div class="card">
         <h2>Aktive Pläne</h2>
         <?php if (empty($breedingPlans)): ?>
@@ -65,8 +75,8 @@
                                     <li>
                                         <div class="plan-parent__title">
                                             <strong><?= htmlspecialchars($parent['parent_type'] === 'virtual' ? ($parent['name'] ?: 'Virtuell') : ($parent['animal_name'] ?? $parent['name'] ?? 'Unbenannt')) ?></strong>
-                                            <?php if ($parent['sex']): ?>
-                                                <span class="badge"><?= htmlspecialchars(strtoupper($parent['sex'])) ?></span>
+                                            <?php if (!empty($parent['sex'])): ?>
+                                                <?= render_sex_badge($parent['sex']) ?>
                                             <?php endif; ?>
                                         </div>
                                         <div class="text-muted">
@@ -118,7 +128,7 @@
             <button type="submit">Zuchtplan speichern</button>
         </form>
         <?php if (!empty($breedingPlans)): ?>
-            <hr style="margin:2rem 0;opacity:0.3;">
+            <hr class="admin-divider">
             <h3>Elterntier hinzufügen</h3>
             <form method="post">
                 <input type="hidden" name="form" value="parent">
@@ -157,9 +167,7 @@
                 <label>Name (für virtuelle Eltern)
                     <input type="text" name="name" value="">
                 </label>
-                <label>Geschlecht (m/w)
-                    <input type="text" name="sex" value="">
-                </label>
+                <?= render_gender_field('sex', $_POST['sex'] ?? null, ['id_base' => 'breeding-sex']) ?>
                 <label>Art / Lokalität
                     <input type="text" name="species" value="">
                 </label>
@@ -171,7 +179,7 @@
             </label>
                 <button type="submit">Elternteil speichern</button>
             </form>
-            <hr style="margin:2rem 0;opacity:0.3;">
+            <hr class="admin-divider">
             <h3>Verpaarung anlegen</h3>
             <form method="post" data-breeding-pair-form>
                 <input type="hidden" name="form" value="pair">
@@ -216,9 +224,7 @@
                             <label>Name
                                 <input type="text" name="parent_a_name">
                             </label>
-                            <label>Geschlecht (m/w)
-                                <input type="text" name="parent_a_sex">
-                            </label>
+                            <?= render_gender_field('parent_a_sex', $_POST['parent_a_sex'] ?? null, ['id_base' => 'parent-a-sex']) ?>
                             <label>Art / Lokalität
                                 <input type="text" name="parent_a_species">
                             </label>
@@ -263,9 +269,7 @@
                             <label>Name
                                 <input type="text" name="parent_b_name">
                             </label>
-                            <label>Geschlecht (m/w)
-                                <input type="text" name="parent_b_sex">
-                            </label>
+                            <?= render_gender_field('parent_b_sex', $_POST['parent_b_sex'] ?? null, ['id_base' => 'parent-b-sex']) ?>
                             <label>Art / Lokalität
                                 <input type="text" name="parent_b_species">
                             </label>
@@ -281,6 +285,7 @@
                 <button type="submit">Verpaarung speichern</button>
             </form>
         <?php endif; ?>
+</div>
 </div>
 </div>
 <script>
