@@ -6,13 +6,18 @@ function ensure_default_settings(PDO $pdo): void
         'site_tagline' => 'Spezialisierte Pflege für Bartagamen und Hakennasennattern',
         'hero_intro' => 'Entdecke unsere Leidenschaft für verantwortungsvolle Haltung und Zucht.',
         'adoption_intro' => 'Diese Tiere suchen ein liebevolles Zuhause. Kontaktiere uns für mehr Informationen.',
-        'footer_text' => '© ' . date('Y') . ' FeroxZ CMS — Version 3.0',
+        'footer_text' => 'FeroxZ Reptile Center – verantwortungsvolle Haltung und Genetikberatung',
         'contact_email' => 'info@example.com'
     ];
 
     foreach ($defaults as $key => $value) {
         $stmt = $pdo->prepare('INSERT OR IGNORE INTO settings(key, value) VALUES (:key, :value)');
         $stmt->execute(['key' => $key, 'value' => $value]);
+    }
+
+    $footer = get_setting($pdo, 'footer_text');
+    if ($footer !== '' && stripos($footer, 'version') !== false) {
+        set_setting($pdo, 'footer_text', $defaults['footer_text']);
     }
 }
 

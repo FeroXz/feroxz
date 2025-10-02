@@ -1,7 +1,17 @@
 <?php include __DIR__ . '/../partials/header.php'; ?>
-<section class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-<h1>Genetikverwaltung</h1>
+<section class="admin-shell">
+<header class="admin-page-header">
+    <div>
+        <h1 class="admin-title">Genetikverwaltung</h1>
+        <p class="admin-subtitle">Behalte komplexe Morph-Kombinationen und Arten im Griff – optimiert für präzise Pogona-Zuchtplanung.</p>
+    </div>
+    <div class="admin-meta">
+        <span class="badge">Genetik-Matrix</span>
+        <span><?= count($speciesList) ?> Arten · <?= count($genes ?? []) ?> Gene</span>
+    </div>
+</header>
 <?php include __DIR__ . '/nav.php'; ?>
+<div class="admin-section">
 <?php if ($flashSuccess): ?>
     <div class="alert alert-success" role="status" aria-live="polite"><?= htmlspecialchars($flashSuccess) ?></div>
 <?php endif; ?>
@@ -9,36 +19,38 @@
     <div class="alert alert-error" role="alert" aria-live="assertive"><?= htmlspecialchars($flashError) ?></div>
 <?php endif; ?>
 
-<div class="grid" style="grid-template-columns:2fr 1fr;gap:2rem;align-items:start;">
+<div class="admin-layout">
     <div class="card">
         <h2>Genetische Arten</h2>
         <?php if (empty($speciesList)): ?>
             <p>Noch keine Arten hinterlegt.</p>
         <?php else: ?>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Wissenschaftlich</th>
-                        <th>Slug</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($speciesList as $species): ?>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
                         <tr>
-                            <td><?= htmlspecialchars($species['name']) ?></td>
-                            <td><?= htmlspecialchars($species['scientific_name'] ?? '') ?></td>
-                            <td><?= htmlspecialchars($species['slug']) ?></td>
-                            <td style="display:flex;gap:0.5rem;flex-wrap:wrap;">
-                                <a class="btn btn-secondary" href="<?= BASE_URL ?>/index.php?route=admin/genetics&amp;species=<?= urlencode($species['slug']) ?>">Anzeigen</a>
-                                <a class="btn btn-secondary" href="<?= BASE_URL ?>/index.php?route=admin/genetics&amp;edit_species=<?= (int)$species['id'] ?>">Bearbeiten</a>
-                                <a class="btn btn-secondary" href="<?= BASE_URL ?>/index.php?route=admin/genetics&amp;delete_species=<?= (int)$species['id'] ?>" onclick="return confirm('Art wirklich löschen? Alle zugehörigen Gene werden entfernt.');">Löschen</a>
-                            </td>
+                            <th>Name</th>
+                            <th>Wissenschaftlich</th>
+                            <th>Slug</th>
+                            <th></th>
                         </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($speciesList as $species): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($species['name']) ?></td>
+                                <td><?= htmlspecialchars($species['scientific_name'] ?? '') ?></td>
+                                <td><?= htmlspecialchars($species['slug']) ?></td>
+                                <td class="table-actions">
+                                    <a class="btn btn-secondary" href="<?= BASE_URL ?>/index.php?route=admin/genetics&amp;species=<?= urlencode($species['slug']) ?>">Anzeigen</a>
+                                    <a class="btn btn-secondary" href="<?= BASE_URL ?>/index.php?route=admin/genetics&amp;edit_species=<?= (int)$species['id'] ?>">Bearbeiten</a>
+                                    <a class="btn btn-secondary" href="<?= BASE_URL ?>/index.php?route=admin/genetics&amp;delete_species=<?= (int)$species['id'] ?>" onclick="return confirm('Art wirklich löschen? Alle zugehörigen Gene werden entfernt.');">Löschen</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
         <?php endif; ?>
     </div>
     <div class="card">
@@ -65,15 +77,17 @@
     </div>
 </div>
 
-<section style="margin-top:3rem;">
+</div>
+
+<section class="admin-section">
     <h2>Gene verwalten</h2>
     <?php if (empty($speciesList)): ?>
         <div class="card">
             <p>Lege zuerst eine Art an, um Gene zu verwalten.</p>
         </div>
     <?php else: ?>
-        <div class="card" style="margin-bottom:1.5rem;">
-            <form method="get" style="display:flex;gap:1rem;align-items:flex-end;flex-wrap:wrap;">
+        <div class="card">
+            <form method="get" class="admin-toolbar">
                 <input type="hidden" name="route" value="admin/genetics">
                 <label>Art auswählen
                     <select name="species" onchange="this.form.submit()">
@@ -89,54 +103,56 @@
             <?php if ($selectedSpecies): ?>
                 <p class="text-muted">Aktiv: <?= htmlspecialchars($selectedSpecies['name']) ?><?= $selectedSpecies['scientific_name'] ? ' (' . htmlspecialchars($selectedSpecies['scientific_name']) . ')' : '' ?></p>
                 <?php if (!empty($selectedSpecies['description'])): ?>
-                    <div class="rich-text-content" style="margin-top:0.75rem;">
+                    <div class="rich-text-content gene-legend">
                         <?= render_rich_text($selectedSpecies['description']) ?>
                     </div>
                 <?php endif; ?>
             <?php endif; ?>
         </div>
 
-        <div class="grid" style="grid-template-columns:2fr 1fr;gap:2rem;align-items:start;">
+        <div class="admin-layout">
             <div class="card">
                 <h3>Gene der Art</h3>
                 <?php if (empty($genes)): ?>
                     <p>Noch keine Gene angelegt.</p>
                 <?php else: ?>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Kürzel</th>
-                                <th>Vererbung</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($genes as $gene): ?>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
                                 <tr>
-                                    <td>
-                                        <strong><?= htmlspecialchars($gene['name']) ?></strong><br>
-                                        <small class="text-muted">Slug: <?= htmlspecialchars($gene['slug']) ?></small>
-                                    </td>
-                                    <td><?= htmlspecialchars($gene['shorthand'] ?? '') ?></td>
-                                    <td>
-                                        <?php
-                                            $modeLabels = [
-                                                'recessive' => 'rezessiv',
-                                                'dominant' => 'dominant',
-                                                'incomplete_dominant' => 'inkomplett dominant',
-                                            ];
-                                        ?>
-                                        <?= htmlspecialchars($modeLabels[$gene['inheritance_mode']] ?? $gene['inheritance_mode']) ?>
-                                    </td>
-                                    <td style="display:flex;gap:0.5rem;flex-wrap:wrap;">
-                                        <a class="btn btn-secondary" href="<?= BASE_URL ?>/index.php?route=admin/genetics&amp;edit_gene=<?= (int)$gene['id'] ?>">Bearbeiten</a>
-                                        <a class="btn btn-secondary" href="<?= BASE_URL ?>/index.php?route=admin/genetics&amp;delete_gene=<?= (int)$gene['id'] ?>" onclick="return confirm('Gen wirklich löschen?');">Löschen</a>
-                                    </td>
+                                    <th>Name</th>
+                                    <th>Kürzel</th>
+                                    <th>Vererbung</th>
+                                    <th></th>
                                 </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($genes as $gene): ?>
+                                    <tr>
+                                        <td>
+                                            <strong><?= htmlspecialchars($gene['name']) ?></strong><br>
+                                            <small class="text-muted">Slug: <?= htmlspecialchars($gene['slug']) ?></small>
+                                        </td>
+                                        <td><?= htmlspecialchars($gene['shorthand'] ?? '') ?></td>
+                                        <td>
+                                            <?php
+                                                $modeLabels = [
+                                                    'recessive' => 'rezessiv',
+                                                    'dominant' => 'dominant',
+                                                    'incomplete_dominant' => 'inkomplett dominant',
+                                                ];
+                                            ?>
+                                            <?= htmlspecialchars($modeLabels[$gene['inheritance_mode']] ?? $gene['inheritance_mode']) ?>
+                                        </td>
+                                        <td class="table-actions">
+                                            <a class="btn btn-secondary" href="<?= BASE_URL ?>/index.php?route=admin/genetics&amp;edit_gene=<?= (int)$gene['id'] ?>">Bearbeiten</a>
+                                            <a class="btn btn-secondary" href="<?= BASE_URL ?>/index.php?route=admin/genetics&amp;delete_gene=<?= (int)$gene['id'] ?>" onclick="return confirm('Gen wirklich löschen?');">Löschen</a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 <?php endif; ?>
             </div>
             <div class="card">
