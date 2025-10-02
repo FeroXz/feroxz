@@ -75,8 +75,8 @@
                                     <li>
                                         <div class="plan-parent__title">
                                             <strong><?= htmlspecialchars($parent['parent_type'] === 'virtual' ? ($parent['name'] ?: 'Virtuell') : ($parent['animal_name'] ?? $parent['name'] ?? 'Unbenannt')) ?></strong>
-                                            <?php if ($parent['sex']): ?>
-                                                <span class="badge"><?= htmlspecialchars(strtoupper($parent['sex'])) ?></span>
+                                            <?php if (!empty($parent['sex'])): ?>
+                                                <?= render_sex_badge($parent['sex']) ?>
                                             <?php endif; ?>
                                         </div>
                                         <div class="text-muted">
@@ -167,9 +167,7 @@
                 <label>Name (für virtuelle Eltern)
                     <input type="text" name="name" value="">
                 </label>
-                <label>Geschlecht (m/w)
-                    <input type="text" name="sex" value="">
-                </label>
+                <?= render_gender_field('sex', $_POST['sex'] ?? null, ['id_base' => 'breeding-sex']) ?>
                 <label>Art / Lokalität
                     <input type="text" name="species" value="">
                 </label>
@@ -226,9 +224,7 @@
                             <label>Name
                                 <input type="text" name="parent_a_name">
                             </label>
-                            <label>Geschlecht (m/w)
-                                <input type="text" name="parent_a_sex">
-                            </label>
+                            <?= render_gender_field('parent_a_sex', $_POST['parent_a_sex'] ?? null, ['id_base' => 'parent-a-sex']) ?>
                             <label>Art / Lokalität
                                 <input type="text" name="parent_a_species">
                             </label>
@@ -273,9 +269,7 @@
                             <label>Name
                                 <input type="text" name="parent_b_name">
                             </label>
-                            <label>Geschlecht (m/w)
-                                <input type="text" name="parent_b_sex">
-                            </label>
+                            <?= render_gender_field('parent_b_sex', $_POST['parent_b_sex'] ?? null, ['id_base' => 'parent-b-sex']) ?>
                             <label>Art / Lokalität
                                 <input type="text" name="parent_b_species">
                             </label>

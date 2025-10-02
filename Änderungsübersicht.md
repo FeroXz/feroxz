@@ -13,10 +13,12 @@
 ## Accessibility
 - Skip-Link, verbesserte Fokusdarstellung und `aria`-optimierte Navigation.
 - Inhaltsverzeichnis + Lesedauer in Pflegeartikeln.
+- Geschlechtsauswahl in allen Tierformularen mit tastaturbedienbaren Icon-Optionen.
 
 ## UX & IA
 - Startseiten-Hero mit drei zentralen CTAs, Kennzahlen und Vertrauenssektion.
 - Vereinheitlichte Tier- und Vermittlungskarten mit responsiven Bildern und klaren Metadaten.
+- Adminbereich mit optimierter Shell für Desktop und Mobile inklusive breiter Tabellen und Formular-Gitter.
 
 ## Infrastruktur & QA
 - Health-Endpoint (`/index.php?route=healthz`) für Monitoring.

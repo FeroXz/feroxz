@@ -28,6 +28,7 @@
                     <th>Name</th>
                     <th>Species</th>
                     <th>Eigentümer</th>
+                    <th>Geschlecht</th>
                     <th>Status</th>
                     <th></th>
                 </tr>
@@ -43,6 +44,10 @@
                         </td>
                         <td><?= htmlspecialchars($animal['species']) ?></td>
                         <td><?= htmlspecialchars($animal['owner_name'] ?? '–') ?></td>
+                        <td>
+                            <?php $sexBadge = render_sex_badge($animal['sex'] ?? null); ?>
+                            <?= $sexBadge ?: "<span class='text-muted'>–</span>" ?>
+                        </td>
                         <td>
                             <?php if ($animal['is_private']): ?>
                                 <span class="badge">Privat</span>
@@ -79,6 +84,7 @@
             <label>Alter
                 <input type="text" name="age" value="<?= htmlspecialchars($editAnimal['age'] ?? '') ?>">
             </label>
+            <?= render_gender_field('sex', $editAnimal['sex'] ?? null, ['id_base' => 'animal-sex', 'required' => true]) ?>
             <label>Genetik
                 <textarea name="genetics" class="rich-text"><?= htmlspecialchars($editAnimal['genetics'] ?? '') ?></textarea>
             </label>

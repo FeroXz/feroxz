@@ -551,6 +551,7 @@ switch ($route) {
             $data['origin'] = trim($data['origin'] ?? '');
             $data['special_notes'] = $data['special_notes'] ?? null;
             $data['description'] = $data['description'] ?? null;
+            $data['sex'] = normalize_sex($data['sex'] ?? null);
             $data['genetics'] = $data['genetics'] ?? null;
             $data['is_private'] = isset($_POST['is_private']);
             $data['is_showcased'] = isset($_POST['is_showcased']);
@@ -609,7 +610,7 @@ switch ($route) {
                         'parent_type' => $parentType === 'virtual' ? 'virtual' : 'animal',
                         'animal_id' => $_POST['animal_id'] ?? null,
                         'name' => trim($_POST['name'] ?? ''),
-                        'sex' => trim($_POST['sex'] ?? ''),
+                        'sex' => normalize_sex($_POST['sex'] ?? null),
                         'species' => trim($_POST['species'] ?? ''),
                         'genetics' => trim($_POST['genetics'] ?? ''),
                         'notes' => $_POST['notes'] ?? null,
@@ -637,7 +638,7 @@ switch ($route) {
                             'parent_type' => $type === 'virtual' ? 'virtual' : 'animal',
                             'animal_id' => $_POST[$prefix . '_animal_id'] ?? null,
                             'name' => trim($_POST[$prefix . '_name'] ?? ''),
-                            'sex' => trim($_POST[$prefix . '_sex'] ?? ''),
+                            'sex' => normalize_sex($_POST[$prefix . '_sex'] ?? null),
                             'species' => trim($_POST[$prefix . '_species'] ?? ''),
                             'genetics' => trim($_POST[$prefix . '_genetics'] ?? ''),
                             'notes' => $_POST[$prefix . '_notes'] ?? null,
@@ -715,6 +716,7 @@ switch ($route) {
         }
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = $_POST;
+            $data['sex'] = normalize_sex($data['sex'] ?? null);
             if (!empty($_FILES['image']['name'])) {
                 $upload = handle_upload($_FILES['image']);
                 if ($upload) {

@@ -20,6 +20,11 @@
                     <?php endif; ?>
                 </h3>
                 <p class="text-sm text-slate-300"><?= htmlspecialchars($animal['species']) ?></p>
+                <?php if ($badge = render_sex_badge($animal['sex'] ?? null, ['class' => 'badge-gender--inline'])): ?>
+                    <div class="mt-2 inline-flex">
+                        <?= $badge ?>
+                    </div>
+                <?php endif; ?>
                 <?php if (!empty($animal['age'])): ?>
                     <p class="mt-2 text-sm text-slate-200"><strong>Alter:</strong> <?= htmlspecialchars($animal['age']) ?></p>
                 <?php endif; ?>

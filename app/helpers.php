@@ -101,6 +101,81 @@ function absolute_url(string $path = ''): string
     return 'https://' . SITE_DOMAIN . $cleanPath;
 }
 
+function get_gender_options(): array
+{
+    return [
+        'female' => ['label' => 'Weiblich', 'icon' => '♀'],
+        'male' => ['label' => 'Männlich', 'icon' => '♂'],
+        'unknown' => ['label' => 'Unbekannt', 'icon' => '⚲'],
+    ];
+}
+
+function normalize_sex(?string $value): string
+{
+    $normalized = strtolower(trim((string)$value));
+    $options = get_gender_options();
+    return array_key_exists($normalized, $options) ? $normalized : 'unknown';
+}
+
+function render_gender_field(string $name, ?string $value = null, array $options = []): string
+{
+    $legend = $options['legend'] ?? 'Geschlecht';
+    $idBase = preg_replace('/[^a-z0-9_-]/i', '_', $options['id_base'] ?? $name);
+    $required = !empty($options['required']) ? ' required' : '';
+    $current = normalize_sex($value);
+    $fieldsetClasses = trim('gender-field ' . ($options['class'] ?? ''));
+    $choiceClass = trim('gender-choice ' . ($options['choice_class'] ?? ''));
+
+    $html = '<fieldset class="' . htmlspecialchars($fieldsetClasses, ENT_QUOTES) . '">';
+    $html .= '<legend>' . htmlspecialchars($legend, ENT_QUOTES) . '</legend>';
+    $html .= '<div class="gender-options">';
+
+    foreach (get_gender_options() as $key => $meta) {
+        $id = $idBase . '-' . $key;
+        $checked = $current === $key ? ' checked' : '';
+        $html .= '<label class="' . htmlspecialchars($choiceClass, ENT_QUOTES) . '">';
+        $html .= '<input class="sr-only" type="radio" id="' . htmlspecialchars($id, ENT_QUOTES) . '" name="' . htmlspecialchars($name, ENT_QUOTES) . '" value="' . htmlspecialchars($key, ENT_QUOTES) . '"' . $checked . $required . '>';
+        $html .= '<span class="gender-choice__content">';
+        $html .= '<span class="gender-choice__icon" aria-hidden="true">' . htmlspecialchars($meta['icon'], ENT_QUOTES) . '</span>';
+        $html .= '<span class="gender-choice__label">' . htmlspecialchars($meta['label'], ENT_QUOTES) . '</span>';
+        $html .= '</span>';
+        $html .= '</label>';
+    }
+
+    $html .= '</div>';
+    $html .= '</fieldset>';
+
+    return $html;
+}
+
+function render_sex_badge(?string $value, array $options = []): string
+{
+    if ($value === null || $value === '') {
+        return '';
+    }
+
+    $sex = normalize_sex($value);
+    $genderOptions = get_gender_options();
+    if (!isset($genderOptions[$sex])) {
+        return '';
+    }
+
+    $meta = $genderOptions[$sex];
+    $tag = $options['tag'] ?? 'span';
+    $classes = trim('badge badge-gender ' . ($options['class'] ?? ''));
+    $label = $meta['label'];
+    $icon = $meta['icon'];
+
+    return sprintf(
+        '<%1$s class="%2$s" aria-label="%3$s" title="%3$s">%4$s %5$s</%1$s>',
+        $tag,
+        htmlspecialchars($classes, ENT_QUOTES),
+        htmlspecialchars($label, ENT_QUOTES),
+        htmlspecialchars($icon, ENT_QUOTES),
+        htmlspecialchars($label, ENT_QUOTES)
+    );
+}
+
 function build_page_meta(array $overrides = [], array $settings = []): array
 {
     $path = $overrides['path'] ?? (parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/');

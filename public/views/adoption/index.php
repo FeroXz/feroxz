@@ -31,6 +31,11 @@
                 <?php if (!empty($listing['species'])): ?>
                     <p class="text-sm text-slate-300"><?= htmlspecialchars($listing['species']) ?></p>
                 <?php endif; ?>
+                <?php if ($badge = render_sex_badge($listing['sex'] ?? null, ['class' => 'badge-gender--inline'])): ?>
+                    <div class="mt-2 inline-flex">
+                        <?= $badge ?>
+                    </div>
+                <?php endif; ?>
                 <?php if (!empty($listing['genetics'])): ?>
                     <p class="mt-2 rounded-xl border border-brand-400/40 bg-brand-500/10 px-3 py-2 text-sm text-brand-100">
                         <span class="font-semibold uppercase tracking-wide">Genetik:</span>

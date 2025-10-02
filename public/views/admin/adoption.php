@@ -23,6 +23,7 @@
             <thead>
                 <tr>
                     <th>Titel</th>
+                    <th>Geschlecht</th>
                     <th>Status</th>
                     <th>Preis</th>
                     <th></th>
@@ -32,6 +33,10 @@
                 <?php foreach ($listings as $listing): ?>
                     <tr>
                         <td><?= htmlspecialchars($listing['title']) ?></td>
+                        <td>
+                            <?php $sexBadge = render_sex_badge($listing['sex'] ?? null); ?>
+                            <?= $sexBadge ?: "<span class='text-muted'>–</span>" ?>
+                        </td>
                         <td><?= htmlspecialchars($listing['status']) ?></td>
                         <td><?= htmlspecialchars($listing['price'] ?? 'n/a') ?></td>
                         <td>
@@ -64,6 +69,7 @@
             <label>Art
                 <input type="text" name="species" value="<?= htmlspecialchars($editListing['species'] ?? '') ?>">
             </label>
+            <?= render_gender_field('sex', $editListing['sex'] ?? null, ['id_base' => 'listing-sex', 'required' => true]) ?>
             <label>Preis
                 <input type="text" name="price" value="<?= htmlspecialchars($editListing['price'] ?? '') ?>">
             </label>
