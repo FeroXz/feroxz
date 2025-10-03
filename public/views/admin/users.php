@@ -1,13 +1,24 @@
 <?php include __DIR__ . '/../partials/header.php'; ?>
-<section class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-<h1>Benutzerverwaltung</h1>
+<section class="admin-shell">
+<header class="admin-page-header">
+    <div>
+        <h1 class="admin-title">Benutzerverwaltung</h1>
+        <p class="admin-subtitle">Stelle dein Terrarium-Team zusammen und verteile Zugänge mit wenigen warmen Klicks.</p>
+    </div>
+    <div class="admin-meta">
+        <span class="badge">Teamstruktur</span>
+        <span><?= count($users) ?> Mitglieder</span>
+    </div>
+</header>
 <?php include __DIR__ . '/nav.php'; ?>
+<div class="admin-section">
 <?php if ($flashSuccess): ?>
     <div class="alert alert-success" role="status" aria-live="polite"><?= htmlspecialchars($flashSuccess) ?></div>
 <?php endif; ?>
-<div class="grid" style="grid-template-columns:2fr 1fr;gap:2rem;align-items:start;">
+<div class="admin-layout">
     <div class="card">
-        <table class="table">
+        <div class="table-responsive">
+            <table class="table">
             <thead>
                 <tr>
                     <th>Benutzername</th>
@@ -35,7 +46,8 @@
                     </tr>
                 <?php endforeach; ?>
             </tbody>
-        </table>
+            </table>
+        </div>
     </div>
     <div class="card">
         <h2><?= $editUser ? 'Benutzer bearbeiten' : 'Benutzer anlegen' ?></h2>
@@ -55,12 +67,22 @@
                     <option value="staff" <?= (($editUser['role'] ?? '') === 'staff') ? 'selected' : '' ?>>Staff</option>
                 </select>
             </label>
-            <label><input type="checkbox" name="can_manage_animals" value="1" <?= !empty($editUser['can_manage_animals']) ? 'checked' : '' ?>> Tiere verwalten</label>
-            <label><input type="checkbox" name="can_manage_settings" value="1" <?= !empty($editUser['can_manage_settings']) ? 'checked' : '' ?>> Einstellungen bearbeiten</label>
-            <label><input type="checkbox" name="can_manage_adoptions" value="1" <?= !empty($editUser['can_manage_adoptions']) ? 'checked' : '' ?>> Adoption verwalten</label>
+            <label class="form-switch">
+                <input type="checkbox" name="can_manage_animals" value="1" <?= !empty($editUser['can_manage_animals']) ? 'checked' : '' ?>>
+                <span>Tiere verwalten</span>
+            </label>
+            <label class="form-switch">
+                <input type="checkbox" name="can_manage_settings" value="1" <?= !empty($editUser['can_manage_settings']) ? 'checked' : '' ?>>
+                <span>Einstellungen bearbeiten</span>
+            </label>
+            <label class="form-switch">
+                <input type="checkbox" name="can_manage_adoptions" value="1" <?= !empty($editUser['can_manage_adoptions']) ? 'checked' : '' ?>>
+                <span>Adoption verwalten</span>
+            </label>
             <button type="submit">Speichern</button>
         </form>
     </div>
+</div>
 </div>
 </section>
 <?php include __DIR__ . '/../partials/footer.php'; ?>
